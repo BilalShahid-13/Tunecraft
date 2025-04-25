@@ -1,0 +1,25 @@
+ <TabsContent value="1">
+          <div className="text-center">
+            <QuestionCard onNext={handleNext} onPrev={handlePrev} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="2">
+          <div className="text-center">
+            <Step2 onNext={handleNext} onPrev={handlePrev} />
+          </div>
+        </TabsContent>
+        <TabsContent value="3">
+          <div className="text-center">
+            <div className="flex justify-between w-full">
+              <Plan onNext={handleNext} onPrev={handlePrev} />
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="4">
+          <div className="text-center">
+            <div className="flex justify-between w-full">
+              <MusicTemplate onNext={handleNext} onPrev={handlePrev} />
+            </div>
+          </div>
+        </TabsContent>
