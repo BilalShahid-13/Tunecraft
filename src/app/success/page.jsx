@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import axios from 'axios';
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from 'react';
 import { toast } from "sonner";
 export default function page() {

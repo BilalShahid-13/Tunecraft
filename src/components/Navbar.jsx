@@ -41,13 +41,13 @@ function Navbar() {
       flex flex-row justify-center max-lg:hidden
       max-xl:hidden
         gap-24 items-center text-lg font-medium `}>
-        {location !== '/Questions' || location !== '/Register' && NavbarItem.map((item, index) => (
+        {(location !== ('/Questions' || '/Register')) && NavbarItem.map((item, index) => (
           <Link href={item.route} key={index}
             className={`${active === index ? 'text-white' : 'text-[#919191]'}`}
             onClick={() => setActive(index)}>{item.name}</Link>
         ))}
       </div>
-      {location !== '/Questions' || location !== 'Register' && !isDesktop && <DropdownMenu
+      {(location !== ('/Questions' || '/Register')) && !isDesktop && <DropdownMenu
         className={`max-sm:flex max-md:flex
       hidden max-lg:flex xl:hidden`}
         style={{ position: 'relative' }}>
