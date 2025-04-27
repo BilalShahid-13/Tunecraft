@@ -75,3 +75,11 @@ export default function Page() {
     </div>
   );
 }
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
+  );
+}
