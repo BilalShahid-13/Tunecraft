@@ -1,5 +1,4 @@
 "use client";
-import Congrats from '@/components/Congrats';
 import { Confetti } from '@/components/magicui/confetti';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,28 +9,30 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import useQuestionStore from '@/store/questionStore';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 export default function AlmostDone({ onNext, onPrev }) {
   const { formData } = useQuestionStore();
   const [data, setData] = useState(null);
   const confettiRef = useRef(null);
+  const navigate = useRouter()
   const [buttonOnClick, setButtonOnClick] = useState(false)
-  console.log(formData.step3);
-
+  const [price, SetPrice] = useState(0)
   useEffect(() => {
     if (formData) {
+      const numericPrice = Number(formData.step3.planPrice.replace('$', '')); // 2.299
       setData(formData.step3);
+      SetPrice(numericPrice)
     }
   }, [formData]);
 
+  console.log(formData)
+
   // Function to trigger confetti on button click
   const handleProceedToPayment = () => {
-    //   console.log('loggin')
+    navigate.push('/Payment')
     setButtonOnClick(!buttonOnClick)
-    // if (confettiRef.current) {
-    //   confettiRef.current.fire(); // Fire confetti animation
-    // }
   };
 
   useEffect(() => {
@@ -62,23 +63,27 @@ export default function AlmostDone({ onNext, onPrev }) {
           <CardContent className={'flex flex-col gap-1'}>
             <div className='flex flex-row justify-between items-center'>
               <h2 className='font-semibold text-xl'>Total:</h2>
-              <h2 className='font-bold text-xl text-[#FF7E6E]'>$1050.75</h2>
+              <h2 className='font-bold text-xl text-[#FF7E6E]'>${price}</h2>
             </div>
           </CardContent>
         </Card>
-        <Button
-          className={'bg-[#FF7E6E] hover:bg-red-400 text-white text-sm font-normal py-5 w-full z-20'}
-          onClick={handleProceedToPayment} // Trigger confetti when clicking button
-        >
-          Proceed to Payment
-        </Button>
-        <Button
-          className={'border-[#B0B0B0] max-sm:w-full border-[1px] px-5 hover:bg-neutral-900 cursor-pointer bg-transparent text-white text-sm font-normal py-5'}
-          onClick={() => onPrev()}
-        >
-          Back
-        </Button>
-      </div>
+
+      </div >
+      <Button
+        className={'my-3 bg-[#FF7E6E] hover:bg-red-400 text-white text-sm font-normal py-5 w-full z-20'}
+        onClick={handleProceedToPayment} // Trigger confetti when clicking button
+      >
+        Proceed to Payment
+      </Button>
+      <Button
+        className={'my-3 border-[#B0B0B0] max-sm:w-full border-[1px] px-5 hover:bg-neutral-900 cursor-pointer bg-transparent text-white text-sm font-normal py-5'}
+        onClick={(e) => {
+          e.preventDefault();
+          onPrev();
+        }}
+      >
+        Back
+      </Button>
 
       {/* <Congrats buttonClick={buttonOnClick} /> */}
 

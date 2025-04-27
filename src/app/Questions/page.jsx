@@ -1,16 +1,13 @@
 "use client";
 import Stepper from '@/components/Stepper';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import axios from 'axios';
 import { useEffect, useState } from 'react';
+import AlmostDone from './_components/AlmostDone';
+import MusicTemplate from './_components/MusicTemplate';
+import Plan from './_components/Plan';
 import QuestionCard from './_components/QuestionCard';
 import Step2 from './_components/Step2';
-import { dbConnect } from '@/lib/dbConnect';
-import { connect } from 'mongoose';
-import axios from 'axios';
-import { Button } from '@/components/ui/button';
-import Plan from './_components/Plan';
-import MusicTemplate from './_components/MusicTemplate';
-import AlmostDone from './_components/AlmostDone';
 
 
 const CustomTabComponent = ({ onNext, onPrev, Component }) => {
@@ -26,7 +23,7 @@ export default function Page() {
     Step2,
     Plan,
     MusicTemplate,
-    AlmostDone
+    AlmostDone,
   ]
   const [currentTab, setCurrentTab] = useState(1);
   const [activeStep, setActiveStep] = useState(0);
@@ -41,6 +38,7 @@ export default function Page() {
     const currentIndex = Items.indexOf(currentTab);
     const prevIndex = Math.max(currentIndex - 1, 0);
     setCurrentTab(Items[prevIndex]);
+    console.log('Prev clicked', prevIndex); // Add logging
   };
 
   useEffect(() => {
@@ -54,7 +52,7 @@ export default function Page() {
 
       }
     }
-    // ConnectDB()
+    ConnectDB()
   }, [])
 
 

@@ -65,13 +65,14 @@ const orderSchema = new Schema(
       },
       price: {
         type: Number,
-        enum: price,
+        // enum: price,
         required: [true, "Price is required"],
       },
     },
     musicTemplate: {
       type: String,
       enum: musicGenre,
+      required: false,
     },
   },
   {
@@ -79,4 +80,5 @@ const orderSchema = new Schema(
   }
 );
 
-export default userSchema.models.User || mongoose.model("Order", orderSchema);
+const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
+export default Order;

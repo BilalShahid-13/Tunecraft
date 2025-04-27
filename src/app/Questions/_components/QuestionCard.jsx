@@ -16,21 +16,22 @@ export default function QuestionCard({ onNext, onPrev }) {
   const { setSelected, selectedIndex, onSubmitted, formData } = useQuestionStore()
 
   useEffect(() => {
-    setSelectedCard(selectedIndex);
-  }, [selectedIndex]);
+    if (formData) {
+      setSelectedCard(formData.step1.step);
+    }
+  }, [formData]);
 
   const OnSubmit = (index, items) => {
     setSelected(false)
     console.log(selectedCard, index)
     setSelected({ disabled: false, index: index });
     onSubmitted(1, {
+      step: index,
       question: items.question,
       des: items.des,
     })
   }
 
-
-  console.log(selectedIndex)
   return (
     <div className="font-inter flex flex-col gap-4 max-sm:justify-center max-sm:items-center">
       <div className="font-inter flex flex-col font-semibold

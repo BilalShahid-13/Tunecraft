@@ -9,18 +9,31 @@ import {
 } from "@/components/ui/card";
 import { TunesItem } from '@/lib/Constant';
 import useQuestionStore from "@/store/questionStore";
+import { useEffect, useState } from "react";
 
 export default function Plan({ onNext, onPrev }) {
-  const { setSelected, selectedIndex, onSubmitted, } = useQuestionStore();
+  const [selectedCard, setSelectedCard] = useState(null)
+  const { setSelected, selectedIndex, onSubmitted, formData } = useQuestionStore();
+
+  useEffect(() => {
+    if (formData) {
+      setSelectedCard(formData.step3.step);
+    }
+  }, [formData]);
 
   const OnSubmit = (index, items) => {
     setSelected({ disabled: false, index: index });
     onSubmitted(3, {
+      step: index,
       planPrice: items.price,
       placeName: items.heading,
       points: items.points
     })
   }
+
+  console.log('====================================');
+  console.log(selectedIndex);
+  console.log('====================================');
 
   return (
     <div className='flex flex-col justify-start items-start gap-5 w-full
@@ -39,7 +52,7 @@ export default function Plan({ onNext, onPrev }) {
             }}
             className={`w-[450px] max-sm:w-full h-full flex justify-start items-start
                max-sm:justify-center max-sm:items-center
-            ${selectedIndex === index ? 'border-[1px] border-[#FF7E6E]' : ''}
+            ${selectedCard === index ? 'border-[1px] border-[#FF7E6E]' : ''}
             transition duration-200 ease-in cursor-pointer`}>
             <CardHeader className={'w-full justify-start items-start'}>
               <CardTitle className={'font-normal text-3xl'}>{items.heading}</CardTitle>
@@ -68,7 +81,7 @@ export default function Plan({ onNext, onPrev }) {
           Back
         </Button>
         <Button
-          disabled={selectedIndex === null ? true : false}
+          disabled={selectedCard >= 0 ? false : true}
           type="submit"
           onClick={() => onNext()}
           className="px-4 py-2 bg-[#FF7E6E] text-white

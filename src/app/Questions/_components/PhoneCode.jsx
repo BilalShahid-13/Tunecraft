@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import codes from "country-calling-code"; // This should contain your country objects
 import Image from "next/image";
 import React, { useState } from "react";
@@ -39,7 +40,7 @@ const OptimizedSelectItem = React.memo(({ index, style, data, onSelect }) => {
   );
 });
 
-export default function PhoneCode() {
+export default function PhoneCode({ className }) {
   const [selectedCode, setSelectedCode] = useState(""); // Store selected country code (isoCode2)
 
   // Handle value change for the dropdown
@@ -58,7 +59,7 @@ export default function PhoneCode() {
     <div>
       <Select className="py-9"
         onValueChange={handleValueChange} value={selectedCode}>
-        <SelectTrigger className="w-[120px] py-5">
+        <SelectTrigger className={cn(`w-[120px] py-5`, className)}>
           {/* Display the flag and dial code as the placeholder */}
           {selectedCountry ? (
             <SelectValue>
