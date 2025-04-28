@@ -15,7 +15,6 @@ import { useEffect } from 'react';
 import { toast } from "sonner";
 export default function page() {
   const navigate = useRouter()
-    const { formData } = useQuestionStore();
 
   // const searchParams = useSearchParams();
   // const email = searchParams.get('email');
