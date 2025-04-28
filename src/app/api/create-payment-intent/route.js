@@ -28,9 +28,7 @@ export async function POST(request) {
       });
       const response = await orderSchema.save();
       if (response) {
-        return NextResponse.json({ msg: "Order created successfully" }).status(
-          200
-        );
+        return NextResponse.json({ msg: "Order created successfully" });
       }
     }
     return NextResponse.json({

@@ -15,6 +15,8 @@ import { useEffect } from 'react';
 import { toast } from "sonner";
 export default function page() {
   const navigate = useRouter()
+    const { formData } = useQuestionStore();
+
   // const searchParams = useSearchParams();
   // const email = searchParams.get('email');
 
@@ -37,7 +39,7 @@ export default function page() {
 
       }
     }
-    fetchData()
+    // fetchData()
   }, [])
   return (
     <div className="flex justify-center items-center">

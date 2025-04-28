@@ -225,7 +225,7 @@ export default function Work() {
       <MusicImage cn={'top-0 -z-10 w-6 h-6 right-[20%] top-[40vh] max-md:right-[10%] max-md:top-[55vh]'} />
       <MusicImage cn={'top-0 -z-10 w-6 h-6 left-[20%] top-[40vh] max-md:top-[55vh] max-md:left-[10%]'} />
 
-      <BorderButton />
+      {/* <BorderButton /> */}
 
     </div>
   )

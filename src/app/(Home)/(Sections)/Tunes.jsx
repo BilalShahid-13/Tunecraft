@@ -83,7 +83,7 @@ export default function Tunes() {
           />
         ))}
       </div>
-      <GradientButton />
+      {/* <GradientButton /> */}
     </div>
 
   )

@@ -100,12 +100,34 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
       }
 
       if (paymentIntent.status === "succeeded") {
-        router.push(`/success?email=${formData.email}`);
+        if (sendMail(formData.email)) {
+          router.push(`/success`);
+        }
       }
     } catch (err) {
       setError(err.message || "Something went wrong")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const sendMail = async (email) => {
+    try {
+      const response = await axios.post('/api/send-mail', {
+        to: email,
+        subject: 'Testing Email',
+      })
+      console.log(response)
+      if (response) {
+        toast.success('Payment Successful! 🎉', {
+          description: `Thank you for your order! Please check your email at ${email} for further details.`,
+          // style: { backgroundColor: '#7bf1a8', color: 'white' }, // Set background to red and text to white
+        });
+      }
+      return true
+    } catch (error) {
+      console.error(error);
+      return false
     }
   }
 
@@ -278,7 +300,7 @@ export default function PaymentForm() {
       let musicTitle = null;
       let songGenre = null;
       if (priceString) {
-        numericPrice = Number(priceString.replace('$', ''));
+        numericPrice = Number(priceString.replace('MX$', ''));
         console.log('numericPrice', numericPrice);
       }
       if (formData.step4.musicTitle) {

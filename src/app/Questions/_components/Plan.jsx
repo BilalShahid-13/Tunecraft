@@ -29,6 +29,9 @@ export default function Plan({ onNext, onPrev }) {
       placeName: items.heading,
       points: items.points
     })
+    setTimeout(() => {
+      onNext();
+    }, 500);
   }
 
   console.log('====================================');
@@ -80,7 +83,7 @@ export default function Plan({ onNext, onPrev }) {
         >
           Back
         </Button>
-        <Button
+        {/* <Button
           disabled={selectedCard >= 0 ? false : true}
           type="submit"
           onClick={() => onNext()}
@@ -89,7 +92,7 @@ export default function Plan({ onNext, onPrev }) {
              hover:bg-[#ff6b58] cursor-pointer"
         >
           Next
-        </Button>
+        </Button> */}
       </div>
     </div>
   )

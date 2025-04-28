@@ -1,3 +1,4 @@
+"use client";
 import CustomInputField from '@/components/CustomInputField';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';

@@ -4,15 +4,16 @@ import { NextResponse } from "next/server";
 const isProtectedRoute = createRouteMatcher(["/Lyricist(.*)", "/forum(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+  const { userId, redirectToSignIn } = await auth();
 
   if (!userId && isProtectedRoute(req)) {
     // Redirect to /Register page if user is not signed in and trying to access protected routes
-    return NextResponse.redirect(new URL("/Register", req.url));
+    // return NextResponse.redirect(new URL("/Register", req.url));
+    return redirectToSignIn();
   }
 
-  // If user is authenticated or route is not protected, continue normally
-  return NextResponse.next();
+  // // If user is authenticated or route is not protected, continue normally
+  // return NextResponse.next();
 });
 
 export const config = {

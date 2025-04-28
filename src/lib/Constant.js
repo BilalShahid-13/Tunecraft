@@ -73,7 +73,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#F70098,#FF7E6E",
     heading: "Microtune",
-    price: "$1.499",
+    price: "MX$1.499",
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune, delivered by a professional",
@@ -87,7 +87,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#FF9D76,#FF7E6E",
     heading: "Soundtune",
-    price: "$2.299",
+    price: "MX$2.299",
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune by a professional",
@@ -101,7 +101,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#FF9D76,#FF7E6E",
     heading: "Supremetune",
-    price: "$3.099",
+    price: "MX$3.099",
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune by a professional",
@@ -115,7 +115,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#F70098,#FF7E6E",
     heading: "Tunecraft",
-    price: "$?",
+    price: "MX$?",
     des: "Customized quote",
     points: [
       "100% custom tuning, your specifications",

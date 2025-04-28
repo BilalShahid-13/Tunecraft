@@ -23,11 +23,6 @@ export default function MusicTemplate({ onNext, onPrev }) {
     }
   }, [formData])
 
-  console.log('====================================');
-  console.log(selectedCard);
-  console.log('====================================');
-
-
   const OnSubmit = (index, items) => {
     setSelected({ disabled: false, index: index });
     onSubmitted(4, {
@@ -35,6 +30,9 @@ export default function MusicTemplate({ onNext, onPrev }) {
       musicTitle: items.title,
       musicCategory: items.category,
     })
+    setTimeout(() => {
+      onNext();
+    }, 500);
   }
 
   return (
@@ -74,7 +72,7 @@ export default function MusicTemplate({ onNext, onPrev }) {
         >
           Back
         </Button>
-        <Button
+        {/* <Button
           disabled={selectedCard >= 0 ? false : true}
           onClick={() => onNext()}
           type="submit"
@@ -83,7 +81,7 @@ export default function MusicTemplate({ onNext, onPrev }) {
              hover:bg-[#ff6b58] cursor-pointer"
         >
           Next
-        </Button>
+        </Button> */}
       </div>
     </div>
   )

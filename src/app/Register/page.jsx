@@ -98,19 +98,30 @@ export default function page() {
         }
       })
       console.log('signupForm', user)
-      await setActive({ session: signUp.createdSessionId })
-      const response = await axios.post('/api/create-user', {
-        clerkId: user.id,
-        email: data.email,
-        username: data.fullName,
-        password: data.password,
-        role: data.role
-      })
-      if (response.status === 200) {
-        toast.success('Account created successfully! 🎉')
-        signupForm.reset();
+      const completeSignup = await signUp.prepareEmailAddressVerification(
+        {
+          strategy: 'email_link',
+
+        }
+      )
+      if (completeSignup.status === 'complete') {
+        await setActive({
+          session: completeSignup.createdSessionId
+        })
       }
-      navigate('/')
+      // await setActive({ session: signUp.createdSessionId })
+      // const response = await axios.post('/api/create-user', {
+      //   clerkId: user.id,
+      //   email: data.email,
+      //   username: data.fullName,
+      //   password: data.password,
+      //   role: data.role
+      // })
+      // if (response.status === 200) {
+      //   toast.success('Account created successfully! 🎉')
+      //   signupForm.reset();
+      // }
+      // navigate('/')
     } catch (error) {
       let errorMessage;
       if (error?.response?.data) {

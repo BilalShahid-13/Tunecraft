@@ -74,10 +74,11 @@ export default function Melodies() {
             txt="speak for you"
             className="relative uppercase  max-md:text-6xl text-7xl max-sm:text-4xl font-semibold text-center"
           />
-          {!isMobile && <BorderButton className={'ml-[10%] max-xl:ml-0'} />}
+          {/* {!isMobile && <BorderButton className={'ml-[10%] max-xl:ml-0'} />} */}
         </div>
-        {isMobile && <BorderButton
-          className={'max-sm:mx-24 justify-center items-center text-center'} />}
+        {/* {isMobile && <BorderButton
+          className={'max-sm:mx-24 justify-center items-center text-center'} />} */}
+          
         <div className='flex flex-col w-[60%] max-sm:w-full
         max-lg:w-full
         max-md:w-full max-md:justify-center max-md:items-center

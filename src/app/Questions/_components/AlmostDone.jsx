@@ -21,7 +21,7 @@ export default function AlmostDone({ onNext, onPrev }) {
   const [price, SetPrice] = useState(0)
   useEffect(() => {
     if (formData) {
-      const numericPrice = Number(formData.step3.planPrice.replace('$', '')); // 2.299
+      const numericPrice = Number(formData.step3.planPrice.replace('MX$', '')); // 2.299
       setData(formData.step3);
       SetPrice(numericPrice)
     }

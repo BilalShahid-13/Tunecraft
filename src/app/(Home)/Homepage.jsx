@@ -1,14 +1,10 @@
 "use client";
 import CustomButton from '@/components/CustomButton';
 import SoundWaveAnimation from '@/components/SoundWaveAnimation';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Eclipse from '../../../public/heroSection/Ellipse 26.svg';
 // import
-
-gsap.registerPlugin(useGSAP)
 const Homepage = () => {
   const navigate = useRouter()
   return (

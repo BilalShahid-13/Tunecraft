@@ -28,7 +28,7 @@ export default function Transform() {
         font-medium w-[70%] max-sm:leading-relaxed max-md:w-full
         text-center leading-28 max-md:leading-relaxed`} />
       <Carousel />
-      <CustomButton />
+      {/* <CustomButton /> */}
 
       <StarImage cn={`right-0 -z-10 w-18 h-18 ml-[46%] mt-5
         max-md:top-4 max-sm:top-0`} />

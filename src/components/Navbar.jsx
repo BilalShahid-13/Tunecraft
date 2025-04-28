@@ -22,7 +22,7 @@ function Navbar() {
 
   useEffect(() => {
     console.log('====================================');
-    console.log(isSignedIn, user);
+    console.log(isSignedIn, user?.firstName,isLoaded);
     console.log('====================================');
 
   }, [isSignedIn, user])
