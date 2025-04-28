@@ -84,7 +84,7 @@ export default function Page() {
         {/*  max-w-xl */}
         {/* Hide triggers if not needed */}
         <TabsList
-        className="hidden"
+          className="hidden"
         >
           {Items.map((items, index) =>
             <TabsTrigger key={index}

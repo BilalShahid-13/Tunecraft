@@ -1,7 +1,7 @@
 "use client";
-import { NavbarItem } from '@/lib/Constant'
-import Link from 'next/link'
-import React, { useState } from 'react'
+import { NavbarItem } from '@/lib/Constant';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import {
   DropdownMenu,
@@ -10,14 +10,25 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useUser } from '@clerk/nextjs';
 
 function Navbar() {
   const [active, setActive] = useState(0)
+  const { isSignedIn, user, isLoaded } = useUser()
+
+  useEffect(() => {
+    console.log('====================================');
+    console.log(isSignedIn, user);
+    console.log('====================================');
+
+  }, [isSignedIn, user])
+
+
+
   const location = usePathname()
   // const isMobile = useIsMobile()
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
@@ -41,29 +52,31 @@ function Navbar() {
       flex flex-row justify-center max-lg:hidden
       max-xl:hidden
         gap-24 items-center text-lg font-medium `}>
-        {(location !== ('/Questions' || '/Register')) && NavbarItem.map((item, index) => (
-          <Link href={item.route} key={index}
-            className={`${active === index ? 'text-white' : 'text-[#919191]'}`}
-            onClick={() => setActive(index)}>{item.name}</Link>
-        ))}
+        {(location !== '/Questions' && location !== '/Register')
+          && NavbarItem.map((item, index) => (
+            <Link href={item.route} key={index}
+              className={`${active === index ? 'text-white' : 'text-[#919191]'}`}
+              onClick={() => setActive(index)}>{item.name}</Link>
+          ))}
       </div>
-      {(location !== ('/Questions' || '/Register')) && !isDesktop && <DropdownMenu
-        className={`max-sm:flex max-md:flex
+      {(location !== '/Questions' && location !== '/Register')
+        && !isDesktop && <DropdownMenu
+          className={`max-sm:flex max-md:flex
       hidden max-lg:flex xl:hidden`}
-        style={{ position: 'relative' }}>
-        <DropdownMenuTrigger>
-          <Menu />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className='bg-black'>
-          <DropdownMenuLabel>Menubar</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {NavbarItem.map((items, index) =>
-            <DropdownMenuItem key={index}>
-              <Link href={items.route}>{items.name}</Link>
-            </DropdownMenuItem>)}
+          style={{ position: 'relative' }}>
+          <DropdownMenuTrigger>
+            <Menu />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className='bg-black'>
+            <DropdownMenuLabel>Menubar</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {NavbarItem.map((items, index) =>
+              <DropdownMenuItem key={index}>
+                <Link href={items.route}>{items.name}</Link>
+              </DropdownMenuItem>)}
 
-        </DropdownMenuContent>
-      </DropdownMenu>}
+          </DropdownMenuContent>
+        </DropdownMenu>}
 
     </div>
   )

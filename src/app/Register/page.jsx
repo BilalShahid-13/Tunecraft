@@ -8,8 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Mail, Lock, User } from "lucide-react"
+import { Mail, Lock, User, LoaderCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSignIn, useSignUp } from "@clerk/nextjs"
+import axios from "axios"
+import { toast } from "sonner";
+import { useRouter } from "next/navigation"
 
 // Define form schemas with Zod
 const loginSchema = z.object({
@@ -30,7 +34,10 @@ const signupSchema = z.object({
 export default function page() {
   const [activeTab, setActiveTab] = useState("login")
   const [selectedRole, setSelectedRole] = useState(null)
-
+  const { isLoaded, signUp, setActive } = useSignUp()
+  const { isLoaded: isSignedIn, signIn, setActive: signInActive } = useSignIn()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useRouter()
   // Login form
   const loginForm = useForm({
     resolver: zodResolver(loginSchema),
@@ -52,14 +59,67 @@ export default function page() {
     },
   })
 
-  const onLoginSubmit = (data) => {
+  const onLoginSubmit = async (data) => {
     console.log("Login data:", data)
+    if (!isSignedIn) {
+      return;
+    }
+    setIsSubmitting(true)
+    try {
+      const user = awaitsignIn.create({
+        identifier: data.email,
+        password: data.password
+      })
+      if (result.status === 'complete') {
+        // Set the active session
+        await signInActive({ session: result.createdSessionId });
+        navigate('/')
+        // Redirect or update UI as needed
+      } else {
+        setError('Additional steps required.'); // e.g., MFA
+      }
+    } catch (error) {
+
+    }
     // Handle login logic here
   }
 
-  const onSignupSubmit = (data) => {
-    console.log("Signup data:", data)
-    // Handle signup logic here
+  const onSignupSubmit = async (data) => {
+    if (!isLoaded)
+      return;
+    setIsSubmitting(true)
+    try {
+      const user = await signUp.create({
+        emailAddress: data.email,
+        password: data.password,
+        unsafeMetadata: {
+          username: data.fullName,
+          role: data.role
+        }
+      })
+      console.log('signupForm', user)
+      await setActive({ session: signUp.createdSessionId })
+      const response = await axios.post('/api/create-user', {
+        clerkId: user.id,
+        email: data.email,
+        username: data.fullName,
+        password: data.password,
+        role: data.role
+      })
+      if (response.status === 200) {
+        toast.success('Account created successfully! 🎉')
+        signupForm.reset();
+      }
+      navigate('/')
+    } catch (error) {
+      let errorMessage;
+      if (error?.response?.data) {
+        errorMessage = error.response.data.msg;
+      }
+      toast.error(errorMessage)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleTabChange = (value) => {
@@ -247,7 +307,9 @@ export default function page() {
               className="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white"
               disabled={signupForm.formState.isSubmitting}
             >
-              {signupForm.formState.isSubmitting ? "Creating Account..." : "Create Account"}
+              {signupForm.formState.isSubmitting ? <>
+                <p>Creating Account</p> <LoaderCircle className="animate-spin" />
+              </> : "Create Account"}
             </Button>
           </form>
         </TabsContent>

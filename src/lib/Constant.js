@@ -19,7 +19,7 @@ export const NavbarItem = [
   { name: "Home", route: "/" },
   { name: "Tunes", route: "/tunes" },
   { name: "About us", route: "/about" },
-  { name: "Crafters", route: "/crafters" },
+  { name: "Crafters", route: "/Register" },
 ];
 
 export const Testimonals = [
