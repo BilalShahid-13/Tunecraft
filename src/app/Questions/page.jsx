@@ -72,7 +72,7 @@ export default function Page() {
 
       {/* Stepper */}
       <div className="w-full flex justify-center
-      items-center max-sm:pl-4 max-lg:pl-22">
+      items-center ">
         <Stepper currentStep={activeStep} />
       </div>
 
@@ -84,7 +84,7 @@ export default function Page() {
         {/*  max-w-xl */}
         {/* Hide triggers if not needed */}
         <TabsList
-          // className="hidden"
+          className="hidden"
         >
           {Items.map((items, index) =>
             <TabsTrigger key={index}

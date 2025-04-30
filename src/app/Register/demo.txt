@@ -1,18 +1,20 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { cn } from "@/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { LoaderCircle, Lock, Mail, User } from "lucide-react"
-import { signIn, useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Mail, Lock, User, LoaderCircle } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useSignIn, useSignUp } from "@clerk/nextjs"
+import axios from "axios"
+import { toast } from "sonner";
+import { useRouter } from "next/navigation"
+
 // Define form schemas with Zod
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -29,12 +31,12 @@ const signupSchema = z.object({
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
 })
 
-
-
 export default function page() {
   const [activeTab, setActiveTab] = useState("login")
   const [selectedRole, setSelectedRole] = useState(null)
-  const { data: session } = useSession()
+  const { isLoaded, signUp, setActive } = useSignUp()
+  const { isLoaded: isSignedIn, signIn, setActive: signInActive } = useSignIn()
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useRouter()
   // Login form
   const loginForm = useForm({
@@ -58,53 +60,78 @@ export default function page() {
   })
 
   const onLoginSubmit = async (data) => {
+    console.log("Login data:", data)
+    if (!isSignedIn) {
+      return;
+    }
+    setIsSubmitting(true)
     try {
-      const res = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
+      const user = awaitsignIn.create({
+        identifier: data.email,
+        password: data.password
       })
-      if (res) {
-        toast.success('Login successful!')
-        navigate.push(`/${session.user.role.toLowerCase()}`)
-        loginForm.reset()
+      if (result.status === 'complete') {
+        // Set the active session
+        await signInActive({ session: result.createdSessionId });
+        navigate('/')
+        // Redirect or update UI as needed
+      } else {
+        setError('Additional steps required.'); // e.g., MFA
       }
     } catch (error) {
-      console.error('Error during login:', error)
-      toast.error('Error during login')
+
     }
+    // Handle login logic here
   }
 
-  const onhandleSignup = async (data) => {
-    console.log(data); // Log the data to see what’s coming in
+  const onSignupSubmit = async (data) => {
+    if (!isLoaded)
+      return;
+    setIsSubmitting(true)
     try {
-      // Call the NextAuth signIn function
-      const res = await signIn("credentials", {
-        username: data.fullName,
-        email: data.email,
+      const user = await signUp.create({
+        emailAddress: data.email,
         password: data.password,
-        role: data.role,
-        redirect: false,  // Prevents automatic redirect after sign-in
-      });
+        unsafeMetadata: {
+          username: data.fullName,
+          role: data.role
+        }
+      })
+      console.log('signupForm', user)
+      const completeSignup = await signUp.prepareEmailAddressVerification(
+        {
+          strategy: 'email_link',
 
-
-      console.log(res); // Log the response to inspect the result
-
-      if (res?.error) {
-        // If there's an error (e.g., invalid credentials), handle it
-        toast.error('Error during verification: ' + res.error);
-      } else if (res?.ok) {
-        // If the response is successful
-        toast.success('Signup successful!');
-        // You can redirect to another page or handle the next steps
+        }
+      )
+      if (completeSignup.status === 'complete') {
+        await setActive({
+          session: completeSignup.createdSessionId
+        })
       }
-
+      // await setActive({ session: signUp.createdSessionId })
+      // const response = await axios.post('/api/create-user', {
+      //   clerkId: user.id,
+      //   email: data.email,
+      //   username: data.fullName,
+      //   password: data.password,
+      //   role: data.role
+      // })
+      // if (response.status === 200) {
+      //   toast.success('Account created successfully! 🎉')
+      //   signupForm.reset();
+      // }
+      // navigate('/')
     } catch (error) {
-      console.error(error);
-      toast.error('Error during verification');
+      let errorMessage;
+      if (error?.response?.data) {
+        errorMessage = error.response.data.msg;
+      }
+      toast.error(errorMessage)
+    } finally {
+      setIsSubmitting(false)
     }
-  };
-
+  }
 
   const handleTabChange = (value) => {
     setActiveTab(value)
@@ -114,7 +141,6 @@ export default function page() {
     setSelectedRole(role)
     signupForm.setValue("role", role)
   }
-
 
   return (
     <div className="w-full max-w-lg max-sm:w-[90%] mx-auto h-[80vh] overflow-hidden flex justify-center items-center">
@@ -141,9 +167,7 @@ export default function page() {
 
         {/* Login Form */}
         <TabsContent value="login" className="bg-[#111111] p-6 rounded-lg">
-          <form
-            onSubmit={loginForm.handleSubmit(onLoginSubmit)}
-            className="space-y-4">
+          <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-white">
                 Email Address
@@ -210,7 +234,7 @@ export default function page() {
 
         {/* Signup Form */}
         <TabsContent value="signup" className="bg-[#111111] p-6 rounded-lg">
-          <form onSubmit={signupForm.handleSubmit(onhandleSignup)} className="space-y-4">
+          <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label className="text-white">I am a</Label>
               <div className="grid grid-cols-3 gap-2">
@@ -232,6 +256,7 @@ export default function page() {
                 <p className="text-red-500 text-sm">{signupForm.formState.errors.role.message}</p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="fullName" className="text-white">
                 Full Name
@@ -249,6 +274,7 @@ export default function page() {
                 <p className="text-red-500 text-sm">{signupForm.formState.errors.fullName.message}</p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="signupEmail" className="text-white">
                 Email Address
@@ -267,6 +293,7 @@ export default function page() {
                 <p className="text-red-500 text-sm">{signupForm.formState.errors.email.message}</p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="signupPassword" className="text-white">
                 Password
@@ -285,6 +312,7 @@ export default function page() {
                 <p className="text-red-500 text-sm">{signupForm.formState.errors.password.message}</p>
               )}
             </div>
+
             <Button
               type="submit"
               className="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white"
@@ -295,7 +323,6 @@ export default function page() {
               </> : "Create Account"}
             </Button>
           </form>
-
         </TabsContent>
       </Tabs>
     </div >

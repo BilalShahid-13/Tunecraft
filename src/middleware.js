@@ -1,26 +1,36 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { roles } from "./lib/Constant"; // Assuming this contains the role-to-route mapping
 
-const isProtectedRoute = createRouteMatcher(["/Lyricist(.*)", "/forum(.*)"]);
+export default async function middleware(req) {
+  const token = await getToken({ req });
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId, redirectToSignIn } = await auth();
-
-  if (!userId && isProtectedRoute(req)) {
-    // Redirect to /Register page if user is not signed in and trying to access protected routes
-    // return NextResponse.redirect(new URL("/Register", req.url));
-    return redirectToSignIn();
+  if (!token) {
+    const roleRoutes = roles.map((r) => r.route);
+    if (roleRoutes.some((route) => req.url.includes(route))) {
+      return NextResponse.redirect(new URL("/Register", req.url));
+    }
   }
 
-  // // If user is authenticated or route is not protected, continue normally
-  // return NextResponse.next();
-});
+  // If user is logged in, find their role-based route
+  const roleRoute = roles.find((r) => r.name === token?.role);
+
+  // If the user is authenticated but trying to access a route not allowed for their role
+  if (token && roleRoute && !req.url.includes(roleRoute?.route)) {
+    return NextResponse.redirect(new URL(`/${roleRoute?.route}`, req.url));
+  }
+
+  // Let the request proceed if no issues
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    // Match all routes except Next.js internals and static files
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always match API routes
-    "/(api|trpc)(.*)",
-  ],
+    // "/dashboard",
+    "/Register",
+    "/lyricist",
+    "/engineer",
+    "/singer",
+    "/admin",
+  ], // Apply middleware to routes that require authentication
 };

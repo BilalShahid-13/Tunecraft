@@ -22,7 +22,7 @@ export default function Stepper({ currentStep }) {
             <li
               key={index}
               className={`flex items-center relative ${!isLast
-                ? "after:content-[''] after:w-16 after:h-0.5 after:inline-block after:transition-colors after:duration-300 " +
+                ? "after:content-[''] after:w-16 after:h-0.5 max-sm:w-16 after:inline-block after:transition-colors after:duration-300 " +
                 (isLineActive
                   ? "after:bg-[#FF7E6E]"
                   : "after:bg-[#B0B0B0]")

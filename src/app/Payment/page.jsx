@@ -1,15 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { loadStripe } from "@stripe/stripe-js"
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import useQuestionStore from "@/store/questionStore"
 import { convertToSubCurrency } from "@/lib/utils"
+import useQuestionStore from "@/store/questionStore"
+import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js"
+import { loadStripe } from "@stripe/stripe-js"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import PhoneCode from "../Questions/_components/PhoneCode"
+import axios from "axios"
+import { toast } from "sonner"
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -36,20 +38,20 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!stripe || !elements) {
-      return
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const cardElement = elements.getElement(CardElement)
+      const cardElement = elements.getElement(CardElement);
 
       if (!cardElement) {
-        throw new Error("Card element not found")
+        throw new Error("Card element not found");
       }
 
       // Create payment intent on the server
@@ -68,19 +70,22 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
             phone: formData.phone,
             address: formData.address,
             musicTitle: musicTitle,
-            songGenre: songGenre
+            songGenre: songGenre,
           },
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Something went wrong")
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Something went wrong");
       }
 
-      const { clientSecret } = await response.json()
+      const { clientSecret } = await response.json();
 
-      // Confirm the payment
+      // Log the clientSecret for debugging
+      console.log("Client Secret:", clientSecret);
+
+      // Confirm the payment with Stripe
       const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
@@ -93,29 +98,33 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
             },
           },
         },
-      })
+      });
 
       if (confirmError) {
-        throw new Error(confirmError.message || "Payment failed")
+        console.error(confirmError);
+        throw new Error(confirmError.message || "Payment failed");
       }
 
       if (paymentIntent.status === "succeeded") {
-        if (sendMail(formData.email)) {
+        const res = await sendMail(formData.email);
+        if (res) {
           router.push(`/success`);
         }
       }
     } catch (err) {
-      setError(err.message || "Something went wrong")
+      console.error(err);
+      setError(err.message || "Something went wrong");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
 
   const sendMail = async (email) => {
     try {
       const response = await axios.post('/api/send-mail', {
         to: email,
-        subject: 'Testing Email',
+        subject: 'Payment Successful',
       })
       console.log(response)
       if (response) {
@@ -123,8 +132,8 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
           description: `Thank you for your order! Please check your email at ${email} for further details.`,
           // style: { backgroundColor: '#7bf1a8', color: 'white' }, // Set background to red and text to white
         });
+        return true
       }
-      return true
     } catch (error) {
       console.error(error);
       return false
@@ -292,6 +301,7 @@ export default function PaymentForm() {
     musicTitle: '',
     songGenre: ''
   });
+  console.log('formdata', formData)
 
   useEffect(() => {
     if (formData && formData.step3) {

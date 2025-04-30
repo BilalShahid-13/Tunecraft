@@ -2,8 +2,8 @@ import React from 'react'
 
 export default function page() {
   return (
-    <>
-     lyricst
-    </>
+    <div>
+
+    </div>
   )
 }

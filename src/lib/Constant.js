@@ -1,17 +1,24 @@
 import alex from "../../public/reviews/alex.png";
-import kate from "../../public/reviews/kate.png";
-import francis from "../../public/reviews/francis.png";
 import angeline from "../../public/reviews/angeline.png";
-import nicolas from "../../public/reviews/nicolas.png";
+import francis from "../../public/reviews/francis.png";
 import john from "../../public/reviews/john.png";
+import kate from "../../public/reviews/kate.png";
+import nicolas from "../../public/reviews/nicolas.png";
 // footer
 import Facebook from "../../public/footer/facebook logo.png";
 import Instagram from "../../public/footer/instagram logo.png";
 import X from "../../public/footer/x.png";
 
 // questions
-import loveSong from "../../public/question/love.png";
+import {
+  ClipboardCheck,
+  LayoutDashboard,
+  LogOut,
+  User,
+  Wallet2
+} from "lucide-react";
 import Celebration from "../../public/question/celebration.png";
+import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
 
@@ -213,5 +220,40 @@ export const musicTemplates = [
   {
     title: "Inspirational Journey",
     category: "Motivation",
+  },
+];
+
+export const roles = [
+  { name: "lyricist", route: "lyricist" },
+  { name: "engineer", route: "engineer/*" },
+  { name: "engineer", route: "engineer" },
+  { name: "singer", route: "singer" },
+  { name: "admin", route: "admin" },
+];
+export const SidebarItems = [
+  {
+    name: "Dashoard",
+    Icon: LayoutDashboard,
+    route: "/Dashboard",
+  },
+  {
+    name: "Tasks",
+    Icon: ClipboardCheck,
+    route: "/tasks",
+  },
+  {
+    name: "Account",
+    Icon: User,
+    route: "engineer/account",
+  },
+  {
+    name: "Payments",
+    Icon: Wallet2,
+    route: "/payments",
+  },
+  {
+    name: "Log out",
+    Icon: LogOut,
+    route: "/",
   },
 ];

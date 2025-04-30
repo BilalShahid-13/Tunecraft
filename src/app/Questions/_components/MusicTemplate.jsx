@@ -50,8 +50,8 @@ export default function MusicTemplate({ onNext, onPrev }) {
             onClick={() => {
               OnSubmit(index, items)
             }}
-            className={` ${premiumCards <= 2 ? 'w-full' : 'w-[350px]'} h-full flex justify-start items-start
-              max-sm:justify-center max-sm:items-center
+            className={` ${premiumCards <= 2 ? 'w-full' : 'w-[350px] max-lg:w-full'} h-full flex justify-start items-start
+              max-sm:justify-center max-sm:items-center 
             ${selectedCard === index ? 'border-[1px] border-[#FF7E6E]' : ''}
             transition duration-200 ease-in cursor-pointer`}>
             <CardHeader className={'w-full justify-start items-start'}>
