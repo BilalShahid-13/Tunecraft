@@ -2,9 +2,7 @@ import User from "@/Schema/User";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import bcrypt from "bcryptjs";
 import Credentials from "next-auth/providers/credentials";
-import EmailProvider from "next-auth/providers/email";
 import client from "./db";
-import { roles } from "./Constant";
 import { dbConnect } from "./dbConnect";
 export const authOptions = {
   adapter: MongoDBAdapter(client),
@@ -92,40 +90,40 @@ export const authOptions = {
         };
       },
     }),
-    EmailProvider({
-      server: process.env.SMTP_HOST,
-      // {
-      //   host: process.env.SMTP_HOST,
-      //   port: process.env.EMAIL_SERVER_HOST,
-      //   auth: {
-      //     user: process.env.GOOGLE_APP_USER,
-      //     pass: process.env.GOOGLE_APP_PASSWORD,
-      //   },
-      // },
-      from: process.env.EMAIL_FROM,
-      sendVerificationRequest: async ({ identifier: email }) => {
-        await sendVerificationRequest({
-          identifier: email,
-          url: "http://localhost:3000/verify-email",
-          provider: {
-            server: process.env.SMTP_HOST,
-            from: process.env.EMAIL_FROM,
-          },
-        });
-      },
-      async generateVerificationToken() {
-        return "ABC123";
-      },
-      normalizeIdentifier(identifier) {
-        // Get the first two elements only,
-        // separated by `@` from user input.
-        let [local, domain] = identifier.toLowerCase().trim().split("@")
-        // The part before "@" can contain a ","
-        // but we remove it on the domain part
-        domain = domain.split(",")[0]
-        return `${local}@${domain}`
-      },
-    }),
+    // EmailProvider({
+    //   server: process.env.SMTP_HOST,
+    //   // {
+    //   //   host: process.env.SMTP_HOST,
+    //   //   port: process.env.EMAIL_SERVER_HOST,
+    //   //   auth: {
+    //   //     user: process.env.GOOGLE_APP_USER,
+    //   //     pass: process.env.GOOGLE_APP_PASSWORD,
+    //   //   },
+    //   // },
+    //   from: process.env.EMAIL_FROM,
+    //   sendVerificationRequest: async ({ identifier: email }) => {
+    //     await sendVerificationRequest({
+    //       identifier: email,
+    //       url: "http://localhost:3000/verify-email",
+    //       provider: {
+    //         server: process.env.SMTP_HOST,
+    //         from: process.env.EMAIL_FROM,
+    //       },
+    //     });
+    //   },
+    //   async generateVerificationToken() {
+    //     return "ABC123";
+    //   },
+    //   normalizeIdentifier(identifier) {
+    //     // Get the first two elements only,
+    //     // separated by `@` from user input.
+    //     let [local, domain] = identifier.toLowerCase().trim().split("@")
+    //     // The part before "@" can contain a ","
+    //     // but we remove it on the domain part
+    //     domain = domain.split(",")[0]
+    //     return `${local}@${domain}`
+    //   },
+    // }),
   ],
 
   callbacks: {
