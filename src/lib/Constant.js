@@ -21,6 +21,9 @@ import Celebration from "../../public/question/celebration.png";
 import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
+import UpdatePassword from "@/components/UpdatePassword";
+
+export const Currency = "MX$";
 
 export const NavbarItem = [
   { name: "Home", route: "/" },
@@ -80,7 +83,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#F70098,#FF7E6E",
     heading: "Microtune",
-    price: "MX$1.499",
+    price: `${Currency}1.499`,
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune, delivered by a professional",
@@ -94,7 +97,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#FF9D76,#FF7E6E",
     heading: "Soundtune",
-    price: "MX$2.299",
+    price: `${Currency}2.299`,
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune by a professional",
@@ -108,7 +111,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#FF9D76,#FF7E6E",
     heading: "Supremetune",
-    price: "MX$3.099",
+    price: `${Currency}3.099`,
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune by a professional",
@@ -122,7 +125,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#F70098,#FF7E6E",
     heading: "Tunecraft",
-    price: "MX$?",
+    price: `${Currency}?`,
     des: "Customized quote",
     points: [
       "100% custom tuning, your specifications",
@@ -234,22 +237,22 @@ export const SidebarItems = [
   {
     name: "Dashoard",
     Icon: LayoutDashboard,
-    route: "Dashboard",
+    route: UpdatePassword,
   },
   {
     name: "Tasks",
     Icon: ClipboardCheck,
-    route: "tasks",
+    route: UpdatePassword,
   },
   {
     name: "Account",
     Icon: User,
-    route: "account",
+    route: UpdatePassword,
   },
   {
     name: "Payments",
     Icon: Wallet2,
-    route: "payments",
+    route: UpdatePassword,
   },
   {
     name: "Log out",

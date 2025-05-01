@@ -8,15 +8,14 @@ import {
   SidebarMenuItem,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarItems } from "@/lib/Constant";
+import { Loader2 } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
-import { signOut } from "next-auth/react";
-import { Loader2, LogOut } from "lucide-react";
-import { Button } from "./ui/button";
 
 export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
   const [selected, setSelected] = useState(null);
@@ -37,7 +36,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
   }
 
   return (
-    <Sidebar className={'relative'}>
+    <Sidebar className={'relative h-screen'}>
       <SidebarHeader className={'flex flex-row justify-center items-center w-full'}>
         {!sidebarCollapsed && (
           <div className="w-full justify-center items-center flex flex-col">
@@ -62,7 +61,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
                     if (items.name === 'Log out') {
                       handleLogout(); // Trigger the handleLogout function on click
                     } else {
-                      navigate.push(items.name); // Navigate for other items
+                      // navigate.push(items.name); // Navigate for other items
                     }
                   }}
                   className={`dark:data-[state=active]:bg-[#FF7E6E40]

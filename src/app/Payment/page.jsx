@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 import PhoneCode from "../Questions/_components/PhoneCode"
 import axios from "axios"
 import { toast } from "sonner"
+import { Currency } from "@/lib/Constant"
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -141,7 +142,7 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full space-y-2">
+    <form onSubmit={handleSubmit} className="w-full space-y-2 px-4">
       <h1 className="text-3xl font-inter font-bold text-white">Payment Details</h1>
       <h2 className="text-lg text-white mb-4">Billing Information</h2>
       <div className="grid grid-cols-2 w-full gap-12 max-sm:grid-cols-1
@@ -258,20 +259,17 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
           </div>
         </div>
 
-
-
-
       </div>
       <div className="space-y-2 border-t border-zinc-800 pt-4">
         <div className="flex justify-between text-zinc-400">
           <p>Package:&nbsp;
             <span className="uppercase">{packageName}</span>
           </p>
-          <span>${packagePrice}</span>
+          <span>{Currency}{packagePrice}</span>
         </div>
         <div className="flex justify-between text-zinc-400">
           <span>Processing Fee</span>
-          <span>${processingFee}</span>
+          <span>{Currency}{processingFee}</span>
         </div>
         <div className="flex justify-between text-xl font-bold text-white">
           <span>Total:</span>

@@ -242,7 +242,7 @@ export default function page() {
                 Full Name
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-3 h-5 w-5 text-zinc-500" />
+                <User className="absolute left-3 top-2 h-5 w-5 text-zinc-500" />
                 <Input
                   id="fullName"
                   placeholder="Enter your full name"
@@ -259,7 +259,7 @@ export default function page() {
                 Email Address
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-zinc-500" />
+                <Mail className="absolute left-3 top-2 h-5 w-5 text-zinc-500" />
                 <Input
                   id="signupEmail"
                   type="email"
@@ -277,7 +277,7 @@ export default function page() {
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-zinc-500" />
+                <Lock className="absolute left-3 top-2 h-5 w-5 text-zinc-500" />
                 <Input
                   id="signupPassword"
                   type="password"

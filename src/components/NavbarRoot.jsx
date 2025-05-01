@@ -13,28 +13,27 @@ import { AppSidebar } from './app-sidebar';
 import DashboardNavbar from "./DashboardNavbar";
 import Navbar from "./Navbar";
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
+import { ScrollArea } from "./ui/scroll-area";
 
 export default function NavbarRoot() {
   const location = usePathname();
   const [isProtectedRoute, setIsProtectedRoute] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Track sidebar state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const protectedRoutes = roles.map((r) => `/${r.route}`);
 
   useEffect(() => {
-    // Check if the current location is one of the protected routes
     setIsProtectedRoute(protectedRoutes.includes(location));
   }, [location, protectedRoutes]);
 
-  // Function to toggle the sidebar state
   function toggleSidebar() {
-    setSidebarCollapsed(prevState => !prevState); // Toggle sidebar state
+    setSidebarCollapsed(prevState => !prevState);
   };
 
   return (
     <>
       <div>
-        {isProtectedRoute ?
+        {isProtectedRoute ? (
           <SidebarProvider
             className={`relative w-full transition-opacity duration-150`}
             style={{
@@ -46,17 +45,19 @@ export default function NavbarRoot() {
               <AppSidebar sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
               <main
                 className={`relative transition-all duration-300
-                  p-0 w-full m-0 `}
+                  p-0 w-full m-0`}
               >
                 <div className='flex flex-row'>
                   <div className="justify-center items-center inline-block">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          {sidebarCollapsed ? <SidebarTrigger
-                            onClick={toggleSidebar}
-                            className={`relative left-0 top-2`}
-                          /> : null}
+                          {sidebarCollapsed && (
+                            <SidebarTrigger
+                              onClick={toggleSidebar}
+                              className={`relative left-0 top-2`}
+                            />
+                          )}
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>Open Sidebar</p>
@@ -66,13 +67,27 @@ export default function NavbarRoot() {
                   </div>
                   <DashboardNavbar link={location} />
                 </div>
-                {SidebarItems.map((items, index) => (
-                  <TabsContent key={index} value={items.name}>{items.name}</TabsContent>
-                ))}
+
+                {/* Scrollable content area - only this part will scroll */}
+                <ScrollArea style={{
+                  height: 'calc(100vh - 64px)' // Adjust based on your navbar height
+                }}>
+                  {SidebarItems.map((items, index) => (
+                    <TabsContent
+                      key={index}
+                      value={items.name}
+                      className="p-4" // Add padding if needed
+                    >
+                      <items.route />
+                    </TabsContent>
+                  ))}
+                </ScrollArea>
               </main>
             </Tabs>
           </SidebarProvider>
-          : <Navbar />}
+        ) : (
+          <Navbar />
+        )}
       </div>
     </>
   );
