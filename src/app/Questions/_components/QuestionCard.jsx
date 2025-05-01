@@ -9,12 +9,13 @@ import {
 import { QuestionsItem } from '@/lib/Constant'
 import useQuestionStore from "@/store/questionStore"
 import Image from 'next/image'
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from 'react'
 
 export default function QuestionCard({ onNext, onPrev }) {
   const [selectedCard, setSelectedCard] = useState(null)
   const { setSelected, selectedIndex, onSubmitted, formData } = useQuestionStore()
-
+  const navigate = useRouter()
   useEffect(() => {
     if (formData) {
       setSelectedCard(formData.step1.step);
@@ -30,6 +31,7 @@ export default function QuestionCard({ onNext, onPrev }) {
       question: items.question,
       des: items.des,
     })
+    setTimeout(() => onNext(), 500);
   }
 
   return (
@@ -77,23 +79,24 @@ export default function QuestionCard({ onNext, onPrev }) {
         <Button
           variant="outline"
           onClick={() => {
-            onPrev();
+            // onPrev();
+            navigate.push('/')
           }}
           className="px-4 py-2 border-[2px] border-white rounded-lg transition-all duration-300 cursor-pointer"
         >
           Back
         </Button>
 
-        <Button
+        {/* <Button
           disabled={selectedIndex === null ? true : false}
           type="submit"
-          onClick={() => onNext()}
+          // onClick={() => onNext()}
           className="px-4 py-2 bg-[#FF7E6E] text-white
         rounded-lg transition-all duration-300
         hover:bg-[#ff6b58] cursor-pointer"
         >
           Next
-        </Button>
+        </Button> */}
       </div>
     </div >
   )

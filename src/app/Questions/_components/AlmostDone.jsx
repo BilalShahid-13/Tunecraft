@@ -31,8 +31,8 @@ export default function AlmostDone({ onNext, onPrev }) {
 
   // Function to trigger confetti on button click
   const handleProceedToPayment = () => {
-    navigate.push('/Payment')
     setButtonOnClick(!buttonOnClick)
+    navigate.push('/Payment')
   };
 
   useEffect(() => {

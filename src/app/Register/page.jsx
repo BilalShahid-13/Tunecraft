@@ -66,7 +66,11 @@ export default function page() {
       })
       if (res) {
         toast.success('Login successful!')
-        navigate.push(`/${session.user.role.toLowerCase()}`)
+        if (session?.user?.role) {
+          navigate.push(`/${session.user.role.toLowerCase()}`)
+        } else {
+          navigate.refresh()
+        }
         loginForm.reset()
       }
     } catch (error) {
@@ -89,13 +93,15 @@ export default function page() {
 
 
       console.log(res); // Log the response to inspect the result
-
-      if (res?.error) {
-        // If there's an error (e.g., invalid credentials), handle it
-        toast.error('Error during verification: ' + res.error);
-      } else if (res?.ok) {
+      if (res) {
         toast.success('Signup successful!');
-        navigate.push(`/${session.user.role.toLowerCase()}`)
+        if (session?.user?.role) {
+          navigate.push(`/${session.user.role.toLowerCase()}`)
+          // If there's an error (e.g., invalid credentials), handle it
+        } else {
+          navigate.refresh()
+        }
+        signupForm.reset();
       }
 
     } catch (error) {

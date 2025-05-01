@@ -1,3 +1,4 @@
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +10,32 @@ import {
 import { signOut, useSession } from 'next-auth/react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Button } from "./ui/button"
-import { LogOut, User } from "lucide-react"
+import { Loader2, LogOut, User } from "lucide-react"
+import { useEffect, useState } from "react";
 
 export default function UserProfile() {
   const { data: session } = useSession()
-  const initials = session?.user?.username.split(' ').map(word => word.charAt(0).toUpperCase()).join('');
+  // const initials = session?.user?.username.split(' ').map(word => word.charAt(0).toUpperCase()).join('');
+  const [loading, setLoading] = useState(false)
+  const [initials, setInitials] = useState(null)
+  useEffect(() => {
+    let name = session?.user?.username.split(' ').map(word => word.charAt(0).toUpperCase()).join('')
+    setInitials(name)
+  }, [session])
+
+
+  const handleLogout = async () => {
+    setLoading(true)
+    try {
+      await signOut({ callbackUrl: '/' })
+    } catch (error) {
+      console.error('logout error', error);
+
+    }
+    finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <>
@@ -31,9 +53,11 @@ export default function UserProfile() {
           <DropdownMenuSeparator />
           <DropdownMenuItem className={'text-left'}>{session?.user?.username}</DropdownMenuItem>
           <DropdownMenuItem>{session?.user?.email}</DropdownMenuItem>
-          <Button onClick={() => signOut({ callbackUrl: '/' })}
+          <Button onClick={handleLogout}
+            disabled={loading}
             className={'w-full'}>
-            <LogOut />
+            {loading ? <Loader2 className="animate-spin" />
+              : <LogOut />}
             Logout</Button>
         </DropdownMenuContent>
       </DropdownMenu>
