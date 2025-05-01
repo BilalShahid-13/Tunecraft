@@ -1,9 +1,17 @@
 "use client";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { roles } from '@/lib/Constant';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { roles, SidebarItems } from '@/lib/Constant';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AppSidebar } from './app-sidebar';
+import DashboardNavbar from "./DashboardNavbar";
+import Navbar from "./Navbar";
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
 
 export default function NavbarRoot() {
@@ -18,45 +26,54 @@ export default function NavbarRoot() {
     setIsProtectedRoute(protectedRoutes.includes(location));
   }, [location, protectedRoutes]);
 
-  const toggleSidebar = () => {
+  // Function to toggle the sidebar state
+  function toggleSidebar() {
     setSidebarCollapsed(prevState => !prevState); // Toggle sidebar state
   };
 
   return (
     <>
-      <SidebarProvider
-        className={'overflow-hidden'}
-        style={{
-          "--sidebar-width": sidebarCollapsed ? "5rem" : "20rem", // Adjust sidebar width
-          "--sidebar-width-mobile": sidebarCollapsed ? "5rem" : "20rem",
-        }}>
-        <Tabs defaultValue="account"
-          className="w-full p-4"
-        >
-          <AppSidebar sidebarCollapsed={sidebarCollapsed} />
-          <main
-            className={`w-full transition-all duration-300 ${sidebarCollapsed ? 'ml-0' : 'ml-[20rem]' // Adjust main content width
-              }`}>
-            {/* Trigger button to toggle sidebar */}
-            <SidebarTrigger
-              onClick={toggleSidebar} // Add event handler to toggle sidebar
-              className={'z-50'}
-            />
-            <TabsContent value="account">Make changes to your account here.</TabsContent>
-            <TabsContent value="password">Change your password here.</TabsContent>
-          </main>
-        </Tabs>
-      </SidebarProvider>
-
-      {/* {isProtectedRoute ?
-        <SidebarProvider>
-          <AppSidebar />
-          <main className='w-full'>
-            <DashboardNavbar link={location} />
-            <SidebarTrigger />
-          </main>
-        </SidebarProvider>
-        : <Navbar />} */}
+      <div>
+        {isProtectedRoute ?
+          <SidebarProvider
+            className={`relative w-full transition-opacity duration-150`}
+            style={{
+              "--sidebar-width": sidebarCollapsed ? "0rem" : "20rem",
+              "--sidebar-width-mobile": sidebarCollapsed ? "0rem" : "20rem",
+            }}
+          >
+            <Tabs defaultValue="account" className="w-full flex flex-row justify-start items-start">
+              <AppSidebar sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
+              <main
+                className={`relative transition-all duration-300
+                  p-0 w-full m-0 `}
+              >
+                <div className='flex flex-row'>
+                  <div className="justify-center items-center inline-block">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          {sidebarCollapsed ? <SidebarTrigger
+                            onClick={toggleSidebar}
+                            className={`relative left-0 top-2`}
+                          /> : null}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Open Sidebar</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <DashboardNavbar link={location} />
+                </div>
+                {SidebarItems.map((items, index) => (
+                  <TabsContent key={index} value={items.name}>{items.name}</TabsContent>
+                ))}
+              </main>
+            </Tabs>
+          </SidebarProvider>
+          : <Navbar />}
+      </div>
     </>
   );
 }

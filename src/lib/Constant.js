@@ -15,7 +15,7 @@ import {
   LayoutDashboard,
   LogOut,
   User,
-  Wallet2
+  Wallet2,
 } from "lucide-react";
 import Celebration from "../../public/question/celebration.png";
 import loveSong from "../../public/question/love.png";
@@ -225,7 +225,7 @@ export const musicTemplates = [
 
 export const roles = [
   { name: "lyricist", route: "lyricist" },
-  { name: "engineer", route: "engineer/*" },
+  { name: "engineer", route: "engineer" },
   { name: "engineer", route: "engineer" },
   { name: "singer", route: "singer" },
   { name: "admin", route: "admin" },
@@ -234,22 +234,22 @@ export const SidebarItems = [
   {
     name: "Dashoard",
     Icon: LayoutDashboard,
-    route: "/Dashboard",
+    route: "Dashboard",
   },
   {
     name: "Tasks",
     Icon: ClipboardCheck,
-    route: "/tasks",
+    route: "tasks",
   },
   {
     name: "Account",
     Icon: User,
-    route: "engineer/account",
+    route: "account",
   },
   {
     name: "Payments",
     Icon: Wallet2,
-    route: "/payments",
+    route: "payments",
   },
   {
     name: "Log out",

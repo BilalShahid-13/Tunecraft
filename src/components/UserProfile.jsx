@@ -24,12 +24,12 @@ export default function UserProfile() {
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className={'flex flex-col gap-1'}>
+        <DropdownMenuContent className={'flex flex-col gap-1 mr-4 justify-start items-start text-left'}>
           <DropdownMenuLabel
-            className={'flex flex-row justify-center items-center gap-2'}>
+            className={'flex flex-row justify-start items-start gap-2 text-left'}>
             <User size={16} />My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>{session?.user?.username}</DropdownMenuItem>
+          <DropdownMenuItem className={'text-left'}>{session?.user?.username}</DropdownMenuItem>
           <DropdownMenuItem>{session?.user?.email}</DropdownMenuItem>
           <Button onClick={() => signOut()}
             className={'w-full'}>
