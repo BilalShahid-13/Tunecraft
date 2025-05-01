@@ -94,9 +94,8 @@ export default function page() {
         // If there's an error (e.g., invalid credentials), handle it
         toast.error('Error during verification: ' + res.error);
       } else if (res?.ok) {
-        // If the response is successful
         toast.success('Signup successful!');
-        // You can redirect to another page or handle the next steps
+        navigate.push(`/${session.user.role.toLowerCase()}`)
       }
 
     } catch (error) {

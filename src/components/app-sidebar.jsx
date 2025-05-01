@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { signOut } from "next-auth/react";
 
 export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
   const [selected, setSelected] = useState(null);
@@ -24,7 +25,8 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
       <SidebarHeader className={'flex flex-row justify-center items-center w-full'}>
         {!sidebarCollapsed && (
           <div className="w-full">
-            <h3 className="text-4xl font-inter mt-4 font-semibold text-center text-[#FF7E6E]">
+            <h3 className="text-4xl font-inter mt-4 cursor-pointer font-semibold text-center text-[#FF7E6E]"
+              onClick={() => navigate.push('/')}>
               Tunecraft
             </h3>
             <div className="bg-gradient-to-r h-[1px] w-full from-red-400/20 via-red-400 to-red-400/20"></div>
@@ -39,6 +41,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
                 <TabsTrigger
                   value={items.name}
                   key={index}
+                  onClick={() => navigate.push(items.name === 'Log out' && signOut({ callbackUrl: '/' }))}
                   className={`dark:data-[state=active]:bg-[#FF7E6E40]
                      px-3 cursor-pointer
             dark:data-[state=active]:text-[#FF7E6E]
@@ -61,7 +64,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
               )}
             </TooltipTrigger>
             <TooltipContent>
-            Close Sidebar
+              Close Sidebar
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

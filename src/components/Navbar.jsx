@@ -65,9 +65,10 @@ function Navbar() {
             <DropdownMenuLabel>Menubar</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {NavbarItem.map((items, index) =>
-              <DropdownMenuItem key={index}>
-                <Link href={items.route}>{items.name}</Link>
-              </DropdownMenuItem>
+              <Link href={items.route} key={index}>
+                <DropdownMenuItem key={index}>{items.name}</DropdownMenuItem>
+              </Link>
+
             )}
           </DropdownMenuContent>
         </DropdownMenu>

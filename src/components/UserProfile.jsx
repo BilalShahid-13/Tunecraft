@@ -31,7 +31,7 @@ export default function UserProfile() {
           <DropdownMenuSeparator />
           <DropdownMenuItem className={'text-left'}>{session?.user?.username}</DropdownMenuItem>
           <DropdownMenuItem>{session?.user?.email}</DropdownMenuItem>
-          <Button onClick={() => signOut()}
+          <Button onClick={() => signOut({ callbackUrl: '/' })}
             className={'w-full'}>
             <LogOut />
             Logout</Button>
