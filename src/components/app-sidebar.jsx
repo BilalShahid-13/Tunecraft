@@ -13,15 +13,11 @@ import { SidebarItems } from "@/lib/Constant";
 import { Loader2 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
-export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
-  const [selected, setSelected] = useState(null);
+export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile }) {
   const [loading, setLoading] = useState(false)
-  const navigate = useRouter();
-
   const handleLogout = async () => {
     setLoading(true)
     try {
@@ -38,16 +34,23 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
   return (
     <Sidebar className={'relative h-screen'}>
       <SidebarHeader className={'flex flex-row justify-center items-center w-full'}>
-        {!sidebarCollapsed && (
+        {isMobile ?
           <div className="w-full justify-center items-center flex flex-col">
             <Link href={'/'} className="text-4xl font-inter mt-4 cursor-pointer font-semibold text-center text-[#FF7E6E]"
-            // onClick={() => navigate.push('/')}
             >
               Tunecraft
             </Link>
             <div className="bg-gradient-to-r h-[1px] w-full from-red-400/20 via-red-400 to-red-400/20"></div>
-          </div>
-        )}
+          </div> : !sidebarCollapsed && (
+            <div className="w-full justify-center items-center flex flex-col">
+              <Link href={'/'} className="text-4xl font-inter mt-4 cursor-pointer font-semibold text-center text-[#FF7E6E]"
+              // onClick={() => navigate.push('/')}
+              >
+                Tunecraft
+              </Link>
+              <div className="bg-gradient-to-r h-[1px] w-full from-red-400/20 via-red-400 to-red-400/20"></div>
+            </div>
+          )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu className={'flex flex-col gap-3 px-2 justify-start items-start'}>
@@ -60,8 +63,6 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
                   onClick={() => {
                     if (items.name === 'Log out') {
                       handleLogout(); // Trigger the handleLogout function on click
-                    } else {
-                      // navigate.push(items.name); // Navigate for other items
                     }
                   }}
                   className={`dark:data-[state=active]:bg-[#FF7E6E40]
@@ -88,7 +89,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar }) {
       <SidebarFooter className={'justify-end items-end flex'}>
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               {!sidebarCollapsed && (
                 <SidebarTrigger onClick={toggleSidebar} />
               )}

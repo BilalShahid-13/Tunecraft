@@ -17,7 +17,7 @@ export async function PATCH(request) {
   }
 
   // 3. parse incoming data
-  const { firstName, lastName, currentPassword, newPassword } =
+  const { fullName, currentPassword, newPassword } =
     await request.json();
 
   // 4. lookup user
@@ -29,13 +29,8 @@ export async function PATCH(request) {
   let didUpdate = false;
 
   // 5. handle name update
-  if (firstName || lastName) {
-    // split existing into parts if you want to preserve
-    const [oldFirst = "", ...rest] = user.username.split(" ");
-    const oldLast = rest.join(" ");
-    const updatedFirst = firstName || oldFirst;
-    const updatedLast = lastName || oldLast;
-    user.username = `${updatedFirst} ${updatedLast}`.trim();
+  if (fullName) {
+    user.fullName = fullName;
     didUpdate = true;
   }
 

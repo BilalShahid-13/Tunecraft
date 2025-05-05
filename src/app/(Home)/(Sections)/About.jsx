@@ -30,7 +30,10 @@ export default function About() {
           rotate-90 max-sm:rotate-0 max-sm:w-[100%] max-md:w-full max-lg:w-[100%]
           max-sm:relative max-sm:left-0 max-md:left-0 max-lg:left-0`} />
         <div className='flex flex-col justify-center items-center gap-12'>
-          <GradientText txt='about us' className={'uppercase text-7xl max-sm:text-4xl font-medium'} />
+          <GradientText txt='about us'
+            // className={'uppercase text-7xl max-sm:text-4xl font-medium'}
+            className={'heading-1 uppercase'}
+          />
           <p className='text-[24px] font-medium max-sm:text-xl text-left max-sm:text-left max-sm:px-4'>At Tunecraft, we are a passionate team of Mexican musicians and composers dedicated to turning your most precious moments into unforgettable songs. </p>
           <p className='text-[24px]  font-normal max-sm:text-xl max-sm:px-4'>Founded by a group of music lovers and industry experts, our mission is to capture the essence of your stories and emotions, creating personalized melodies that will resonate in your heart and the hearts of your loved ones.</p>
         </div>

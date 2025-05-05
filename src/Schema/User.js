@@ -11,6 +11,14 @@ const userSchema = new mongoose.Schema(
       enum: ["lyricist", "singer", "engineer"],
       required: true,
     },
+    resetPasswordToken: {
+      type: String,
+      required: false,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      required: false,
+    },
   },
   {
     timestamps: true,

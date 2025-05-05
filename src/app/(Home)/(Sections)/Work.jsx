@@ -1,5 +1,4 @@
 "use client";
-import BorderButton from "@/components/BorderButton";
 import GradientText from "@/components/GradientText";
 import {
   Card,
@@ -13,8 +12,8 @@ import gsap from "gsap";
 import Image from 'next/image';
 import { useEffect, useRef, useState } from "react";
 import MusicSrc from '../../../../public/image 10.png';
-import MusicSrc2 from '../../../../public/image 9.png';
 import MusicSrc3 from '../../../../public/image 9 (1).png';
+import MusicSrc2 from '../../../../public/image 9.png';
 import Music from '../../../../public/music.png';
 
 gsap.registerPlugin(useGSAP)
@@ -175,7 +174,8 @@ export default function Work() {
   return (
     <div className='relative flex items-center justify-center flex-col gap-12 max-sm:mt-12'>
       <GradientText txt={'How does it work?'}
-        className={'uppercase text-7xl text-center max-sm:text-2xl max-md:text-5xl w-full font-medium max-lg:text-6xl'} />
+        // className={'uppercase text-7xl text-center max-sm:text-2xl max-md:text-5xl w-full font-medium max-lg:text-6xl'} />
+        className={'heading-1 uppercase'} />
       {/* rgb(66, 16, 10) */}
 
       <Card

@@ -1,21 +1,20 @@
 "use client";
-import GradientText from '@/components/GradientText'
+import GradientText from '@/components/GradientText';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle
-} from "@/components/ui/card"
-import Image from 'next/image'
+} from "@/components/ui/card";
+import Image from 'next/image';
 // img
-import BorderButton from '@/components/BorderButton'
-import Eclipse from '../../../../public/heroSection/Ellipse 26.svg'
-import Star from '../../../../public/Star 9.png'
-import { MelodiesItem } from '@/lib/Constant'
-import { Play } from 'lucide-react'
-import SoundWaveAnimation from '@/components/SoundWaveAnimation'
-import { useIsMobile } from '@/hooks/use-mobile'
+import SoundWaveAnimation from '@/components/SoundWaveAnimation';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MelodiesItem } from '@/lib/Constant';
+import { Play } from 'lucide-react';
+import Eclipse from '../../../../public/heroSection/Ellipse 26.svg';
+import Star from '../../../../public/Star 9.png';
 
 
 const MelodiesCard = ({ heading, genre }) => {
@@ -68,7 +67,8 @@ export default function Melodies() {
          max-sm:items-center max-sm:text-center max-md:w-full'>
           <GradientText
             txt="Melodies that"
-            className="relative uppercase text-7xl max-md:text-6xl max-sm:text-4xl font-semibold text-center"
+            // className="relative uppercase text-7xl max-md:text-6xl max-sm:text-4xl font-semibold text-center"
+            className="heading-1 uppercase"
           />
           <GradientText
             txt="speak for you"
@@ -78,7 +78,7 @@ export default function Melodies() {
         </div>
         {/* {isMobile && <BorderButton
           className={'max-sm:mx-24 justify-center items-center text-center'} />} */}
-          
+
         <div className='flex flex-col w-[60%] max-sm:w-full
         max-lg:w-full
         max-md:w-full max-md:justify-center max-md:items-center

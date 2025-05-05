@@ -11,7 +11,7 @@ export default function GradientText({ txt = 'How does it work?', className }) {
   useGSAP(() => {
     const tl = gsap.timeline({
       repeat: -1, defaults: {
-        duration: 4, ease: 'power4.inOut',yoyo: true,yoyoEase: 'power4.inOut'
+        duration: 4, ease: 'power4.inOut', yoyo: true, yoyoEase: 'power4.inOut'
       }
     });
     tl.to(headingRef.current, {

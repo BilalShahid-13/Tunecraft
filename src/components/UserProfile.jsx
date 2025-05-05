@@ -48,14 +48,14 @@ export default function UserProfile() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className={'flex flex-col gap-1 mr-4 justify-start items-start text-left'}>
           <DropdownMenuLabel
-            className={'flex flex-row justify-start items-start gap-2 text-left'}>
+            className={'flex flex-row justify-start w-full items-start gap-2 text-left'}>
             <User size={16} />My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className={'text-left'}>{session?.user?.username}</DropdownMenuItem>
+          <DropdownMenuItem className={'text-left w-full'}>{session?.user?.username}</DropdownMenuItem>
           <DropdownMenuItem>{session?.user?.email}</DropdownMenuItem>
           <Button onClick={handleLogout}
             disabled={loading}
-            className={'w-full'}>
+            className={'w-full primary-btn'}>
             {loading ? <Loader2 className="animate-spin" />
               : <LogOut />}
             Logout</Button>

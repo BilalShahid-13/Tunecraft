@@ -6,14 +6,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { roles, SidebarItems } from '@/lib/Constant';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AppSidebar } from './app-sidebar';
 import DashboardNavbar from "./DashboardNavbar";
 import Navbar from "./Navbar";
-import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
 import { ScrollArea } from "./ui/scroll-area";
+import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
 
 export default function NavbarRoot() {
   const location = usePathname();
@@ -21,14 +22,23 @@ export default function NavbarRoot() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const protectedRoutes = roles.map((r) => `/${r.route}`);
+  const isMobile = useMediaQuery({ query: "(max-width: 639px)" });
 
   useEffect(() => {
     setIsProtectedRoute(protectedRoutes.includes(location));
   }, [location, protectedRoutes]);
 
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarCollapsed(true);
+    }
+  }, [isMobile])
+
   function toggleSidebar() {
     setSidebarCollapsed(prevState => !prevState);
   };
+
+  console.log(isMobile, sidebarCollapsed)
 
   return (
     <>
@@ -41,18 +51,24 @@ export default function NavbarRoot() {
               "--sidebar-width-mobile": sidebarCollapsed ? "0rem" : "20rem",
             }}
           >
-            <Tabs defaultValue="account" className="w-full flex flex-row justify-start items-start">
-              <AppSidebar sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
+            <Tabs defaultValue={SidebarItems[0].name} className="w-full flex flex-row justify-start items-start">
+              <AppSidebar sidebarCollapsed={sidebarCollapsed}
+                isMobile={isMobile}
+                toggleSidebar={toggleSidebar} />
               <main
                 className={`relative transition-all duration-300
                   p-0 w-full m-0`}
               >
-                <div className='flex flex-row'>
-                  <div className="justify-center items-center inline-block">
+                {/* sidebar trigger */}
+                <div className='flex flex-row justify-start items-start bg-background'>
+                  <div className="inline-block max-sm:mt-1 justify-center items-center">
                     <TooltipProvider>
                       <Tooltip>
-                        <TooltipTrigger>
-                          {sidebarCollapsed && (
+                        <TooltipTrigger asChild>
+                          {isMobile ? <SidebarTrigger
+                            onClick={toggleSidebar}
+                            className={`relative left-0 top-2`}
+                          /> : sidebarCollapsed && (
                             <SidebarTrigger
                               onClick={toggleSidebar}
                               className={`relative left-0 top-2`}

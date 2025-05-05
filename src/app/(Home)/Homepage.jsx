@@ -10,10 +10,7 @@ const Homepage = () => {
   return (
     <div>
       <div className='relative justify-center items-center flex flex-col gap-18 max-sm:gap-18 pt-12'>
-        <h2 className='text-7xl max-sm:text-2xl
-         font-semibold text-center max-md:text-5xl
-         max-lg:text-6xl
-          text-white w-[80%] leading-20 max-sm:leading-relaxed'>
+        <h2 className='heading-1 w-[80%] mt-6'>
           Create Musical Magic For Every Occasion
         </h2>
         <CustomButton onClick={() => navigate.push('/Questions')} />

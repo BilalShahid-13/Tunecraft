@@ -1,6 +1,6 @@
-@import "tailwindcss";/* Global CSS */
+@import "tailwindcss"; /* Global CSS */
 @import "tw-animate-css";
-
+/* @import "tailwindcss-nth-child"; */
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -145,4 +145,33 @@
 .custom-scrollbar {
   -ms-overflow-style: none; /* For Internet Explorer */
   scrollbar-width: none; /* For Firefox */
+}
+
+.heading-1 {
+  @apply text-7xl max-sm:text-2xl
+font-semibold text-center max-md:text-5xl
+max-lg:text-6xl
+   leading-20 max-sm:leading-relaxed;
+}
+
+.primary-btn {
+  @apply bg-[#ff7e6e] cursor-pointer hover:bg-red-400 transition ease-in duration-100 w-full text-white;
+}
+
+.input-error {
+  @apply text-red-500 text-sm;
+}
+
+.inputfield-box {
+  @apply relative flex items-start;
+}
+
+/* Style the second input child */
+.inputfield-box > input:nth-child(2) {
+  @apply bg-zinc-800 border border-zinc-700 pl-10 text-white placeholder:text-zinc-500;
+}
+
+/* Style the first child (icon) */
+.inputfield-box > :nth-child(1) {
+  @apply absolute left-3 top-[6px] w-5 text-zinc-500;
 }
