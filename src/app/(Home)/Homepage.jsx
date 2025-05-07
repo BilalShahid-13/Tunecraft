@@ -4,9 +4,19 @@ import SoundWaveAnimation from '@/components/SoundWaveAnimation';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Eclipse from '../../../public/heroSection/Ellipse 26.svg';
+import { useEffect } from 'react';
 // import
 const Homepage = () => {
   const navigate = useRouter()
+  useEffect(() => {
+    if (navigate?.query?.scrollTo) { // Check if scrollTo exists
+      const element = document.getElementById(navigate.query.scrollTo);
+      console.log('element', element, navigate?.query?.scrollTo)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, []);
   return (
     <div>
       <div className='relative justify-center items-center flex flex-col gap-18 max-sm:gap-18 pt-12'>

@@ -59,15 +59,9 @@ const orderSchema = new Schema(
       required: false,
     },
     plan: {
-      name: {
-        type: String,
-        required: [true, "Plan name is required"],
-      },
-      price: {
-        type: Number,
-        // enum: price,
-        required: [true, "Price is required"],
-      },
+      type: mongoose.schema.Types.ObjectId,
+      ref: "Plan",
+      required: [true, "Plan is required"],
     },
     musicTemplate: {
       type: String,

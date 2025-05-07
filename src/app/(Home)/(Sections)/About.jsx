@@ -14,7 +14,8 @@ export default function About() {
        max-md:flex max-md:flex-col max-lg:flex-col max-lg:flex
        max-xl:flex max-xl:flex-col max-xl:gap-44
        max-sm:justify-center max-sm:items-center
-       justify-center items-center gap-21 max-sm:gap-10 relative'>
+       justify-center items-center gap-21 max-sm:gap-10 relative'
+        id='about-us'>
         <div className={'relative w-[500px] h-[500px] max-sm:w-[300px] max-xl:w-[600px] max-xl:h-[600px] max-sm:h-[300px] max-xl:z-10'}>
           <Image
             src={EclipsePng}

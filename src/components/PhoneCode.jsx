@@ -41,7 +41,7 @@ const OptimizedSelectItem = React.memo(({ index, style, data, onSelect }) => {
   );
 });
 
-export default function PhoneCode({ className }) {
+export default function PhoneCode({ className, signupForm }) {
   const [selectedCode, setSelectedCode] = useState(DEFAULT_COUNTRY.isoCode2);
 
   // Set default value on mount
@@ -52,14 +52,17 @@ export default function PhoneCode({ className }) {
   const handleValueChange = (value) => {
     setSelectedCode(value);
     const selectedItem = codes.find((c) => c.isoCode2 === value);
-    console.log("Selected country:", selectedItem);
+    signupForm.setValue('phoneCode', `${selectedItem.countryCodes[0]}`);
   };
 
   const selectedCountry = codes.find((item) => item.isoCode2 === selectedCode);
 
   return (
     <div>
-      <Select onValueChange={handleValueChange} value={selectedCode}>
+      <Select
+        onValueChange={handleValueChange}
+        value={selectedCode}
+      >
         <SelectTrigger className={cn(`w-[120px] py-5`, className)}>
           <SelectValue>
             <div className="flex items-center gap-2">
@@ -73,6 +76,7 @@ export default function PhoneCode({ className }) {
             </div>
           </SelectValue>
         </SelectTrigger>
+
         <SelectContent>
           <List
             height={300}
@@ -92,6 +96,10 @@ export default function PhoneCode({ className }) {
           </List>
         </SelectContent>
       </Select>
+
+      {signupForm.formState.errors.phoneCode && (
+        <p className="input-error">{signupForm.formState.errors.phoneCode.message}</p>
+      )}
     </div>
   );
 }

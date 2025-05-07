@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
-export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile }) {
+export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile,items }) {
   const [loading, setLoading] = useState(false)
   const handleLogout = async () => {
     setLoading(true)
@@ -54,7 +54,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile }) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu className={'flex flex-col gap-3 px-2 justify-start items-start'}>
-          {SidebarItems.map((items, index) => (
+          {items.map((items, index) => (
             <SidebarMenuItem key={index} className="w-full flex justify-start items-center select-none">
               <TabsList className={`w-full mt-3 h-14 transition-colors duration-100`}>
                 <TabsTrigger

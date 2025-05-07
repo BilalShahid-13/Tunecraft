@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { roles, SidebarItems } from '@/lib/Constant';
+import { adminPanel, roles, SidebarItems } from '@/lib/Constant';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AppSidebar } from './app-sidebar';
@@ -19,13 +19,17 @@ import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
 export default function NavbarRoot() {
   const location = usePathname();
   const [isProtectedRoute, setIsProtectedRoute] = useState(false);
+  const [isAdmin, setAdmin] = useState(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const protectedRoutes = roles.map((r) => `/${r.route}`);
   const isMobile = useMediaQuery({ query: "(max-width: 639px)" });
-
+  const items = isAdmin ? adminPanel : SidebarItems;
   useEffect(() => {
     setIsProtectedRoute(protectedRoutes.includes(location));
+    if (location === '/admin') {
+      setAdmin(true)
+    }
   }, [location, protectedRoutes]);
 
   useEffect(() => {
@@ -38,7 +42,18 @@ export default function NavbarRoot() {
     setSidebarCollapsed(prevState => !prevState);
   };
 
-  console.log(isMobile, sidebarCollapsed)
+  function roleBasedItem() {
+    if (isAdmin) {
+      return adminPanel[0].name
+    } else {
+      return SidebarItems[0].name
+    }
+  }
+
+  useEffect(() => {
+
+  }, [isAdmin])
+
 
   return (
     <>
@@ -51,9 +66,13 @@ export default function NavbarRoot() {
               "--sidebar-width-mobile": sidebarCollapsed ? "0rem" : "20rem",
             }}
           >
-            <Tabs defaultValue={SidebarItems[0].name} className="w-full flex flex-row justify-start items-start">
+            <Tabs
+              defaultValue={isAdmin ? adminPanel[0].name
+                : SidebarItems[0].name}
+              className="w-full flex flex-row justify-start items-start">
               <AppSidebar sidebarCollapsed={sidebarCollapsed}
                 isMobile={isMobile}
+                items={items}
                 toggleSidebar={toggleSidebar} />
               <main
                 className={`relative transition-all duration-300
@@ -88,7 +107,7 @@ export default function NavbarRoot() {
                 <ScrollArea style={{
                   height: 'calc(100vh - 64px)' // Adjust based on your navbar height
                 }}>
-                  {SidebarItems.map((items, index) => (
+                  {items.map((items, index) => (
                     <TabsContent
                       key={index}
                       value={items.name}
@@ -96,6 +115,7 @@ export default function NavbarRoot() {
                     >
                       <items.route />
                     </TabsContent>
+
                   ))}
                 </ScrollArea>
               </main>

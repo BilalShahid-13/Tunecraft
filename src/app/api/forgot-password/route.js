@@ -1,8 +1,9 @@
 // app/api/forgot-password/route.js
 import { dbConnect } from "@/lib/dbConnect";
+import { forgotPassword } from "@/lib/emailTemplates";
 import User from "@/Schema/User";
+import { sendMail } from "@/utils/emailService";
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 
 export async function POST(request) {
   try {
@@ -29,25 +30,13 @@ export async function POST(request) {
     user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
     await user.save();
 
+    const { html, subject } = forgotPassword(otp);
     // 4) Send the OTP via email
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: 587,
-      auth: {
-        user: process.env.GOOGLE_APP_USER,
-        pass: process.env.GOOGLE_APP_PASSWORD,
-      },
-    });
-    await transporter.sendMail({
-      to: user.email,
-      from: process.env.GOOGLE_APP_USER,
-      subject: "Your Password Reset Code",
-      html: `<p>Your password reset code is <strong>${otp}</strong>. It expires in 1 hour.</p>`,
-    });
+    await sendMail(subject, html);
 
     // 5) Return success
     return NextResponse.json(
-      { message: "Reset code sent to your email.",user },
+      { message: "Reset code sent to your email.", user },
       { status: 200 }
     );
   } catch (error) {

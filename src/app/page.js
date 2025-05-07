@@ -1,3 +1,6 @@
+"use client";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import Footer from "./(Footer)/Footer";
 import About from "./(Home)/(Sections)/About";
 import Melodies from "./(Home)/(Sections)/Melodies";
@@ -7,10 +10,19 @@ import Work from "./(Home)/(Sections)/Work";
 import Homepage from "./(Home)/Homepage";
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("scrollTo")) {
+      const element = document.getElementById(searchParams.get("scrollTo"));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [searchParams]);
   return (
     <>
       {/* <AnimatedWaves /> */}
-        <Homepage />
+      <Homepage />
       <div className="flex flex-col gap-34 px-15 max-sm:px-0 max-sm:w-full max-sm:gap-32">
         <Work />
         <About />
@@ -18,7 +30,7 @@ export default function Home() {
         <Tunes />
         <Melodies />
       </div>
-        <Footer />
+      <Footer />
     </>
   );
 }

@@ -9,7 +9,7 @@ import { CardElement, Elements, useElements, useStripe } from "@stripe/react-str
 import { loadStripe } from "@stripe/stripe-js"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import PhoneCode from "../Questions/_components/PhoneCode"
+import PhoneCode from "../../components/PhoneCode"
 import axios from "axios"
 import { toast } from "sonner"
 import { Currency } from "@/lib/Constant"
@@ -124,8 +124,7 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
   const sendMail = async (email) => {
     try {
       const response = await axios.post('/api/send-mail', {
-        to: email,
-        subject: 'Payment Successful',
+        to: email
       })
       console.log(response)
       if (response) {

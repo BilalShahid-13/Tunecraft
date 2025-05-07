@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import Credentials from "next-auth/providers/credentials";
 import client from "./db";
 import { dbConnect } from "./dbConnect";
+
 export const authOptions = {
   adapter: MongoDBAdapter(client),
   session: {

@@ -68,7 +68,7 @@ export default function Page() {
     max-sm:justify-start max-sm:items-start max-sm:h-screen
     max-lg:gap-y-14
     max-sm:overflow-auto max-sm:gap-y-14 max-sm:mt-12 max-lg:mt-12
-    justify-center gap-6 w-full px-4 overflow-hidden">
+    justify-center gap-6 w-full px-4 overflow-x-hidden">
 
       {/* Stepper */}
       <div className="w-full flex justify-center

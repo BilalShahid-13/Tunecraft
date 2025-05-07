@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from '@/components/ui/textarea';
 import useQuestionStore from '@/store/questionStore';
 import { useEffect, useState } from 'react';
-import PhoneCode from '@/app/Questions/_components/PhoneCode';
+import PhoneCode from '@/components/PhoneCode';
 
 const SelectItems = [
   "Parent", "Sibling", "Spouse", "Friend",
@@ -141,7 +141,7 @@ export default function Step2({ onNext, onPrev }) {
   };
 
   return (
-    <div className='flex flex-col gap-6 justify-start items-start w-full'>
+    <div className='flex flex-col gap-6 justify-start items-start w-full overflow-y-auto'>
       <h2 className='capitalize text-4xl font-semibold'>Tell us your story</h2>
       <p className='text-[#B0B0B0] font-normal text-lg'>Share details about what you want to express in your custom tune</p>
       <form onSubmit={handleSubmit(onSubmit, onError)} className='justify-center items-center flex-col w-full gap-6 space-y-6'>

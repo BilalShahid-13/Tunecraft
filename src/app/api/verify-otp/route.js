@@ -29,10 +29,6 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-
-    // Optionally clear the token so it can't be reused
-    // user.resetPasswordToken = undefined;
-    // user.resetPasswordExpires = undefined;
     await user.save();
 
     return NextResponse.json(

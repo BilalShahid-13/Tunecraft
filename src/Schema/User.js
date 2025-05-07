@@ -5,10 +5,22 @@ const userSchema = new mongoose.Schema(
   {
     email: { type: String, required: [true, "email required"], unique: true },
     username: { type: String, required: [true, "username required"] },
-    password: { type: String, required: [true, "password required"] },
+    password: { type: String, required: false },
     role: {
       type: String,
       enum: ["lyricist", "singer", "engineer"],
+      required: true,
+    },
+    musicTemplate: {
+      type: String,
+      required: false,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    cv: {
+      type: String,
       required: true,
     },
     resetPasswordToken: {

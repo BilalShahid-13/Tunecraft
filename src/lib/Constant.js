@@ -10,10 +10,15 @@ import Instagram from "../../public/footer/instagram logo.png";
 import X from "../../public/footer/x.png";
 
 // questions
+import UpdatePassword from "@/components/UpdatePassword";
 import {
+  Clipboard,
   ClipboardCheck,
+  Clock,
+  Key,
   LayoutDashboard,
   LogOut,
+  PlusCircle,
   User,
   Wallet2,
 } from "lucide-react";
@@ -21,14 +26,15 @@ import Celebration from "../../public/question/celebration.png";
 import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
-import UpdatePassword from "@/components/UpdatePassword";
+import craftersManagment from "@/app/admin/components/craftersManagment";
+import projectManagment from "@/app/admin/components/projectManagment";
 
 export const Currency = "MX$";
 
 export const NavbarItem = [
   { name: "Home", route: "/" },
   { name: "Tunes", route: "/tunes" },
-  { name: "About us", route: "/about" },
+  { name: "About us", route: "/?scrollTo=about-us" },
   { name: "Crafters", route: "/Register" },
 ];
 
@@ -83,7 +89,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#F70098,#FF7E6E",
     heading: "Microtune",
-    price: `${Currency}1.499`,
+    price: `${Currency}1499`,
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune, delivered by a professional",
@@ -97,7 +103,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#FF9D76,#FF7E6E",
     heading: "Soundtune",
-    price: `${Currency}2.299`,
+    price: `${Currency}2299`,
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune by a professional",
@@ -111,7 +117,7 @@ export const TunesItem = [
   {
     gradientColor: "0deg,#FF9D76,#FF7E6E",
     heading: "Supremetune",
-    price: `${Currency}3.099`,
+    price: `${Currency}3099`,
     des: "Ready in 5 business days",
     points: [
       "Your personalized tune by a professional",
@@ -139,14 +145,17 @@ export const MelodiesItem = [
   {
     heading: "Birthday song",
     genre: "pop",
+    music: "/sample audio/aniversry.mp3",
   },
   {
     heading: "anniversary song",
     genre: "rock",
+    music: "/sample audio/happy-birthday-177361.mp3",
   },
   {
     heading: "song for parents",
     genre: "pop",
+    music: "/sample audio/happy-birthday-334876.mp3",
   },
 ];
 
@@ -258,5 +267,44 @@ export const SidebarItems = [
     name: "Log out",
     Icon: LogOut,
     route: "/",
+  },
+];
+
+export const adminPanel = [
+  {
+    name: "Crafters Managment",
+    Icon: User,
+    route: craftersManagment,
+  },
+  {
+    name: "Project Managment",
+    Icon: Clipboard,
+    route: projectManagment,
+  },
+];
+
+export const craftersManagmentList = [
+  {
+    name: "All Users",
+    Icon: User,
+    description:
+      "List of all users who have signed up, including information such as username, phone number, role (lyricist, singer, engineer, etc.), and current status (pending, approved, rejected).",
+  },
+  {
+    name: "Pending Approvals",
+    Icon: Clock,
+    description:
+      "List of users who have signed up but are awaiting admin approval.",
+  },
+  {
+    name: "Add New User",
+    Icon: PlusCircle,
+    description: "Admin can manually add a new user and assign them a role.",
+  },
+  {
+    name: "User Roles",
+    Icon: Key,
+    description:
+      "Assign or edit user roles (Lyricist, Singer, Engineer, Admin, etc.).",
   },
 ];
