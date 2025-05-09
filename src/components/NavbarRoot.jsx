@@ -15,6 +15,7 @@ import DashboardNavbar from "./DashboardNavbar";
 import Navbar from "./Navbar";
 import { ScrollArea } from "./ui/scroll-area";
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
+import useSidebarWidth from "@/store/sidebarWidth";
 
 export default function NavbarRoot() {
   const location = usePathname();
@@ -25,6 +26,7 @@ export default function NavbarRoot() {
   const protectedRoutes = roles.map((r) => `/${r.route}`);
   const isMobile = useMediaQuery({ query: "(max-width: 639px)" });
   const items = isAdmin ? adminPanel : SidebarItems;
+  const { addSidebarWidth } = useSidebarWidth()
   useEffect(() => {
     setIsProtectedRoute(protectedRoutes.includes(location));
     if (location === '/admin') {
@@ -37,6 +39,10 @@ export default function NavbarRoot() {
       setSidebarCollapsed(true);
     }
   }, [isMobile])
+
+  useEffect(() => {
+    addSidebarWidth(sidebarCollapsed)
+  }, [sidebarCollapsed])
 
   function toggleSidebar() {
     setSidebarCollapsed(prevState => !prevState);
@@ -79,7 +85,7 @@ export default function NavbarRoot() {
                   p-0 w-full m-0`}
               >
                 {/* sidebar trigger */}
-                <div className='flex flex-row justify-start items-start bg-background'>
+                <div className='flex flex-row justify-start items-start bg-background w-full'>
                   <div className="inline-block max-sm:mt-1 justify-center items-center">
                     <TooltipProvider>
                       <Tooltip>

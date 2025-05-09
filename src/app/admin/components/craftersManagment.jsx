@@ -1,57 +1,88 @@
 "use client";
-import { craftersManagmentList } from '@/lib/Constant'
-import React, { useEffect } from 'react'
-import CustomCard from './CustomCard'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import UserCard from './UserCard'
-import axios from 'axios';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { craftersManagmentList } from '@/lib/Constant';
+import useSidebarWidth from '@/store/sidebarWidth';
+import CustomCard from './CustomCard';
+import UserCard from './UserCard';
+import PendingApproval from "./PendingApproval";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import useAllUsers from "@/store/allUsers";
+import ApproveUsers from "./ApproveUsers";
 
 const components = [
-  UserCard
+  UserCard,
+  PendingApproval,
+  ApproveUsers
 ]
-export default function craftersManagment() {
-  const [allUsers, setAllUsers] = React.useState([])
-  useEffect(() => {
-    fetchData()
-  }, [])
 
-  const fetchData = async () => {
+function CustomComopnent({ Component, users, isLoading }) {
+  return <Component users={users} isLoading={isLoading} />
+}
+
+export default function craftersManagment() {
+  const { width } = useSidebarWidth()
+  const [allUsers, setAllUsers] = useState([])
+  const [loading, setLoading] = useState(false)
+  const { addAllUser, isFetched, setIsUpdate } = useAllUsers()
+
+  useEffect(() => {
+    fetchAllUsers()
+  }, [isFetched])
+
+  const fetchAllUsers = async () => {
     try {
+      setLoading(true)
       const res = await axios.get('/api/fetch-signup-user')
-      // console.log(res.data.data)
       setAllUsers(res.data.data)
+      addAllUser(res.data.data)
+      if (res) {
+        setIsUpdate(false);
+      }
     } catch (error) {
       console.error(error);
-
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <>
-      <Tabs defaultValue={'0'}>
-        <TabsList className="flex gap-3 mt-3 bg-transparent">
+      <Tabs defaultValue="2">
+        <TabsList
+          className={`flex flex-row gap-3 mt-3 mb-6
+          max-xl:grid max-lg:grid max-lg:place-items-center
+             max-xl:grid-cols-2 bg-transparent
+             max-xl:place-items-center
+          ${width ? 'max-lg:grid-cols-2' : 'max-lg:grid-cols-1'}
+             max-sm:grid max-sm:grid-cols-1 w-auto
+               h-auto max-lg:w-full`}
+        >
           {craftersManagmentList.map((items, index) => (
             <TabsTrigger
-              key={index}  // key should be applied to the TabsTrigger
+              key={index}
               value={`${index}`}
-              className="h-auto bg-transparent cursor-pointer p-0 m-0 px-0 py-0 dark:data-[state=active]:bg-transparent"
+              className={`h-auto cursor-pointer
+dark:data-[state=active]:border-[#ff7e6e]
+              ${width ? 'max-lg:w-fit max-xl:w-full' : 'max-lg:w-full'}
+                   p-0 m-0 w-fit max-sm:w-full
+                   dark:data-[state=active]:bg-transparent
+`}
             >
               <CustomCard name={items.name} Icon={items.Icon} />
             </TabsTrigger>
           ))}
         </TabsList>
 
-        <ScrollArea className='mt-10 h-[90vh]'>
-          {components.map((Items, index) => (
-            <TabsContent key={index} value={`${index}`}>
-              <Items allUsers={allUsers}/>
-            </TabsContent>
-          ))}
-        </ScrollArea>
-
+        {components.map((Items, index) => (
+          <TabsContent key={index} value={`${index}`} className="mt-6">
+            <CustomComopnent
+              Component={Items}
+              users={allUsers}
+              isLoading={loading} />
+          </TabsContent>
+        ))}
       </Tabs>
-
 
     </>
   )

@@ -17,7 +17,7 @@ export async function PATCH(request) {
   }
 
   // 3. parse incoming data
-  const { fullName, currentPassword, newPassword } =
+  const { fullName, currentPassword, newPassword, email } =
     await request.json();
 
   // 4. lookup user

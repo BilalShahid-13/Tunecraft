@@ -8,16 +8,18 @@ const transporter = nodemailer.createTransport({
     pass: process.env.GOOGLE_APP_PASSWORD,
   },
 });
-export async function sendMail(subject, html,to) {
+export async function sendMail(subject, html, to) {
   try {
     const info = await transporter.sendMail({
-      to: user.email || to,
+      // to: user.email || to,
+      to: to,
       from: process.env.GOOGLE_APP_USER,
       subject: subject,
       html: html,
     });
     return info;
   } catch (error) {
-    console.error("eror from emailService", error);
+    console.error("error from emailService", error);
+    return info
   }
 }

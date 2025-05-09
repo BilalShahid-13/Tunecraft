@@ -6,7 +6,14 @@ export async function GET() {
   try {
     await dbConnect();
     // Fetch users where role is not 'admin'
-    const users = await User.find({ role: { $ne: "admin" } }); // `$ne` stands for "not equal"
+    const users = await User.find({
+      role: { $ne: "admin" },
+      // $or: [
+      //   { isApproved: false },
+      //   { isApproved: { $exists: false } },
+      //   { isApproved: null },
+      // ],
+    });
 
     return NextResponse.json({
       message: "Data fetch successfully",

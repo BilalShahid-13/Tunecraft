@@ -15,6 +15,9 @@ import { FixedSizeList as List } from "react-window";
 
 const ITEM_HEIGHT = 50;
 
+// Find Mexico in the codes array
+const DEFAULT_COUNTRY = codes.find(item => item.countryCodes[0] === "52") || codes[0];
+
 const OptimizedSelectItem = React.memo(({ index, style, data, onSelect }) => {
   const item = data[index];
   return (
@@ -29,7 +32,7 @@ const OptimizedSelectItem = React.memo(({ index, style, data, onSelect }) => {
           width={20}
           height={15}
           alt={item.country}
-          src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${item.isoCode2}.svg`}
+          src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.isoCode2}.svg`}
         />
         <span>{item.country}</span>
         <span className="font-light text-zinc-500">+{item.countryCodes[0]}</span>
@@ -38,30 +41,25 @@ const OptimizedSelectItem = React.memo(({ index, style, data, onSelect }) => {
   );
 });
 
-export default function PhoneCode({ className, signupForm, defaultValue='52' }) {
-  const [selectedCode, setSelectedCode] = useState("");
+export default function PhoneCode({ className, signupForm, defaultValue }) {
+  const [selectedCode, setSelectedCode] = useState(DEFAULT_COUNTRY.isoCode2);
 
+  // Set default value on mount
   useEffect(() => {
     if (defaultValue) {
-      const match = codes.find((item) =>
-        item.countryCodes?.some(code => String(code) === String(defaultValue))
-      );
-
-      if (match) {
-        setSelectedCode(match.isoCode2);
-        signupForm.setValue("phoneCode", String(match.countryCodes[0]));
-      } else {
-        console.warn(`No matching code found for defaultValue: ${defaultValue}`);
-      }
+      const code = codes.find(item => item.countryCodes.includes(defaultValue));
+      console.log(code.isoCode2)
+      setSelectedCode(`${code.isoCode2}`);
+    } else {
+      setSelectedCode(DEFAULT_COUNTRY.isoCode2);
     }
-  }, [defaultValue, signupForm]);
+  }, []);
 
   const handleValueChange = (value) => {
+    setSelectedCode(value);
     const selectedItem = codes.find((c) => c.isoCode2 === value);
-    if (selectedItem) {
-      setSelectedCode(value);
-      signupForm.setValue("phoneCode", String(selectedItem.countryCodes[0]));
-    }
+    console.log(selectedItem.countryCodes[0])
+    signupForm.setValue('phoneCode', `${selectedItem.countryCodes[0]}`);
   };
 
   const selectedCountry = codes.find((item) => item.isoCode2 === selectedCode);
@@ -74,19 +72,15 @@ export default function PhoneCode({ className, signupForm, defaultValue='52' }) 
       >
         <SelectTrigger className={cn(`w-[120px] py-5`, className)}>
           <SelectValue>
-            {selectedCountry ? (
-              <div className="flex items-center gap-2">
-                <Image
-                  width={20}
-                  height={15}
-                  alt={selectedCountry.country}
-                  src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${selectedCountry.isoCode2}.svg`}
-                />
-                <span>+{selectedCountry.countryCodes[0]}</span>
-              </div>
-            ) : (
-              <span>Select</span>
-            )}
+            <div className="flex items-center gap-2">
+              <Image
+                width={20}
+                height={15}
+                alt={selectedCountry.country}
+                src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${selectedCountry.isoCode2}.svg`}
+              />
+              <span>+{selectedCountry.countryCodes[0]}</span>
+            </div>
           </SelectValue>
         </SelectTrigger>
 
@@ -110,7 +104,7 @@ export default function PhoneCode({ className, signupForm, defaultValue='52' }) 
         </SelectContent>
       </Select>
 
-      {signupForm?.formState?.errors?.phoneCode && (
+      {signupForm.formState.errors.phoneCode && (
         <p className="input-error">{signupForm.formState.errors.phoneCode.message}</p>
       )}
     </div>

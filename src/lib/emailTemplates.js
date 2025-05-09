@@ -1,3 +1,5 @@
+const supportEmail = "support@example.com";
+
 export const paymentSuccessfull = {
   subject: "Payment Successful",
   html: `
@@ -30,5 +32,32 @@ export const forgotPassword = (otp) => {
     html: `<p>Your password reset code is
     <strong>${otp}</strong>.
     It expires in 1 hour.</p>`,
+  };
+};
+
+export const userApproved = (username, email, password) => {
+  return {
+    to: email,
+    subject: "🎉 Your Account Has Been Approved!",
+    html: `<div style="font-family: Arial, sans-serif; max-width: 600px;
+    margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+     <h2 style="color: #ff7e6e;">Welcome to Tunecraft!</h2>
+     <p>Hello <strong>${username}</strong>,
+     </p> <p>Your account has been approved.
+     You can now log in using the credentials below:</p>
+     <table style="margin-top: 20px;"> <tr><td>
+     <strong>Email:</strong></td><td>${email}
+     </td></tr> <tr><td><strong>Password:</strong>
+     </td><td><code>${password}</code></td></tr>
+     </table> <p style="margin-top: 20px;">
+     Click below to get started:</p>
+     <a href="https://your-app.com/login"
+     style="display:inline-block; padding: 10px 15px;
+      background-color: #ff7e6e; color: white; text-decoration: none;
+       border-radius: 4px;">Login Now</a> <p style="margin-top: 30px;
+       font-size: 0.9em; color: #888;">If you didn't request
+        this account or believe this is a mistake,
+        please contact our support team.</p> ${supportEmail}<p>–
+        The Tunecraft Team</p> </div>`,
   };
 };

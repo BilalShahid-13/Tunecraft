@@ -10,24 +10,25 @@ import Instagram from "../../public/footer/instagram logo.png";
 import X from "../../public/footer/x.png";
 
 // questions
+import craftersManagment from "@/app/admin/components/craftersManagment";
+import projectManagment from "@/app/admin/components/projectManagment";
 import UpdatePassword from "@/components/UpdatePassword";
 import {
+  Check,
   Clipboard,
   ClipboardCheck,
   Clock,
   Key,
   LayoutDashboard,
   LogOut,
-  PlusCircle,
   User,
+  UsersRound,
   Wallet2,
 } from "lucide-react";
 import Celebration from "../../public/question/celebration.png";
 import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
-import craftersManagment from "@/app/admin/components/craftersManagment";
-import projectManagment from "@/app/admin/components/projectManagment";
 
 export const Currency = "MX$";
 
@@ -273,7 +274,7 @@ export const SidebarItems = [
 export const adminPanel = [
   {
     name: "Crafters Managment",
-    Icon: User,
+    Icon: UsersRound,
     route: craftersManagment,
   },
   {
@@ -297,9 +298,9 @@ export const craftersManagmentList = [
       "List of users who have signed up but are awaiting admin approval.",
   },
   {
-    name: "Add New User",
-    Icon: PlusCircle,
-    description: "Admin can manually add a new user and assign them a role.",
+    name: "Approved Users",
+    Icon: Check,
+    description: "Users who have been approved and are now active members.",
   },
   {
     name: "User Roles",

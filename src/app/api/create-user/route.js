@@ -30,6 +30,13 @@ export async function POST(request) {
       );
     }
 
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json(
+        { msg: "User already exists", success: false },
+        { status: 400 }
+      );
+    }
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
     const res = await uploadFile(buffer, "/Tunecraft/cv");

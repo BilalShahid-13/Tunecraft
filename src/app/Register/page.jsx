@@ -63,7 +63,7 @@ export default function page() {
       select: '',
       password: "",
       file: "",
-      phoneCode: "+52",
+      phoneCode: "52",
       phone: "",
     },
   })
@@ -114,8 +114,8 @@ export default function page() {
         toast.error(res.data.msg || "Signup failed");
       }
     } catch (error) {
-      toast.error("Error during signup");
-      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data.msg || error.message);
+      console.error(error.response?.data.msg || error.message);
     }
   };
 
