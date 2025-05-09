@@ -59,7 +59,8 @@ const orderSchema = new Schema(
       required: false,
     },
     plan: {
-      type: mongoose.schema.Types.ObjectId,
+      // type: mongoose.schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Plan",
       required: [true, "Plan is required"],
     },
