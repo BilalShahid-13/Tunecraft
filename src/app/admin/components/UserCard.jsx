@@ -200,6 +200,7 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                   </div>
                   <AlertDialogTrigger asChild>
                     <Button
+                      onClick={()=>onDiscard(items)}
                       disabled={discardLoading === items._id}
                       className="bg-zinc-700 text-white hover:bg-zinc-800 cursor-pointer active:green-300">
                       {discardLoading === items._id ?

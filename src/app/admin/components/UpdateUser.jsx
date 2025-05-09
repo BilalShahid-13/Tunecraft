@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -33,7 +34,7 @@ const updateSchema = z.object({
   })
 export default function UpdateUser({ user }) {
   const [defaultPhoneCode, setDefaultPhoneCode] = useState(null);
-
+  const [users, setUsers] = useState(null)
   const updateForm = useForm({
     resolver: zodResolver(updateSchema),
     defaultValues: {
@@ -51,7 +52,7 @@ export default function UpdateUser({ user }) {
     const code = match?.[1];
     const number = match?.[2];
     setDefaultPhoneCode(code);
-
+    setUsers(user)
     updateForm.reset({
       username: user?.username || "",
       email: user?.email || "",
@@ -61,6 +62,14 @@ export default function UpdateUser({ user }) {
       phoneCode: code || "",
     });
   }, [user]);
+
+  useEffect(() => {
+    console.log(users)
+    const match = user?.phone.match(/\(\+(\d+)\)(\d+)/);
+    const code = match?.[1];
+    const number = match?.[2];
+    console.log(match)
+  }, [users])
 
   const onReset = () => {
     const match = user?.phone.match(/\(\+(\d+)\)(\d+)/);
@@ -78,11 +87,11 @@ export default function UpdateUser({ user }) {
     });
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data)
 
     // try {
-    //   const res = await axios.patch()
+    //   const res = await axios.patch('/api/update-users-all')
     // } catch (error) {
     //   console.error(error);
 
