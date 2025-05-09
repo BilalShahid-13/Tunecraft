@@ -9,14 +9,13 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SidebarItems } from "@/lib/Constant";
 import { Loader2 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
-export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile,items }) {
+export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items }) {
   const [loading, setLoading] = useState(false)
   const handleLogout = async () => {
     setLoading(true)

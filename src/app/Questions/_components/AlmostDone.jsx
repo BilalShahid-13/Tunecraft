@@ -1,5 +1,10 @@
 "use client";
-import { Confetti } from '@/components/magicui/confetti';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,17 +13,11 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { Currency } from '@/lib/Constant';
 import useQuestionStore from '@/store/questionStore';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 
 export default function AlmostDone({ onNext, onPrev }) {
   const { formData } = useQuestionStore();

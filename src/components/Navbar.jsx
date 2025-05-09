@@ -12,7 +12,7 @@ import { NavbarItem, roles } from '@/lib/Constant';
 import { Menu } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 function Navbar() {

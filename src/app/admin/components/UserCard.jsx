@@ -4,8 +4,12 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { Button } from '@/components/ui/button'
+} from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,27 +17,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/card";
 
-import { Check, Loader2, Mail, Phone, Sliders, User, X } from 'lucide-react'
-import { generateStrongPassword } from "@/utils/generateStrongPassword"
-import React, { useEffect, useState } from "react"
-import axios from "axios"
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAllUsers from "@/store/allUsers";
+import { generateStrongPassword } from "@/utils/generateStrongPassword";
+import axios from "axios";
+import { Check, Loader2, Mail, Phone, Sliders, User, X } from 'lucide-react';
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import UpdateUser from "./UpdateUser";
 
 function Loader() {

@@ -1,17 +1,16 @@
 "use client";
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios'; // <-- added
 import { Loader2, Lock, Mail } from 'lucide-react';
-import CustomInputField from './CustomInputField';
+import { useSession } from 'next-auth/react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useSession } from 'next-auth/react';
-import React, { useEffect } from 'react';
-import axios from 'axios';  // <-- added
-import { toast } from 'sonner';
 
 // Schemas
 const personalInfoSchema = z.object({
