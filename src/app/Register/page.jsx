@@ -26,7 +26,8 @@ const signupSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().length(10, { message: "Phone number must be 10 digits" }),
-  phoneCode: z.string().min(1, "Please select a country").max(3, "Invalid country code")
+  phoneCode: z.string().min(1, "Please select a country").max(3, "Invalid country code"),
+  textField: z.string().optional(),
 }).superRefine((data, ctx) => {
   if ((data.role === "lyricist" || data.role === "singer") && (!data.select || data.select.trim() === "")) {
     ctx.addIssue({
@@ -95,10 +96,12 @@ export default function page() {
   // const formData = new FormData();
   const onhandleSignup = async (data) => {
     const formData = new FormData();
+    console.log(data.textField)
     formData.append("username", data.fullName);
     formData.append("email", data.email);
     formData.append("role", data.role);
     formData.append("phone", `(+${data.phoneCode})` + data.phone);
+    formData.append("details", data.textField);
     formData.append("musicTemplate", data.select || "");
     if (data.file) {
       formData.append("cv", data.file);

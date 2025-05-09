@@ -1,15 +1,7 @@
 import { uploadFile } from "@/lib/cloudinary";
 import { dbConnect } from "@/lib/dbConnect";
 import User from "@/Schema/User";
-import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 export async function POST(request) {
   const formData = await request.formData();
@@ -20,6 +12,7 @@ export async function POST(request) {
   const phone = formData.get("phone");
   const musicTemplate = formData.get("musicTemplate");
   const file = formData.get("cv");
+  const details = formData.get("details");
 
   try {
     // Check for missing required fields
@@ -29,6 +22,7 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+    await dbConnect();
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -40,7 +34,6 @@ export async function POST(request) {
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
     const res = await uploadFile(buffer, "/Tunecraft/cv");
-    await dbConnect();
     const newUser = await new User({
       email,
       username,
@@ -48,6 +41,7 @@ export async function POST(request) {
       phone,
       musicTemplate,
       cv: res.secure_url,
+      info: details,
     });
     await newUser.save();
 
@@ -61,7 +55,7 @@ export async function POST(request) {
       {
         msg: "User created successfully",
         success: true,
-        data: { secure_url },
+        data: { url: secure_url, data: newUser },
       },
       { status: 200 }
     );

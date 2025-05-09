@@ -52,6 +52,7 @@ export default function UserCard({ users, isLoading = false, approveUser = false
   useEffect(() => {
     if (users) {
       setAllUsers(users)
+      console.log('uses', users)
     }
     if (loading) {
       setLoading(isLoading)
@@ -98,11 +99,6 @@ export default function UserCard({ users, isLoading = false, approveUser = false
       setDiscardLoading(false)
     }
   }
-
-  const formatPhone = (phone) => {
-    return phone.replace(/^(\(\+\d+\))/, ""); // Remove the country code in the format (+xx)
-  };
-
 
   return (
     <div className="flex flex-col gap-3">
@@ -158,6 +154,17 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
+                {items.info && <Accordion type="single" collapsible>
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className={'cursor-pointer'}>
+                      Additional Info
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      {/* CV Preview (using Google Docs Viewer) */}
+                      {items?.info}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>}
               </CardContent>
 
               {items.isApproved ? null
@@ -200,7 +207,7 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                   </div>
                   <AlertDialogTrigger asChild>
                     <Button
-                      onClick={()=>onDiscard(items)}
+                      onClick={() => onDiscard(items)}
                       disabled={discardLoading === items._id}
                       className="bg-zinc-700 text-white hover:bg-zinc-800 cursor-pointer active:green-300">
                       {discardLoading === items._id ?

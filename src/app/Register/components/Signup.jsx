@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from '@/components/ui/textarea'
 import { QuestionsItem } from '@/lib/Constant'
 import { cn } from '@/lib/utils'
 import { LoaderCircle, Mail, User } from 'lucide-react'
@@ -53,35 +54,37 @@ export default function Signup({
           )}
         </div>
 
-        {(watchRole === "lyricist" || watchRole === "singer") && (
+        {["lyricist", "singer"].includes(watchRole) && (
           <Controller
             control={signupForm.control}
             name="select"
-            render={({ field, fieldState }) => { // Add this to see if field.value is updating
-              return (
-                <div className="space-y-2">
-                  <Label className="text-white" htmlFor="select">Select an option</Label>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select an option" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {QuestionsItem.map((items, index) => (
-                        <SelectItem key={index} value={items.question}>
-                          {items.question}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.error && (
-                    <p className="text-red-500">{fieldState.error.message}</p>
-                  )}
-                </div>
-              );
-            }}
+            rules={{ required: "This field is required" }}
+            render={({ field, fieldState }) => (
+              <div className="space-y-2">
+                <Label className="text-white" htmlFor="select">
+                  {watchRole === "lyricist"
+                    ? "Select a question for the writer"
+                    : "Select a question for the singer"}
+                </Label>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {QuestionsItem.map((item, index) => (
+                      <SelectItem key={index} value={item.question}>
+                        {item.question}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.error && (
+                  <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+                )}
+              </div>
+            )}
           />
         )}
-
 
 
         <div className="space-y-2">
@@ -120,7 +123,7 @@ export default function Signup({
         {/* phone */}
         <div className='flex flex-col gap-1'>
           <div className='flex flex-row justify-center items-center gap-1'>
-            <PhoneCode signupForm={signupForm}/>
+            <PhoneCode signupForm={signupForm} />
             <CustomInputField
               label={''}
               placeholder='Enter your WhatsApp number'
@@ -133,6 +136,18 @@ export default function Signup({
             <p className="input-error">{signupForm.formState.errors.phone.message}</p>
           )}
         </div>
+
+        {/* textarea */}
+        <div className="space-y-2">
+          <Label htmlFor="details" className="text-white"> Additional information or preferences</Label>
+          <Textarea placeholder="Write anything you'd like us to know..."
+            id='details'
+            {...signupForm.register("textField")} />
+
+        </div>
+        {signupForm.formState.errors.textField && (
+          <p className="input-error">{signupForm.formState.errors.textField.message}</p>
+        )}
 
         {/* cv */}
         <CustomFileInput signupForm={signupForm}
