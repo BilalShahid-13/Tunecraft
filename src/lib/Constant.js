@@ -245,7 +245,7 @@ export const roles = [
 ];
 export const SidebarItems = [
   {
-    name: "Dashoard",
+    name: "Dashboard",
     Icon: LayoutDashboard,
     route: UpdatePassword,
   },
@@ -257,6 +257,7 @@ export const SidebarItems = [
   {
     name: "Account",
     Icon: User,
+    // route: UpdateUSer,
     route: UpdatePassword,
   },
   {

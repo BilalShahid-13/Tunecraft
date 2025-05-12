@@ -1,16 +1,16 @@
 "use client";
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios'; // <-- added
 import { Loader2, Lock, Mail } from 'lucide-react';
-import { useSession } from 'next-auth/react';
-import React, { useEffect } from 'react';
+import { getSession, signIn } from 'next-auth/react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { GetServerLoading } from '@/utils/GetServerLoading';
 
 // Schemas
 const personalInfoSchema = z.object({
@@ -35,17 +35,30 @@ const passwordUpdateSchema = z
   });
 
 export default function UpdatePassword() {
-  const { data: session } = useSession();
+  const [session, setSession] = useState(null)
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      setSession(sessionData)
+    }
+    fetchSession()
+  }, [])
 
   // Personal‐info form
   const {
     register: registerPersonalInfo,
     handleSubmit: handleSubmitPersonalInfo,
     setValue,
-    formState: { errors: personalInfoErrors, isValidating },
+    setError,
+    getValues,
+    formState: { errors: personalInfoErrors, isValidating, isSubmitting },
   } = useForm({
     resolver: zodResolver(personalInfoSchema),
-    defaultValues: { firstName: "", lastName: "", email: "" },
+    defaultValues: {
+      fullName: session?.user.username,
+      email: session?.user.email
+    },
   });
 
   // Password form
@@ -56,34 +69,63 @@ export default function UpdatePassword() {
     reset,
   } = useForm({
     resolver: zodResolver(passwordUpdateSchema),
-    defaultValues: { currentPassword: "", newPassword: "", confirmNewPassword: "" },
+    defaultValues: {
+      currentPassword: "", newPassword: "", confirmNewPassword: "",
+    },
   });
 
   // Populate initial values
   useEffect(() => {
     if (session?.user) {
-      setValue("fullName", session.user.username || "");
-      setValue("email", session.user.email || "");
+      setValue("fullName", session?.user.username || "");
+      setValue("email", session?.user.email || "");
     }
-  }, [session, setValue]);
+  }, [session]);
 
   // 1) Personal info submit
   const onSubmitPersonalInfo = async (data) => {
+    const payload = {};
+    const fullName = session.user.username
+    const email = session.user.email
+    if (email != data.email) {
+      payload.email = data.email; // Update email if changed
+    }
+    if (fullName != data.fullName) {
+      payload.fullName = data.fullName; // Update username if changed
+    }
+    console.log(payload)
     try {
-      const payload = {
-        fullName: data.fullName,
-      };
       const res = await axios.patch('/api/update-user', payload);
       console.log('Personal info updated:', res.data);
       if (res.data?.message) {
+        if (payload.email) {
+          try {
+            const res = await signIn('updateUsername', {
+              username: payload.fullName,
+              redirect: false,
+            })
+            console.log(res)
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          try {
+            const res = await signIn('updateEmail', {
+              email: payload.email,
+              redirect: false,
+            })
+            console.log(res)
+          } catch (error) {
+            console.error(error);
+
+          }
+        }
         toast.success(res.data.message);
       } else {
         toast.success('Name updated successfully');
       }
-      // e.g. toast.success('Name updated')
     } catch (err) {
       console.error('Error updating personal info:', err.response?.data || err.message);
-      // e.g. toast.error(err.response?.data?.error || 'Update failed')
     }
   };
 
@@ -108,6 +150,10 @@ export default function UpdatePassword() {
       // e.g. toast.error(err.response?.data?.error || 'Password change failed')
     }
   };
+
+
+  if (!session)
+    return <GetServerLoading session={session} />
 
   return (
     <div className='flex justify-center items-center flex-col'>
@@ -144,7 +190,6 @@ export default function UpdatePassword() {
           <Mail className="absolute left-3 top-8 h-5 w-5 text-zinc-500" />
           <Input
             id="email"
-            disabled
             type="email"
             placeholder="Enter your email"
             className="pl-10 w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
@@ -159,8 +204,8 @@ export default function UpdatePassword() {
 
 
         <Button className="primary-btn" type="submit">
-          {isValidating ? <React.Fragment>
-            <Loader2 className='animate-spin' />
+          {isSubmitting ? <React.Fragment>
+            <Loader2 className='animate-spin' /> Saving
           </React.Fragment> : 'Save Changes'}
         </Button>
       </form>

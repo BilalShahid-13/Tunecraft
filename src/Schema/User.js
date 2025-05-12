@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,7 +7,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: false },
     role: {
       type: String,
-      enum: ["lyricist", "singer", "engineer"],
+      enum: ["lyricist", "singer", "engineer", "admin"],
       required: true,
     },
     musicTemplate: {
@@ -17,15 +16,15 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
+      required: false,
     },
-    info:{
-      type:String,
-      required:false
+    info: {
+      type: String,
+      required: false,
     },
     cv: {
       type: String,
-      required: true,
+      required: false,
     },
     resetPasswordToken: {
       type: String,

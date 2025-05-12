@@ -20,6 +20,7 @@ export async function PATCH(request) {
   const { fullName, currentPassword, newPassword, email } =
     await request.json();
 
+  let msg = null;
   // 4. lookup user
   const user = await User.findOne({ email: session.user.email });
   if (!user) {
@@ -32,6 +33,13 @@ export async function PATCH(request) {
   if (fullName) {
     user.fullName = fullName;
     didUpdate = true;
+    msg = 'username updated successfully';
+  }
+
+  if (email) {
+    user.email = email;
+    didUpdate = true;
+    msg = 'email updated successfully';
   }
 
   // 6. handle password update
@@ -50,6 +58,7 @@ export async function PATCH(request) {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     didUpdate = true;
+    msg = 'password updated successfully';
   }
 
   if (!didUpdate) {
@@ -61,5 +70,5 @@ export async function PATCH(request) {
 
   // 7. save and return success
   await user.save();
-  return NextResponse.json({ message: "Profile updated successfully" });
+  return NextResponse.json({ message: msg });
 }

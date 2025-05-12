@@ -47,6 +47,7 @@ export default function UserCard({ users, isLoading = false, approveUser = false
   const [approveLoading, setApproveLoading] = useState(false)
   const [discardLoading, setDiscardLoading] = useState(false)
   const [updateUserProfile, setUpdateUserProfile] = useState(null);
+  const [frameLoading, setFrameLoading] = useState(null)
   const { setIsUpdate } = useAllUsers()
 
   useEffect(() => {
@@ -100,6 +101,10 @@ export default function UserCard({ users, isLoading = false, approveUser = false
     }
   }
 
+  const handleIframeLoad = () => {
+    setFrameLoading(false);
+  };
+
   return (
     <div className="flex flex-col gap-3">
       {loading ? <Loader />
@@ -136,13 +141,21 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                     </AccordionTrigger>
                     <AccordionContent>
                       {/* CV Preview (using Google Docs Viewer) */}
+                      {frameLoading &&
+                        <div className="flex justify-center items-center h-6">
+                          <Loader2 className="animate-spin h-4 w-4" />
+                        </div>
+                      }
                       <iframe
+                        key={index}
                         src={`https://docs.google.com/viewer?url=${items.cv}&embedded=true`}
                         width="100%"
                         height="600px"
+                        onLoad={handleIframeLoad}
                         title="CV Preview"
+                        onError={(e) => console.error(e)}
+                        style={frameLoading ? { display: 'none' } : { display: 'block' }} // Hide iframe while loading
                       ></iframe>
-
                       {/* Download Button */}
                       <a
                         href={items.cv}
@@ -223,7 +236,8 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                 </div> : null}
             </Card >
           </AlertDialog>
-        )}
-    </div>
+        )
+      }
+    </div >
   )
 }

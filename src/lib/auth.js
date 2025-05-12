@@ -91,40 +91,46 @@ export const authOptions = {
         };
       },
     }),
-    // EmailProvider({
-    //   server: process.env.SMTP_HOST,
-    //   // {
-    //   //   host: process.env.SMTP_HOST,
-    //   //   port: process.env.EMAIL_SERVER_HOST,
-    //   //   auth: {
-    //   //     user: process.env.GOOGLE_APP_USER,
-    //   //     pass: process.env.GOOGLE_APP_PASSWORD,
-    //   //   },
-    //   // },
-    //   from: process.env.EMAIL_FROM,
-    //   sendVerificationRequest: async ({ identifier: email }) => {
-    //     await sendVerificationRequest({
-    //       identifier: email,
-    //       url: "http://localhost:3000/verify-email",
-    //       provider: {
-    //         server: process.env.SMTP_HOST,
-    //         from: process.env.EMAIL_FROM,
-    //       },
-    //     });
-    //   },
-    //   async generateVerificationToken() {
-    //     return "ABC123";
-    //   },
-    //   normalizeIdentifier(identifier) {
-    //     // Get the first two elements only,
-    //     // separated by `@` from user input.
-    //     let [local, domain] = identifier.toLowerCase().trim().split("@")
-    //     // The part before "@" can contain a ","
-    //     // but we remove it on the domain part
-    //     domain = domain.split(",")[0]
-    //     return `${local}@${domain}`
-    //   },
-    // }),
+    Credentials({
+      name: "updateEmail",
+      credentials: {
+        username: { label: "Username", type: "text" },
+      },
+      async authorize(credentials) {
+        await dbConnect();
+
+        // Sign-in logic
+        const user = await User.findOne({ email: credentials?.email });
+        if (!user) throw new Error("No email found");
+
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        };
+      },
+    }),
+    Credentials({
+      name: "updateUsername",
+      credentials: {
+        username: { label: "Username", type: "text" },
+      },
+      async authorize(credentials) {
+        await dbConnect();
+
+        // Sign-in logic
+        const user = await User.findOne({ email: credentials?.username });
+        if (!user) throw new Error("No username found");
+
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        };
+      },
+    }),
   ],
 
   callbacks: {
