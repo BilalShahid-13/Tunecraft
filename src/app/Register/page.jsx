@@ -69,8 +69,6 @@ export default function page() {
     },
   })
 
-
-
   const onLoginSubmit = async (data) => {
     try {
       const res = await signIn("credentials", {
@@ -79,7 +77,7 @@ export default function page() {
         redirect: false,
       });
 
-      if (res.ok) {
+      if (res.status === 200) {
         toast.success("Login successful!");
         loginForm.reset();
 

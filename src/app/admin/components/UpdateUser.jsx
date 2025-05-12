@@ -184,6 +184,8 @@ export default function UpdateUser({ user }) {
         console.log(res.data);
       } else {
         toast.error("Error updating user");
+        console.error(error);
+        
       }
     } catch (error) {
       toast.error(error.response?.data?.error || "An error occurred");
