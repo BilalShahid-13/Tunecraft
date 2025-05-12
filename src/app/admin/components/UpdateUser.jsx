@@ -142,25 +142,28 @@ export default function UpdateUser({ user }) {
   };
 
   const onSubmit = async (data) => {
-
     const payload = {};
 
-    // Check if phone has changed, if so, update the phone in the payload
+    // Ensure phone code is correctly compared with the default or current phone code
     const match = users.phone.match(/\(\+(\d+)\)(\d+)/);
     const code = match?.[1];
     const number = match?.[2];
+
     console.log(data.phoneCode, defaultPhoneCode, code);
 
+    // Update username if it differs from the current username
     if (data.username !== users.username) {
       console.log("Updating username:", data.username);
       payload.username = data.username;
     }
 
+    // Update email if it differs from the current email
     if (data.email !== users.email) {
       console.log("Updating email:", data.email);
       payload.email = data.email;
     }
 
+    // Update phone number if it differs from the current number and phone code is different
     if (data.phone !== number && data.phoneCode !== code) {
       console.log("Updating phone:", data.phone);
       payload.phone = `(+${data.phoneCode})${data.phone}`;
@@ -169,25 +172,30 @@ export default function UpdateUser({ user }) {
     // Handle password update if password is changed
     if (data.password && data.password !== users.password) {
       console.log("Updating password");
-      payload.password = data.password;
+      payload.password = data.password; // Remember to hash the password on the backend
     }
 
-    // Ensure you are passing the user ID in the payload
+    // Ensure the user ID is included in the payload
     payload.id = users._id;
-    console.log(payload)
+
+    console.log("Payload to be sent:", payload);
+
     try {
       const res = await axios.patch('/api/update-users-all', payload);
-      if (res.statusText === 'OK') {
-        toast.success(res.data.message);
-        setIsOpen(false)
-        setIsUpdate(true);
-        console.log(res.data);
-      } else {
-        toast.error("Error updating user");
-        console.error(res);
 
+      // Ensure the response status is 200 and handle success
+      if (res.status === 200) {
+        toast.success(res.data.message);
+        setIsOpen(false);  // Close the dialog or reset the form
+        setIsUpdate(true); // Set state indicating the update was successful
+        console.log("Response:", res.data);
       }
+      // else {
+      //   toast.error("Error updating user");
+      //   console.error("Error response:", res);
+      // }
     } catch (error) {
+      // Handle errors properly
       toast.error(error.response?.data?.error || "An error occurred");
       console.error(error.response?.data?.error || error.message);
     }
