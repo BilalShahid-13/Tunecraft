@@ -77,21 +77,26 @@ export default function page() {
         email: data.email,
         password: data.password,
         redirect: false,
-      })
-      if (res) {
-        toast.success('Login successful!')
+      });
+
+      if (res.ok) {
+        toast.success("Login successful!");
+        loginForm.reset();
+
         if (session?.user?.role) {
-          navigate.push(`/${session.user.role.toLowerCase()}`)
+          navigate.push(`/${session.user.role.toLowerCase()}`);
         } else {
-          navigate.refresh()
+          navigate.refresh();
         }
-        loginForm.reset()
+      } else {
+        // signIn does not throw, it returns { ok: false, error: "message" }
+        toast.error(res.error || "Invalid email or password");
       }
     } catch (error) {
-      console.error('Error during login:', error)
-      toast.error('Error during login')
+      console.error("Login exception:", error);
+      toast.error("Something went wrong during login");
     }
-  }
+  };
 
   // const formData = new FormData();
   const onhandleSignup = async (data) => {

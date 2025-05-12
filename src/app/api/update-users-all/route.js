@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs";
 
 export async function PATCH(request) {
   try {
-    const { id, password, email, phone } = await request.json();
+    const { id, password, email, phone, username } = await request.json();
 
-    if (!id || !password || !email || !phone) {
+    if (!id || !password || !email || !phone || !username) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
@@ -27,6 +27,7 @@ export async function PATCH(request) {
       id,
       {
         $set: {
+          username,
           email,
           phone,
           password: hashedPassword,

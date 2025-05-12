@@ -14,8 +14,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -90,12 +92,23 @@ export default function UpdateUser({ user }) {
   const onSubmit = async (data) => {
     console.log(data)
 
-    // try {
-    //   const res = await axios.patch('/api/update-users-all')
-    // } catch (error) {
-    //   console.error(error);
+    try {
+      const res = await axios.patch('/api/update-users-all', {
+        id: user._id,
+        username: data.username,
+        email: data.email,
+        phone: `(+${data.phoneCode})${data.phone}`,
+        password: data.password
+      })
+      if (res.statusText === "OK") {
+        toast.success(res.data.message)
+        console.log(res)
+      }
+    } catch (error) {
+      toast.success(error.response.data.error)
+      console.error(error);
 
-    // }
+    }
   }
 
   return (
@@ -152,7 +165,11 @@ export default function UpdateUser({ user }) {
               Reset
             </Button>
             <Button type="submit" disabled={!updateForm.formState.isValid}>
-              Update Changes
+              {updateForm.formState.isSubmitting ?
+                <React.Fragment>
+                  <Loader2 className="animate-spin" />
+                  Updating...
+                </React.Fragment> : 'Update Changes'}
             </Button>
           </DialogFooter>
         </form>
