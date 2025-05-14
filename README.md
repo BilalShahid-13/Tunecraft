@@ -34,3 +34,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+<!-- db template -->
+{
+  "_id": { "$oid": "6824992fc2c247c70e1dc4cf" },
+  "email": "atif@gmail.com",
+  "username": "atif",
+  "role": "singer",
+  "musicTemplate": "Love Song",
+  "phone": "(+52)1111111111",
+  "info": "i want shayari",
+  "cv": "https://res.cloudinary.com/dbsxojyxy/raw/upload/v1746804136/Tunecraft/…",
+  "password": "$2b$12$Vr3W5PrOSv2rpXUFXi2IMedwPIlI0Xbw0U57WsmfsGvIlh84sMjdW",
+  "userStatus": "rejected"
+}

@@ -1,4 +1,5 @@
 "use client"
+import React from 'react';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,16 +13,28 @@ import PhoneCode from "../../components/PhoneCode"
 import axios from "axios"
 import { toast } from "sonner"
 import { Currency } from "@/lib/Constant"
-
+import { z } from "zod"
+import { Loader2 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import CustomInputField from "@/components/CustomInputField"
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-
-function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, songGenre }) {
+const checkOutSchema = z.object({
+  firstName: z.string().min(2, { message: "First name must be at least 2 characters" }),
+  lastName: z.string().min(2, { message: "Last name must be at least 2 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  phone: z.string().length(10, { message: "Phone number must be 10 digits" }),
+  phoneCode: z.string().min(1, "Please select a country").max(3, "Invalid country code"),
+  address: z.string().min(2, { message: "Address must be at least 2 characters" }),
+})
+function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, songGenre, personalInfo }) {
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [defaultCode, setDefaultCode] = useState('52');
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -30,15 +43,40 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
     address: "",
   })
 
+  const chekoutForm = useForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      phoneCode: "51",
+      address: "",
+    },
+    resolver: zodResolver(checkOutSchema),
+  })
+
+  useEffect(() => {
+    if (personalInfo) {
+      chekoutForm.setValue("firstName", personalInfo.firstName)
+      chekoutForm.setValue("lastName", personalInfo.lastName)
+      chekoutForm.setValue("email", personalInfo.email)
+      chekoutForm.setValue("phone", personalInfo.phone)
+      setDefaultCode(personalInfo.phoneCode)
+      // chekoutForm.setValue("phoneCode", personalInfo.phoneCode)
+    }
+  }, [personalInfo])
+
+  console.log(personalInfo)
+
   const totalAmount = packagePrice + processingFee
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (data) => {
+    console.log('handleSubmit', data, convertToSubCurrency(totalAmount),
+      musicTitle, songGenre, packageName)
 
     if (!stripe || !elements) {
       return;
@@ -62,57 +100,61 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
         },
         body: JSON.stringify({
           amount: convertToSubCurrency(totalAmount), // Convert to cents
-          email: formData.email,
+          email: data.email,
           metadata: {
             packageName,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            address: formData.address,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phone: `+(${data.phoneCode})` + data.phone,
+            address: data.address,
             musicTitle: musicTitle,
             songGenre: songGenre,
+            jokes: personalInfo.memories,
+            backgroundStory: personalInfo.backgroundStory,
           },
         }),
       });
 
+      console.log('Payment Intent Response:', response); // Add this log to check server response
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Error Data:', errorData); // Log the error response
         throw new Error(errorData.message || "Something went wrong");
       }
 
       const { clientSecret } = await response.json();
 
-      // Log the clientSecret for debugging
-      console.log("Client Secret:", clientSecret);
+      console.log("Client Secret:", clientSecret); // Log the client secret
 
       // Confirm the payment with Stripe
       const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email,
-            phone: formData.phone,
+            name: `${data.firstName} ${data.lastName}`,
+            email: data.email,
+            phone: `+(${data.phoneCode})` + data.phone,
             address: {
-              line1: formData.address,
+              line1: data.address,
             },
           },
         },
       });
 
       if (confirmError) {
-        console.error(confirmError);
+        console.error('Stripe Payment Error:', confirmError);
         throw new Error(confirmError.message || "Payment failed");
       }
 
       if (paymentIntent.status === "succeeded") {
-        const res = await sendMail(formData.email);
+        const res = await sendMail(data.email);
         if (res) {
           router.push(`/success`);
         }
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error in handleSubmit:', err); // Log the error to track issues
       setError(err.message || "Something went wrong");
     } finally {
       setIsLoading(false);
@@ -121,6 +163,7 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
 
 
   const sendMail = async (email) => {
+    console.log('email', email)
     try {
       const response = await axios.post('/api/send-mail', {
         to: email
@@ -140,7 +183,7 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full space-y-2 px-4">
+    <form onSubmit={chekoutForm.handleSubmit(handleSubmit)} className="w-full space-y-2 px-4">
       <h1 className="text-3xl font-inter font-bold text-white">Payment Details</h1>
       <h2 className="text-lg text-white mb-4">Billing Information</h2>
       <div className="grid grid-cols-2 w-full gap-12 max-sm:grid-cols-1
@@ -148,69 +191,52 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
 
         <div className="flex flex-col justify-start gap-8 w-full">
           <div className="grid grid-cols-2 justify-start gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-white">
-                First Name
-              </Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                placeholder="Enter Name"
-                required
-                value={formData.firstName}
-                onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-white">
-                Last Name
-              </Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                placeholder="Enter Last Name"
-                required
-                value={formData.lastName}
-                onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
-              />
-            </div>
+            <CustomInputField
+              errors={chekoutForm.formState.errors}
+              type="firstName"
+              label="First Name"
+              {...chekoutForm.register('firstName')}
+              // value={formData.firstName}
+              placeholder="Enter Name" />
+            <CustomInputField
+              errors={chekoutForm.formState.errors}
+              type="lastName"
+              label="Last Name"
+              {...chekoutForm.register('lastName')}
+              // value={formData.firstName}
+              placeholder="Enter Name" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-white">
-              Email Address
-            </Label>
-            <Input
-              id="email"
-              name="email"
+            <CustomInputField
+              errors={chekoutForm.formState.errors}
               type="email"
-              placeholder="example@gmail.com"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
-            />
+              label="Email"
+              {...chekoutForm.register('email')}
+              // value={formData.firstName}
+              placeholder="Enter Email" />
           </div>
-
 
           <div className="space-y-2">
             <Label htmlFor="phone" className="text-white">
               Phone Number
             </Label>
             <div className="flex flex-row justify-center items-center gap-2">
-              <PhoneCode className={'w-[100px] px-2 py-0'} />
-              <Input
-                id="phone"
-                name="phone"
-                placeholder="123-000-00-00"
-                required
-                value={formData.phone}
-                onChange={handleChange}
-                className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
-              />
+              <PhoneCode className={'w-[100px] px-2 py-0'}
+                // {...CheckoutForm.register('phoneCode')}
+                signupForm={chekoutForm} defaultValue={defaultCode} />
+              <CustomInputField
+                className={'py-0'}
+                {...chekoutForm.register('phone')}
+                type="phone"
+                label={null}
+                placeholder="123-000-00-00" />
             </div>
-
+            {chekoutForm.formState.errors.phone &&
+              <span className="input-error">
+                {chekoutForm.formState.errors.phone.message}</span>}
+            {chekoutForm.formState.errors.phoneCode &&
+              <span className="input-error">
+                {chekoutForm.formState.errors.phoneCode.message}</span>}
           </div>
         </div>
 
@@ -242,18 +268,13 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
             </div>
           </div>
           <div className="space-y-2 pt-7">
-            <Label htmlFor="address" className="text-white">
-              Billing Address
-            </Label>
-            <Input
-              id="address"
-              name="address"
-              placeholder="Street Address"
-              required
-              value={formData.address}
-              onChange={handleChange}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
-            />
+            <CustomInputField
+              errors={chekoutForm.formState.errors}
+              type="address"
+              label={'Billing Address'}
+              {...chekoutForm.register('address')}
+              // value={CheckoutForm.}
+              placeholder="Street Address" />
           </div>
         </div>
 
@@ -280,9 +301,12 @@ function CheckoutForm({ packageName, packagePrice, processingFee, musicTitle, so
       <Button
         type="submit"
         disabled={!stripe || isLoading}
-        className="w-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white py-4"
+        className="w-full bg-[#ff6b6b] hover:bg-[#ff5252]
+         text-white py-4 cursor-pointer"
       >
-        {isLoading ? "Processing..." : "Complete Payment"}
+        {isLoading ? <React.Fragment>
+          <Loader2 className="animate-spin" /> Processing
+        </React.Fragment> : "Complete Payment"}
       </Button>
     </form>
   )
@@ -297,7 +321,16 @@ export default function PaymentForm() {
     musicTitle: '',
     songGenre: ''
   });
-  console.log('formdata', formData)
+  console.log('formData', formData)
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    phoneCode: "",
+    memories: "",
+    backgroundStory: ""
+  })
 
   useEffect(() => {
     if (formData && formData.step3) {
@@ -322,6 +355,21 @@ export default function PaymentForm() {
         songGenre: songGenre
       });
     }
+    if (formData && formData.step2) {
+      const username = formData.step2.name || "";
+      const [firstName, lastName] = username.split(' ');
+      if (username) {
+        setPersonalInfo({
+          firstName: firstName || "",
+          lastName: lastName || "",
+          email: formData.step2?.email,
+          phone: formData.step2?.phone,
+          phoneCode: formData.step2?.phoneCode,
+          memories: formData.step2?.memories,
+          backgroundStory: formData.step2?.backgroundStory
+        })
+      }
+    }
   }, [formData]);
 
   return (
@@ -334,6 +382,7 @@ export default function PaymentForm() {
             processingFee={price.processingFee}
             musicTitle={price.musicTitle}
             songGenre={price.songGenre}
+            personalInfo={personalInfo}
           />
         </Elements>
       </div>

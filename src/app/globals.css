@@ -1,13 +1,10 @@
 @import "tailwindcss"; /* Global CSS */
 @import "tw-animate-css";
-/* @import "tailwindcss-nth-child"; */
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* --font-poppins: "Poppins", sans-serif; */
   --font-poppins: var(--font-poppins);
   --font-inter: var(--font-inter);
-  /* --font-inter: "Inter", sans-serif; */
 }
 
 @theme inline {
@@ -48,6 +45,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* width breakpoints */
+  --breakpoint-xs: 25rem;
 }
 
 :root {
@@ -150,7 +149,7 @@
 .heading-1 {
   @apply text-7xl max-sm:text-2xl
 font-semibold text-center max-md:text-5xl
-max-lg:text-6xl
+max-lg:text-6xl max-xs:text-2xl
    leading-20 max-sm:leading-relaxed;
 }
 
@@ -159,7 +158,7 @@ max-lg:text-6xl
 }
 
 .input-error {
-  @apply text-red-500 text-sm;
+  @apply text-red-400 text-xs;
 }
 
 .inputfield-box {

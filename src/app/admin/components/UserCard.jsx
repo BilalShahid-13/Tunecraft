@@ -7,6 +7,13 @@ import {
 } from "@/components/ui/accordion";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
@@ -24,7 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import useAllUsers from "@/store/allUsers";
 import { generateStrongPassword } from "@/utils/generateStrongPassword";
 import axios from "axios";
-import { Check, Loader2, Mail, Phone, Sliders, User, X } from 'lucide-react';
+import { Check, Frown, Loader2, Mail, Phone, Sliders, User, X } from 'lucide-react';
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import UpdateUser from "./UpdateUser";
@@ -41,12 +48,13 @@ function Loader() {
   )
 }
 
-export default function UserCard({ users, isLoading = false, approveUser = false }) {
+export default function UserCard({ users, isLoading = false, userStatus = null, userRole = false }) {
   const [allUsers, setAllUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [approveLoading, setApproveLoading] = useState(false)
   const [discardLoading, setDiscardLoading] = useState(false)
   const [updateUserProfile, setUpdateUserProfile] = useState(null);
+  const [isOpen, setOpen] = useState(false)
   const [frameLoading, setFrameLoading] = useState(null)
   const { setIsUpdate } = useAllUsers()
 
@@ -60,6 +68,22 @@ export default function UserCard({ users, isLoading = false, approveUser = false
     }
   }, [users, isLoading])
 
+  console.log('user card', users)
+
+
+  function _userStatus(status) {
+    if (status === 'pending') {
+      return { label: 'Pending', colorClass: 'bg-blue-400' };  // Blue for pending
+    }
+    if (status === 'approved') {
+      return { label: 'Approved', colorClass: 'bg-green-400' };  // Green for approved
+    }
+    if (status === 'rejected') {
+      return { label: 'Rejected', colorClass: 'bg-red-400' };  // Red for rejected
+    }
+  }
+
+
   async function onApprove(user) {
     setApproveLoading(user._id);
     setIsUpdate(true);
@@ -72,7 +96,7 @@ export default function UserCard({ users, isLoading = false, approveUser = false
         password: password,
       });
       if (res) {
-        setIsUpdate();
+        setIsUpdate(true);
       }
       toast.success(res.data.message);
     } catch (error) {
@@ -88,10 +112,29 @@ export default function UserCard({ users, isLoading = false, approveUser = false
     setDiscardLoading(user._id)
     console.log('user', user._id)
     try {
-      const res = await axios.delete('/api/discard-application', {
+      const res = await axios.delete('/api/reject-application', {
         data: { id: user._id }
       });
-      if (res) {
+      if (res.statusText === 'OK') {
+        toast.success('Application Discarded');
+        setTimeout(() => setIsUpdate(), 500);
+
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDiscardLoading(false)
+    }
+  }
+
+  async function onHide(user) {
+    setDiscardLoading(user._id)
+    console.log('user', user._id)
+    try {
+      const res = await axios.patch('/api/hide-application', {
+        data: { id: user._id }
+      });
+      if (res.statusText === 'OK') {
         setIsUpdate();
       }
     } catch (error) {
@@ -105,6 +148,17 @@ export default function UserCard({ users, isLoading = false, approveUser = false
     setFrameLoading(false);
   };
 
+  if (allUsers.length === 0) {
+    return (
+      <div className="flex justify-center items-center gap-3 flex-col">
+        {/* <Frown className="text-red-500" size={50} /> */}
+        <p className="text-zinc-400 font-inter">{` No users have been ${userStatus} yet. Don’t worry, let’s get things started!`}
+        </p>
+      </div>
+    )
+  }
+
+  console.log(userStatus, 'all user', allUsers.length === 0)
   return (
     <div className="flex flex-col gap-3">
       {loading ? <Loader />
@@ -113,12 +167,26 @@ export default function UserCard({ users, isLoading = false, approveUser = false
             <Card key={index} className={'relative z-0 max-lg:w-full'}>
               <CardHeader className={'flex flex-col gap-4'}>
                 <CardTitle className={'flex justify-between items-center gap-3 text-lg font-inter capitalize w-full'}>
-                  <div className='flex flex-row justify-start items-center gap-3'>
-                    <Sliders color={'#ff7e6e'} size={15} />
-                    {items.role}
-                    <Badge className={'bg-[#ff7e6e]'}>{items.isApproved ? 'Approved' : 'Pending'}</Badge>
-                  </div>
-                  <p className='capitalize font-medium text-zinc-200'>{items?.musicTemplate}</p>
+                  {userRole ?
+                    <div className="flex flex-row-reverse justify-between items-center w-full">
+                      <Badge className={_userStatus(items.userStatus).colorClass}>
+                        {_userStatus(items.userStatus).label}
+                      </Badge>
+                      <p className='capitalize font-medium text-zinc-200'>{items?.musicTemplate}</p>
+
+                    </div>
+                    :
+                    <React.Fragment>
+                      <div className='flex flex-row justify-start items-center gap-3'>
+                        <Sliders color={'#ff7e6e'} size={15} />
+                        {items.role}
+                        <Badge className={_userStatus(items.userStatus).colorClass}>
+                          {_userStatus(items.userStatus).label}
+                        </Badge>
+                      </div>
+                      <p className='capitalize font-medium text-zinc-200'>{items?.musicTemplate}</p>
+                    </React.Fragment>
+                  }
                 </CardTitle>
                 <CardDescription className={'flex flex-col gap-2'}>
                   <p className="capitalize font-inter flex flex-row gap-2 justify-start items-center"> <User size={13} /> {items?.username}</p>
@@ -180,8 +248,8 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                 </Accordion>}
               </CardContent>
 
-              {items.isApproved ? null
-                : <CardFooter className={'flex flex-row-reverse justify-end items-center w-full gap-3'}>
+              {userStatus === 'pending' &&
+                <CardFooter className={'flex flex-row-reverse justify-end items-center w-full gap-3'}>
                   <Button className="bg-[#ff7e6e] hover:bg-red-400 cursor-pointer active:bg-red-400"
                     onClick={() => onApprove(items)}
                     disabled={approveLoading === items._id}>
@@ -196,21 +264,24 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                   </Button>
                   <AlertDialogTrigger asChild>
                     <Button
+                      onClick={() => onHide(items)}
+                      // onClick={() => onDiscard(items)}
                       disabled={discardLoading === items._id}
                       className="bg-zinc-700 text-white hover:bg-zinc-800 cursor-pointer active:green-300">
                       {discardLoading === items._id ?
                         <React.Fragment>
                           <Loader2 className="animate-spin" />
-                          Discarding
+                          Rejecting
                         </React.Fragment>
                         :
                         <React.Fragment>
-                          <X /> Discard</React.Fragment>}
+                          <X /> Reject</React.Fragment>}
                     </Button>
                   </AlertDialogTrigger>
                 </CardFooter>
               }
-              {approveUser ?
+              {/* approved users */}
+              {userStatus === 'approved' &&
                 <div className="flex flex-row justify-start items-center w-full gap-3 ml-4"
                 >
                   <div onClick={(e) => setUpdateUserProfile(items)}>
@@ -220,20 +291,76 @@ export default function UserCard({ users, isLoading = false, approveUser = false
                   </div>
                   <AlertDialogTrigger asChild>
                     <Button
-                      onClick={() => onDiscard(items)}
+                      onClick={() => {
+                        onHide(items)
+                        setOpen(false)
+                      }}
                       disabled={discardLoading === items._id}
                       className="bg-zinc-700 text-white hover:bg-zinc-800 cursor-pointer active:green-300">
                       {discardLoading === items._id ?
                         <React.Fragment>
                           <Loader2 className="animate-spin" />
-                          Discarding
+                          Rejecting
                         </React.Fragment>
                         :
                         <React.Fragment>
-                          <X /> Discard</React.Fragment>}
+                          <X /> Reject approve</React.Fragment>}
                     </Button>
                   </AlertDialogTrigger>
-                </div> : null}
+                </div>}
+
+              {userStatus === 'rejected' &&
+                <CardFooter className={'flex flex-row-reverse justify-end items-center w-full gap-3'}>
+                  <Button className="bg-[#ff7e6e] hover:bg-red-400 cursor-pointer active:bg-red-400"
+                    onClick={() => onApprove(items)}
+                    disabled={approveLoading === items._id}>
+                    {approveLoading === items._id ?
+                      <React.Fragment>
+                        <Loader2 className="animate-spin" />
+                        Approving
+                      </React.Fragment>
+                      :
+                      <React.Fragment>
+                        <Check /> Approve</React.Fragment>}
+                  </Button>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      onClick={() =>
+                        setOpen(true)}
+                      className="bg-zinc-700 text-white hover:bg-zinc-800 cursor-pointer active:green-300">
+                      <React.Fragment>
+                        <X /> Discard</React.Fragment>
+                    </Button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent open={isOpen}>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the account
+                        and remove your data from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={discardLoading === items._id}
+                        onClick={() => {
+                          onDiscard(items)
+                        }}>
+                        {discardLoading === items._id ?
+                          <React.Fragment>
+                            <Loader2 className="animate-spin" />
+                            Discarding
+                          </React.Fragment>
+                          :
+                          'Continue'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </CardFooter>
+              }
+
             </Card >
           </AlertDialog>
         )

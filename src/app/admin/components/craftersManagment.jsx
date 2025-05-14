@@ -1,22 +1,27 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { craftersManagmentList } from '@/lib/Constant';
-import useSidebarWidth from '@/store/sidebarWidth';
-import CustomCard from './CustomCard';
-import UserCard from './UserCard';
-import PendingApproval from "./PendingApproval";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import useAllUsers from "@/store/allUsers";
+import useSidebarWidth from '@/store/sidebarWidth';
+import axios from "axios";
+import { useEffect, useState } from "react";
 import ApproveUsers from "./ApproveUsers";
+import CustomCard from './CustomCard';
+import PendingApproval from "./PendingApproval";
+import RejectedUsers from "./RejectedUsers";
+import UserCard from './UserCard';
+import UserRole from "./UserRole";
 
 const components = [
   UserCard,
   PendingApproval,
-  ApproveUsers
+  ApproveUsers,
+  RejectedUsers,
+  UserRole
 ]
 
-function CustomComopnent({ Component, users, isLoading }) {
+function CustomComopnent({ Component, users, isLoading, index }) {
+  // console.log(index)
   return <Component users={users} isLoading={isLoading} />
 }
 
@@ -48,29 +53,31 @@ export default function craftersManagment() {
 
   return (
     <>
-      <Tabs defaultValue="0">
+      <Tabs defaultValue="0" className={'w-full flex'}>
         <TabsList
-          className={`flex flex-row flex-wrap justify-center items-center
-    gap-3 mt-3 mb-6
-    max-xl:grid max-xl:grid-cols-2 max-xl:place-items-center
-    max-lg:grid max-lg:place-items-center
-    ${width ? 'max-lg:grid-cols-2' : 'max-lg:grid-cols-1'}
-    max-sm:grid max-sm:grid-cols-1
-    bg-transparent h-auto w-full`}
+          className={`grid grid-cols-4 grid-rows-2 place-items-center
+          gap-3 mt-3 mb-6  max-xl:grid max-xl:grid-cols-2
+          max-xl:place-items-center
+          max-md:grid-cols-2
+          max-lg:grid max-lg:place-items-center
+          ${width ? 'max-lg:grid-cols-3' : 'max-lg:grid-cols-1'}
+          max-sm:grid max-sm:grid-cols-1
+          bg-transparent h-auto w-full`}
         >
           {craftersManagmentList.map((items, index) => (
             <TabsTrigger
               key={index}
               value={`${index}`}
-              className={`
-        w-full h-auto p-0 m-0 cursor-pointer
+              className={`h-auto p-0 m-0 cursor-pointer w-full
         dark:data-[state=active]:bg-transparent
         rounded-xl transition-all
         dark:data-[state=active]:border-[#ff7e6e]
         max-sm:w-full
+        ${index >= 4 ? `col-span-4 max-md:col-span-2
+        max-sm:col-span-1 max-xl:col-span-2 max-lg:col-span-1
+         ` : ''}
       `}
             >
-
               <CustomCard name={items.name} Icon={items.Icon} />
             </TabsTrigger>
           ))}
@@ -82,7 +89,8 @@ export default function craftersManagment() {
             <CustomComopnent
               Component={Items}
               users={allUsers}
-              isLoading={loading} />
+              isLoading={loading}
+              index={index} />
           </TabsContent>
         ))}
       </Tabs>

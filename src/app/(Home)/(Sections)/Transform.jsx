@@ -24,10 +24,6 @@ export default function Transform() {
      justify-center relative max-sm:gap-3'>
       <GradientText txt='We transform your emotions into songs.'
         className={'heading-1 uppercase w-[90%]'}
-      // className={`uppercase text-7xl max-sm:text-2xl max-md:text-5xl
-      //   max-lg:text-5xl max-lg:w-full max-xl:text-6xl max-xl:w-full
-      // font-medium w-[70%] max-sm:leading-relaxed max-md:w-full
-      // text-center leading-28 max-md:leading-relaxed`}
       />
       <Carousel />
       {/* <CustomButton /> */}

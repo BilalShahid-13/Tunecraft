@@ -15,7 +15,7 @@ export default function PendingApproval() {
 
   return (
     <>
-      <UserCard users={pendingUsers} />
+      <UserCard users={pendingUsers} userStatus='pending'/>
     </>
   )
 }

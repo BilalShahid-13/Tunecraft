@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { mongo, Schema } from "mongoose";
 
 const songGenre = [
   "Love Song",
@@ -19,7 +19,7 @@ const musicGenre = [
   "Inspirational Journey",
 ];
 
-const orderSchema = new Schema(
+const orderSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -28,10 +28,8 @@ const orderSchema = new Schema(
       maxLength: [50, "Name must be at most 50 characters"],
     },
     phone: {
-      type: Number,
+      type: String,
       required: [true, "Phone number is required"],
-      length: [11, "Phone number must be 11 digits"],
-      unique: true,
     },
     email: {
       type: String,
@@ -56,11 +54,11 @@ const orderSchema = new Schema(
     },
     backgroundStory: {
       type: String,
-      required: false,
+      required: true,
     },
     plan: {
-      // type: mongoose.schema.Types.ObjectId,
-      type: Schema.Types.ObjectId,
+      // type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Plan",
       required: [true, "Plan is required"],
     },

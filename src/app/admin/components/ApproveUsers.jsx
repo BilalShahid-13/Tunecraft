@@ -15,7 +15,7 @@ export default function ApproveUsers() {
 
   return (
     <>
-      <UserCard users={activeUsers} approveUser={true}/>
+      <UserCard users={activeUsers} userStatus={'approved'} />
     </>
   )
 }

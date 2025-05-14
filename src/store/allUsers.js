@@ -4,17 +4,20 @@ const useAllUsers = create((set) => ({
   allUser: [],
   pendingUser: [],
   activeUser: [],
+  rejectedUser: [],
   userRole: [],
   isFetched: false,
 
   addAllUser: (users) => {
-    const pending = users.filter((user) => user.isApproved === false);
-    const approved = users.filter((user) => user.isApproved === true);
+    const pending = users.filter((user) => user.userStatus === "pending");
+    const approved = users.filter((user) => user.userStatus === "approved");
+    const rejected = users.filter((user) => user.userStatus === "rejected");
 
     set({
       allUser: users,
       pendingUser: pending,
       activeUser: approved,
+      rejectedUser: rejected,
     });
   },
 

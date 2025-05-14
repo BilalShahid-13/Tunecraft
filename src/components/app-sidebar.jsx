@@ -43,7 +43,6 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
           </div> : !sidebarCollapsed && (
             <div className="w-full justify-center items-center flex flex-col">
               <Link href={'/'} className="text-4xl font-inter mt-4 cursor-pointer font-semibold text-center text-[#FF7E6E]"
-              // onClick={() => navigate.push('/')}
               >
                 Tunecraft
               </Link>
@@ -61,7 +60,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
                   key={items.name}
                   onClick={() => {
                     if (items.name === 'Log out') {
-                      handleLogout(); // Trigger the handleLogout function on click
+                      handleLogout();
                     }
                   }}
                   className={`dark:data-[state=active]:bg-[#FF7E6E40]

@@ -61,3 +61,4 @@ export const userApproved = (username, email, password) => {
         The Tunecraft Team</p> </div>`,
   };
 };
+

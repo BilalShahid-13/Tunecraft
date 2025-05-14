@@ -22,6 +22,8 @@ import {
   LayoutDashboard,
   LogOut,
   User,
+  UserCheck,
+  UserRoundX,
   UsersRound,
   Wallet2,
 } from "lucide-react";
@@ -29,6 +31,7 @@ import Celebration from "../../public/question/celebration.png";
 import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
+import Dashboard from "@/app/(Dashboard)/components/Dashboard";
 
 export const Currency = "MX$";
 
@@ -236,6 +239,118 @@ export const musicTemplates = [
   },
 ];
 
+// tunes
+export const tuneAudioItems = [
+  {
+    model: "Microtune",
+    gradientColor: "0deg,#F70098,#FF7E6E",
+    tunes: [
+      {
+        name: "Birthday Song",
+        songTemplate: "Celebration",
+        musicLink: "/audio/alone-296348.mp3",
+      },
+      {
+        name: "Anniversary Ballad",
+        songTemplate: "Romance",
+        musicLink:
+          "/audio/brain-implant-cyberpunk-sci-fi-trailer-action-intro-330416.mp3",
+      },
+      {
+        name: "Birthday Song",
+        songTemplate: "Celebration",
+        musicLink: "/audio/kugelsicher-by-tremoxbeatz-302838 (1).mp3",
+      },
+      {
+        name: "Graduation Anthem",
+        songTemplate: "Achievement",
+        musicLink:
+          "/audio/lost-in-dreams-abstract-chill-downtempo-cinematic-future-beats-270241.mp3",
+      },
+    ],
+  },
+  {
+    model: "Soundtune",
+    gradientColor: "0deg,#FF9D76,#FF7E6E",
+    tunes: [
+      {
+        name: "Graduation Anthem",
+        songTemplate: "Achievement",
+        musicLink: "/audio/dont-talk-315229.mp3",
+      },
+      {
+        name: "Wedding First Dance",
+        songTemplate: "Romance",
+        musicLink: "/audio/experimental-cinematic-hip-hop-315904.mp3",
+      },
+      {
+        name: "Graduation Anthem",
+        songTemplate: "Achievement",
+        musicLink:
+          "/audio/showreel-music-promo-advertising-opener-vlog-background-intro-theme-261601.mp3",
+      },
+    ],
+  },
+  {
+    model: "Supremetune",
+    gradientColor: "0deg,#FF9D76,#FF7E6E",
+    tunes: [
+      {
+        name: "Friendship Tribute",
+        songTemplate: "Personal",
+        musicLink: "/audio/so-fresh-315255.mp3",
+      },
+      {
+        name: "Family Celebration",
+        songTemplate: "Family",
+        musicLink:
+          "/audio/showreel-music-promo-advertising-opener-vlog-background-intro-theme-261601.mp3",
+      },
+      {
+        name: "Love Declaration",
+        songTemplate: "Romance",
+        musicLink: "/audio/so-fresh-315255.mp3",
+      },
+      {
+        name: "Friendship Tribute",
+        songTemplate: "Personal",
+        musicLink: "/audio/soulsweeper-252499.mp3",
+      },
+    ],
+  },
+  {
+    model: "Tunecraft",
+    gradientColor: "0deg,#F70098,#FF7E6E",
+    tunes: [
+      {
+        name: "Love Declaration",
+        songTemplate: "Romance",
+        musicLink: "/audio/gardens-stylish-chill-303261.mp3",
+      },
+      {
+        name: "Inspirational Journey",
+        songTemplate: "Motivation",
+        musicLink: "/audio/gorila-315977.mp3",
+      },
+      {
+        name: "Love Declaration",
+        songTemplate: "Romance",
+        musicLink: "/audio/spinning-head-271171.mp3",
+      },
+      {
+        name: "Love Declaration",
+        songTemplate: "Romance",
+        musicLink: "/audio/stylish-deep-electronic-262632.mp3",
+      },
+      {
+        name: "Friendship Tribute",
+        songTemplate: "Personal",
+        musicLink: "/audio/tell-me-the-truth-260010.mp3",
+      },
+    ],
+  },
+];
+
 export const roles = [
   { name: "lyricist", route: "lyricist" },
   { name: "engineer", route: "engineer" },
@@ -247,7 +362,7 @@ export const SidebarItems = [
   {
     name: "Dashboard",
     Icon: LayoutDashboard,
-    route: UpdatePassword,
+    route: Dashboard,
   },
   {
     name: "Tasks",
@@ -300,7 +415,12 @@ export const craftersManagmentList = [
   },
   {
     name: "Approved Users",
-    Icon: Check,
+    Icon: UserCheck,
+    description: "Users who have been approved and are now active members.",
+  },
+  {
+    name: "Rejected Users",
+    Icon: UserRoundX,
     description: "Users who have been approved and are now active members.",
   },
   {

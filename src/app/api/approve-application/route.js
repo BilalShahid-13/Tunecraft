@@ -20,7 +20,7 @@ export async function PATCH(request) {
 
     const updatedUser = await User.findOneAndUpdate(
       { _id: id },
-      { $set: { isApproved: true, password: hashedPassword } },
+      { $set: { userStatus: "approved", password: hashedPassword } },
       { new: true }
     );
 

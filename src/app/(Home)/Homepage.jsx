@@ -1,10 +1,11 @@
 "use client";
 import CustomButton from '@/components/CustomButton';
 import SoundWaveAnimation from '@/components/SoundWaveAnimation';
+import { TunesItem } from '@/lib/Constant';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Eclipse from '../../../public/heroSection/Ellipse 26.svg';
 import { useEffect } from 'react';
+import Eclipse from '../../../public/heroSection/Ellipse 26.svg';
 // import
 const Homepage = () => {
   const navigate = useRouter()
@@ -17,6 +18,14 @@ const Homepage = () => {
       }
     }
   }, []);
+  const extractPrice = (price) => {
+    const result = price.match(/\d+/); // Match numbers
+    return result ? result[0] : null; // Return the matched number
+  };
+  let price = TunesItem.map((items) => items.price)
+  console.log(price)
+  let a = extractPrice(price[0])
+  console.log(a)
   return (
     <div>
       <div className='relative justify-center items-center flex flex-col gap-18 max-sm:gap-18 pt-12'>
@@ -35,7 +44,6 @@ const Homepage = () => {
             className="object-cover" // or object-cover, depending on your need
           />
         </div>
-        {/* FF5B46 */}
 
       </div>
     </div>

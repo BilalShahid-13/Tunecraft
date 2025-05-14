@@ -28,15 +28,16 @@ export default function CustomButton({ text = 'Create your own tune', onClick = 
   return (
     <>
       <Button ref={buttonRef} onClick={onClick}
-        className={`bg-[#ff7e6e] text-white
-        text-center capitalize text-lg
-        max-sm:text-lg
-        max-lg:text-3xl max-lg:py-9
-        mx-sm:text-sm max-sm:p-6
-         p-6 rounded-full hover:bg-red-400
-         cursor-pointer`}>
+        className={`
+        bg-[#ff7e6e] text-white
+                text-center capitalize text-lg
+                max-sm:text-lg
+                max-lg:text-3xl max-lg:py-9
+                mx-sm:text-sm max-sm:p-6
+                 p-6 rounded-full hover:bg-red-400
+                 cursor-pointer`}>
         {text}
-      </Button>
+      </Button >
     </>
   )
 }
