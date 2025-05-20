@@ -9,9 +9,9 @@ const useAllUsers = create((set) => ({
   isFetched: false,
 
   addAllUser: (users) => {
-    const pending = users.filter((user) => user.userStatus === "pending");
-    const approved = users.filter((user) => user.userStatus === "approved");
-    const rejected = users.filter((user) => user.userStatus === "rejected");
+    const pending = users.filter((user) => user.approvalStatus === "pending");
+    const approved = users.filter((user) => user.approvalStatus === "approved");
+    const rejected = users.filter((user) => user.approvalStatus === "rejected");
 
     set({
       allUser: users,

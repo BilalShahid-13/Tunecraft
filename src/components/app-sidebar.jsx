@@ -12,11 +12,35 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import axios from "axios";
+import useNotificationStore from "@/store/notification";
+import { Badge } from "./ui/badge";
 
 export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items }) {
   const [loading, setLoading] = useState(false)
+  const { setApprovalNotifications, totalNotifications, setIsUpdate, isFetched } = useNotificationStore()
+  useEffect(() => {
+    const notificationItem = items.find((item) => item.name === 'Notifications');
+    if (notificationItem && !isFetched) {
+      getNotificationCount()
+      setIsUpdate(true)
+    }
+  }, [items, isFetched])
+
+  const getNotificationCount = async () => {
+    try {
+      const notifcations = await axios.get('/api/notification/getAllPending')
+      if (notifcations.statusText === 'OK') {
+        setApprovalNotifications(notifcations.data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+
+    }
+  }
+
   const handleLogout = async () => {
     setLoading(true)
     try {
@@ -29,6 +53,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       setLoading(false)
     }
   }
+
 
   return (
     <Sidebar className={'relative h-screen'}>
@@ -75,7 +100,13 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
                       <items.Icon className="scale-125" /> // Show logout icon when not loading
                     )
                   ) : (
-                    items?.Icon && <items.Icon className="scale-125" />
+                    <div className="flex relative">
+                      {items?.Icon && <items.Icon className="scale-125" />}
+                      <div className="flex absolute -top-3 left-1">
+                        {items.name === 'Notifications'
+                          && <Badge
+                            className={'scale-75 bg-red-400 text-white'}>{totalNotifications}</Badge>}</div>
+                    </div>
                   )}
                   <p>{items.name}</p>
                 </TabsTrigger>

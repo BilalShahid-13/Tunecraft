@@ -22,7 +22,7 @@ import CustomInputField from "@/components/CustomInputField"
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 const checkOutSchema = z.object({
   firstName: z.string().min(2, { message: "First name must be at least 2 characters" }),
-  lastName: z.string().min(2, { message: "Last name must be at least 2 characters" }),
+  lastName: z.string().optional(),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().length(10, { message: "Phone number must be 10 digits" }),
   phoneCode: z.string().min(1, "Please select a country").max(3, "Invalid country code"),

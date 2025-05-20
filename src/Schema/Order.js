@@ -1,23 +1,97 @@
-import mongoose, { mongo, Schema } from "mongoose";
+import {
+  currentStageEnum,
+  musicTemplates,
+  QuestionsItem,
+  submissionStatusEnum,
+} from "@/lib/Constant";
+import mongoose from "mongoose";
 
-const songGenre = [
-  "Love Song",
-  "Birthday Song",
-  "Custom Song",
-  "Friendship Song",
-];
+const songGenreEnum = QuestionsItem.map((item) => item.question);
+const musicGenreEnum = musicTemplates.map((item) => item.title);
 
-const price = [1.499, 2.299, 3.499];
-
-const musicGenre = [
-  "Birthday Song",
-  "Anniversary Ballad",
-  "Wedding First Dance",
-  "Friendship Tribute",
-  "Family Celebration",
-  "Love Declaration",
-  "Inspirational Journey",
-];
+const craftersObject = {
+  lyricist: {
+    assignedCrafterId: {
+      // ✅ this is your reference to the user
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    submissionStatus: {
+      type: String,
+      enum: submissionStatusEnum,
+      default: "pending",
+    },
+    assignedAtTime: {
+      type: Date,
+      default: null,
+    },
+    submittedAtTime: {
+      type: Date,
+      default: null,
+    },
+    submittedFileUrl: {
+      type: String,
+      default: null,
+    },
+    revisionAttempts: { type: Number, default: 0 },
+    adminFeedback: { type: String, default: "" },
+  },
+  singer: {
+    assignedCrafterId: {
+      // ✅ this is your reference to the user
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    submissionStatus: {
+      type: String,
+      enum: submissionStatusEnum,
+      default: "pending",
+    },
+    assignedAtTime: {
+      type: Date,
+      default: null,
+    },
+    submittedAtTime: {
+      type: Date,
+      default: null,
+    },
+    submittedFileUrl: {
+      type: [String],
+      default: null,
+    },
+    revisionAttempts: { type: Number, default: 0 },
+    adminFeedback: { type: String, default: "" },
+  },
+  engineer: {
+    assignedCrafterId: {
+      // ✅ this is your reference to the user
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    submissionStatus: {
+      type: String,
+      enum: submissionStatusEnum,
+      default: "pending",
+    },
+    assignedAtTime: {
+      type: Date,
+      default: null,
+    },
+    submittedAtTime: {
+      type: Date,
+      default: null,
+    },
+    submittedFileUrl: {
+      type: String,
+      default: null,
+    },
+    revisionAttempts: { type: Number, default: 0 },
+    adminFeedback: { type: String, default: "" },
+  },
+};
 
 const orderSchema = new mongoose.Schema(
   {
@@ -44,7 +118,7 @@ const orderSchema = new mongoose.Schema(
     songGenre: {
       type: String,
       required: [true, "Genre is required"],
-      enum: songGenre,
+      enum: songGenreEnum,
       message:
         "Role `{VALUE}` is not allowed. Must be one of: admin, editor, viewer.",
     },
@@ -57,15 +131,29 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     plan: {
-      // type: Schema.Types.ObjectId,
       type: mongoose.Schema.Types.ObjectId,
       ref: "Plan",
       required: [true, "Plan is required"],
     },
     musicTemplate: {
       type: String,
-      enum: musicGenre,
+      enum: musicGenreEnum,
       required: false,
+    },
+    currentStage: {
+      type: String,
+      enum: currentStageEnum,
+      default: "pending",
+    },
+    orderStatus: {
+      type: String,
+      enum: ["pending", "in-progress", "completed", "cancelled"],
+      default: "pending",
+    },
+    crafters: craftersObject,
+    finalSongUrl: {
+      type: String,
+      default: null,
     },
   },
   {

@@ -14,6 +14,7 @@ import craftersManagment from "@/app/admin/components/craftersManagment";
 import projectManagment from "@/app/admin/components/projectManagment";
 import UpdatePassword from "@/components/UpdatePassword";
 import {
+  Bell,
   Check,
   Clipboard,
   ClipboardCheck,
@@ -32,6 +33,7 @@ import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
 import Dashboard from "@/app/(Dashboard)/components/Dashboard";
+import Notification from "@/app/admin/components/Notification";
 
 export const Currency = "MX$";
 
@@ -389,7 +391,7 @@ export const SidebarItems = [
 
 export const adminPanel = [
   {
-    name: "Crafters Managment",
+    name: "Crafters Management",
     Icon: UsersRound,
     route: craftersManagment,
   },
@@ -397,6 +399,11 @@ export const adminPanel = [
     name: "Project Managment",
     Icon: Clipboard,
     route: projectManagment,
+  },
+  {
+    name: "Notifications",
+    Icon: Bell,
+    route: Notification,
   },
 ];
 
@@ -429,4 +436,53 @@ export const craftersManagmentList = [
     description:
       "Assign or edit user roles (Lyricist, Singer, Engineer, Admin, etc.).",
   },
+];
+
+// available tasks
+export const musicPlans = [
+  {
+    plan: "Microtune",
+    totalAmount: 1499,
+    lyricist: 300,
+    singer: 200,
+    engineer: 300,
+    free: 699,
+  },
+  {
+    plan: "Soundtune",
+    totalAmount: 2299,
+    lyricist: 450,
+    singer: 300,
+    engineer: 450,
+    free: 1099,
+  },
+  {
+    plan: "Supremetune",
+    totalAmount: 3099,
+    lyricist: 600,
+    singer: 400,
+    engineer: 600,
+    free: 1499,
+  },
+];
+
+// db constants
+export const currentStageEnum = [
+  "pending",
+  "lyricist",
+  "review_lyricist",
+  "singer",
+  "review_singer",
+  "engineer",
+  "review_engineer",
+  "done",
+];
+
+export const submissionStatusEnum = [
+  "pending",
+  "available",
+  "assigned",
+  "submitted",
+  "approved",
+  "rejected",
 ];

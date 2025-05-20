@@ -1,5 +1,5 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -17,48 +17,40 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCountdown } from "@/hooks/useCountdown";
 import { musicPlans } from "@/lib/Constant";
 import useSidebarWidth from "@/store/sidebarWidth";
 import useTasks from "@/store/tasks";
 import axios from "axios";
-import { Clock, Loader2, MoveRight } from 'lucide-react';
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { Clock, Loader2, MoveRight } from 'lucide-react'
+import React, { useEffect, useState } from "react"
 
 export default function TaskCard({
   badge = 'New',
   title = 'Birthday Song',
   des = 'i want song like o repiya sung by rahet',
-  plan, item, session, assignedAtTime,
+  plan, item, session,
   time = '3hr', bgStory, currentStage, songGenre
 }) {
   const [userPlan, setUserPlan] = useState({ title: '', price: 0 })
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  // const [time, setTime] = useState(null)
   const { width } = useSidebarWidth();
-  const { setFetchedTasks } = useTasks()
-  const countdown = useCountdown(assignedAtTime, 3)
+  const { addActiveTasks, setFetchedTasks } = useTasks()
 
   useEffect(() => {
     if (plan) {
+      console.log(plan)
       const musicPlan = musicPlans.find(item => item.plan === plan.name)
+      console.log(musicPlan[currentStage])
       if (musicPlan) {
         setUserPlan({ price: musicPlan[currentStage], title: musicPlan.plan })
       }
     }
   }, [plan])
 
-  useEffect(() => {
-    if(countdown === '0:00:00') {
-      // setDialogOpen(false)
-      console.warn('time is up')
-    }
-  }, [countdown])
-
 
   const startWorking = async (item) => {
+    console.log(item._id)
     setIsLoading(true)
     try {
       const res = await axios.patch('/api/startWorking', {
@@ -68,13 +60,11 @@ export default function TaskCard({
       })
       if (res.statusText === 'OK') {
         console.log('order started successfully', res)
-        setFetchedTasks(true)
+        addActiveTasks(res.data.order)
         setDialogOpen(false)
       }
     } catch (error) {
-      console.error(error.response.data.error);
-      toast.error(error.response.data.error)
-      setDialogOpen(false)
+      console.error(error);
     } finally {
       setIsLoading(false)
     }
@@ -95,8 +85,7 @@ export default function TaskCard({
         <CardFooter className={'flex flex-row  justify-between items-center'}>
           <div className='text-zinc-400 text-sm flex items-center gap-2'>
             <Clock size={14} />
-            {/* <p className='font-inter'>{time}</p> */}
-            <p className='font-inter'>{badge === 'New' ? time : countdown}</p>
+            <p className='font-inter'>{time}</p>
           </div>
           <div className='text-zinc-400 text-sm flex items-center gap-2'>
             <h2 className='font-semibold font-inter'>MX$</h2>

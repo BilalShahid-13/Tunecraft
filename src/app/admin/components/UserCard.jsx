@@ -32,9 +32,10 @@ import useAllUsers from "@/store/allUsers";
 import { generateStrongPassword } from "@/utils/generateStrongPassword";
 import axios from "axios";
 import { Check, Frown, Loader2, Mail, Phone, Sliders, User, X } from 'lucide-react';
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import UpdateUser from "./UpdateUser";
+import useNotificationStore from "@/store/notification";
 
 function Loader() {
   return (
@@ -57,19 +58,38 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
   const [isOpen, setOpen] = useState(false)
   const [frameLoading, setFrameLoading] = useState(null)
   const { setIsUpdate } = useAllUsers()
-
+  const { notifications, isClicked, setClicked } = useNotificationStore()
+  const cardRefs = useRef({});
   useEffect(() => {
     if (users) {
       setAllUsers(users)
-      console.log('uses', users)
     }
     if (loading) {
       setLoading(isLoading)
     }
   }, [users, isLoading])
 
-  console.log('user card', users)
+  const scrollToCard = useCallback(() => {
+    const clickedNotificationId = notifications.approvalNotification?.[0]?._id;
+    if (
+      clickedNotificationId &&
+      cardRefs.current[clickedNotificationId] &&
+      userStatus === 'pending'
+    ) {
+      cardRefs.current[clickedNotificationId].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      setClicked(false);
+    }
+  }, [notifications.approvalNotification, userStatus]);
 
+  useEffect(() => {
+    // Delay the scroll by a short time to ensure the element is rendered
+    if (isClicked) {
+      setTimeout(scrollToCard, 200);
+    }
+  }, [scrollToCard]);
 
   function _userStatus(status) {
     if (status === 'pending') {
@@ -82,7 +102,6 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
       return { label: 'Rejected', colorClass: 'bg-red-400' };  // Red for rejected
     }
   }
-
 
   async function onApprove(user) {
     setApproveLoading(user._id);
@@ -110,7 +129,6 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
 
   async function onDiscard(user) {
     setDiscardLoading(user._id)
-    console.log('user', user._id)
     try {
       const res = await axios.delete('/api/reject-application', {
         data: { id: user._id }
@@ -129,7 +147,6 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
 
   async function onHide(user) {
     setDiscardLoading(user._id)
-    console.log('user', user._id)
     try {
       const res = await axios.patch('/api/hide-application', {
         data: { id: user._id }
@@ -158,19 +175,23 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
     )
   }
 
-  console.log(userStatus, 'all user', allUsers.length === 0)
+
+
   return (
     <div className="flex flex-col gap-3">
       {loading ? <Loader />
         : allUsers.map((items, index) =>
           <AlertDialog key={index} className='relative z-0'>
-            <Card key={index} className={'relative z-0 max-lg:w-full'}>
+            <Card key={index} className={'relative z-0 max-lg:w-full'}
+              ref={(el) => {
+                cardRefs.current[items._id] = el;
+              }}>
               <CardHeader className={'flex flex-col gap-4'}>
                 <CardTitle className={'flex justify-between items-center gap-3 text-lg font-inter capitalize w-full'}>
                   {userRole ?
                     <div className="flex flex-row-reverse justify-between items-center w-full">
-                      <Badge className={_userStatus(items.userStatus).colorClass}>
-                        {_userStatus(items.userStatus).label}
+                      <Badge className={_userStatus(items.approvalStatus)?.colorClass}>
+                        {_userStatus(items.approvalStatus).label}
                       </Badge>
                       <p className='capitalize font-medium text-zinc-200'>{items?.musicTemplate}</p>
 
@@ -180,8 +201,8 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
                       <div className='flex flex-row justify-start items-center gap-3'>
                         <Sliders color={'#ff7e6e'} size={15} />
                         {items.role}
-                        <Badge className={_userStatus(items.userStatus).colorClass}>
-                          {_userStatus(items.userStatus).label}
+                        <Badge className={_userStatus(items.approvalStatus).colorClass}>
+                          {_userStatus(items.approvalStatus).label}
                         </Badge>
                       </div>
                       <p className='capitalize font-medium text-zinc-200'>{items?.musicTemplate}</p>
@@ -262,22 +283,20 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
                       <React.Fragment>
                         <Check /> Approve</React.Fragment>}
                   </Button>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      onClick={() => onHide(items)}
-                      // onClick={() => onDiscard(items)}
-                      disabled={discardLoading === items._id}
-                      className="bg-zinc-700 text-white hover:bg-zinc-800 cursor-pointer active:green-300">
-                      {discardLoading === items._id ?
-                        <React.Fragment>
-                          <Loader2 className="animate-spin" />
-                          Rejecting
-                        </React.Fragment>
-                        :
-                        <React.Fragment>
-                          <X /> Reject</React.Fragment>}
-                    </Button>
-                  </AlertDialogTrigger>
+                  <Button
+                    onClick={() => { onHide(items) }}
+                    // onClick={() => onDiscard(items)}
+                    disabled={discardLoading === items._id}
+                    className="bg-zinc-700 text-white hover:bg-zinc-800 cursor-pointer active:green-300">
+                    {discardLoading === items._id ?
+                      <React.Fragment>
+                        <Loader2 className="animate-spin" />
+                        Rejecting
+                      </React.Fragment>
+                      :
+                      <React.Fragment>
+                        <X /> Reject</React.Fragment>}
+                  </Button>
                 </CardFooter>
               }
               {/* approved users */}

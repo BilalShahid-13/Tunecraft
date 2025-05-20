@@ -11,11 +11,11 @@ export async function PATCH() {
       {
         role: { $ne: "admin" }, // Exclude admins
         $or: [
-          { userStatus: { $ne: "rejected" } }, // Only update if not already rejected
-          { userStatus: { $exists: false } }, // If userStatus does not exist, update it
+          { approvalStatus: { $ne: "rejected" } }, // Only update if not already rejected
+          { approvalStatus: { $exists: false } }, // If userStatus does not exist, update it
         ],
       },
-      { userStatus: "rejected" }, // Update userStatus to 'rejected'
+      { approvalStatus: "rejected" }, // Update userStatus to 'rejected'
       { new: true } // Return the updated document
     );
 

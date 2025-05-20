@@ -47,6 +47,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   /* width breakpoints */
   --breakpoint-xs: 25rem;
+  --color-primary: oklch(0.7381 0.16016 28.7594);
 }
 
 :root {

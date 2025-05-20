@@ -46,6 +46,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   "phone": "(+52)1111111111",
   "info": "i want shayari",
   "cv": "https://res.cloudinary.com/dbsxojyxy/raw/upload/v1746804136/Tunecraft/…",
-  "password": "$2b$12$Vr3W5PrOSv2rpXUFXi2IMedwPIlI0Xbw0U57WsmfsGvIlh84sMjdW",
-  "userStatus": "rejected"
+  "password": "$2y$10$9h8pwDMNjiIbVbpAegGtPeQy4FoKuMxNxQerst2941KjzwPLWyVl2",
+  "approvalStatus": "rejected"
 }
+
+
+
+flow:
+im working on a project called tunecraft , the working of the project is ,a if  user/orderer order thes the music he/she wants to create so it gives the input and meanwhile the freelancer like the singer,lyricist and wngineer they want to earn money by creating lyrics,or mixing crafters section so they resgister it but the twist is they just send the role,fullname,email,resume,phone number not password now the form is go on mongodb and i creates the admin panel so the admin will go through the form and accept/reject it and now if admin accept it so the all orders were showing the singer/engineer/lyricist in their dashboard they can pick them but at a time they only pick one because they are already working on one project so they cant pick another if they are done their previous work then they pick another proeject,and the standard time is 3hrs but what if crafter dont deleiver the project on time so the order will extend to 2 hrs more , after 2 hrs if it still not deleiver so it will charge the plenty  after 1 plenty in admin the planty user highlight some sort of red sign after 3 plenties the working task will be freeze to 2 hours also if some other crafter pick the available task so the other crafters dont pick it make it unshown to other crafters,after the crafter is completed the task like the lyricist now it will move to the singer and engineer and if lyricist comlpeted the task so it will go to the admin for revision if admin accept so it will go to singer dashboard,and same goes to singer and engineer now the song is done so after completing the song we send an email to orderer.

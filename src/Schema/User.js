@@ -34,30 +34,29 @@ const userSchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
-    userStatus: {
+    approvalStatus: {
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: "pending",
       required: true,
     },
-    Orders: [
-      {
-        order: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Order",
-          required: false,
-        },
-        status: {
-          type: String,
-          enum: ["pending", "completed", "assigned"],
-          required: false,
-        },
-        assignedAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+    activeOrderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      default: null,
+    },
+    lateSubmissionCount: {
+      type: Number,
+      default: 0,
+    },
+    taskAccessBlockedUntil: {
+      type: Date,
+      default: null,
+    },
+    canAcceptNewOrders: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

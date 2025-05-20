@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { adminPanel, roles, SidebarItems } from '@/lib/Constant';
+import useNotificationStore from "@/store/notification";
+import useSidebarWidth from "@/store/sidebarWidth";
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AppSidebar } from './app-sidebar';
@@ -15,18 +17,18 @@ import DashboardNavbar from "./DashboardNavbar";
 import Navbar from "./Navbar";
 import { ScrollArea } from "./ui/scroll-area";
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
-import useSidebarWidth from "@/store/sidebarWidth";
 
 export default function NavbarRoot() {
   const location = usePathname();
   const [isProtectedRoute, setIsProtectedRoute] = useState(false);
   const [isAdmin, setAdmin] = useState(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   const protectedRoutes = roles.map((r) => `/${r.route}`);
   const isMobile = useMediaQuery({ query: "(max-width: 639px)" });
   const items = isAdmin ? adminPanel : SidebarItems;
   const { addSidebarWidth } = useSidebarWidth()
+  const { tabValue, setTabValue } = useNotificationStore()
+
   useEffect(() => {
     setIsProtectedRoute(protectedRoutes.includes(location));
     if (location === '/admin') {
@@ -56,10 +58,6 @@ export default function NavbarRoot() {
     }
   }
 
-  useEffect(() => {
-
-  }, [isAdmin])
-
 
   return (
     <>
@@ -73,8 +71,10 @@ export default function NavbarRoot() {
             }}
           >
             <Tabs
-              defaultValue={isAdmin ? adminPanel[0].name
-                : SidebarItems[0].name}
+              // defaultValue={`${(isAdmin ? adminPanel[2].name
+              //   : SidebarItems[0].name)}`}
+              value={tabValue}
+              onValueChange={setTabValue}
               className="w-full flex flex-row justify-start items-start">
               <AppSidebar sidebarCollapsed={sidebarCollapsed}
                 isMobile={isMobile}
@@ -113,15 +113,11 @@ export default function NavbarRoot() {
                 <ScrollArea style={{
                   height: 'calc(100vh - 64px)' // Adjust based on your navbar height
                 }}>
-                  {items.map((items, index) => (
-                    <TabsContent
-                      key={index}
-                      value={items.name}
-                      className="p-4" // Add padding if needed
-                    >
-                      <items.route />
+                  {items.map((item) => (
+                    <TabsContent key={item.name}
+                      value={item.name} className="p-4">
+                      <item.route />
                     </TabsContent>
-
                   ))}
                 </ScrollArea>
               </main>

@@ -1,6 +1,7 @@
 import { dbConnect } from "@/lib/dbConnect";
 import Order from "@/Schema/Order";
 import Plan from "@/Schema/Plan";
+import User from "@/Schema/User";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -17,10 +18,13 @@ export async function POST(request) {
     const { amount, email, metadata } = await request.json();
 
     // Check if necessary fields exist in the metadata
-    if (!metadata.packageName || !metadata.firstName || !metadata.lastName) {
+    if (!metadata.packageName || !metadata.firstName) {
       throw new Error("Missing required metadata fields");
     }
-
+    const lyricist = await User.findOne({
+      role: "lyricist",
+      approvalStatus: "approved",
+    }).session(session);
     // Create a payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount, // Amount in cents (not dollars)
@@ -55,7 +59,14 @@ export async function POST(request) {
       songGenre: metadata.songGenre,
       musicTemplate: metadata.musicTitle,
       jokes: metadata.jokes,
-      backgroundStory:metadata.backgroundStory
+      backgroundStory: metadata.backgroundStory,
+      currentStage: "lyricist",
+      crafters: {
+        lyricist: {
+          id: lyricist._id,
+          submissionStatus: "available",
+        },
+      },
     });
 
     // Save the order in the session

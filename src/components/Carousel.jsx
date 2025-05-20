@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/card"
 import Rating from './Rating';
 import Image from 'next/image';
+import TaskCard from '@/app/(Dashboard)/components/TaskCard';
 
 function ReviewCard({ item }) {
   return (
@@ -47,9 +48,8 @@ function ReviewCard({ item }) {
 }
 
 export default function Carousel({
-  useDefaultData = false,
   Component,
-  badge,
+  data = false,
   steps = true
 }) {
   const prevRef = useRef(null);
@@ -78,19 +78,32 @@ export default function Carousel({
   }, [swiperInstance]);
 
   function SlideView() {
-    if (isMobile) return 1;
-    if (isTablet) return 2;
-    return width ? 3 : 2;
+    if (!data) {
+      if (isMobile) return 1;
+      if (isTablet) return 2;
+      return width ? 3 : 2;
+    } else {
+      if (isMobile) return 1;
+      if (isTablet) return 2;
+      return width ? 3 : 2;
+    }
   }
 
   return (
     <>
       {/* Navigation Buttons */}
-      <div className="w-full flex justify-end items-center gap-2 mb-4 max-sm:mr-5 ">
-        <Button ref={prevRef} variant="ghost" size="icon" disabled={activeIndex === 0}>
+      <div className={`w-full flex justify-end
+      ${data ? 'absolute top-0' : 'mb-4'}
+         items-center gap-2  max-sm:mr-5 overflow-x-hidden`}>
+        <Button ref={prevRef} variant="ghost"
+          className={'cursor-pointer'}
+          size="icon" disabled={activeIndex === 0}>
           <MoveLeft className={`${activeIndex === 0 ? 'text-[#FCC6C0]' : 'text-[#FF6467]'}`} />
         </Button>
-        <Button ref={nextRef} variant="ghost" size="icon" disabled={isEnd}>
+        <Button ref={nextRef}
+          variant="ghost"
+          className={'cursor-pointer'}
+          size="icon" disabled={isEnd}>
           <MoveRight className={`${isEnd ? 'text-[#FCC6C0]' : 'text-[#FF7E6E]'}`} />
         </Button>
       </div>
@@ -106,7 +119,7 @@ export default function Carousel({
           }  transition-all duration-300 ease-in-out`}
       >
 
-        {!useDefaultData ? (
+        {!data ? (
           Testimonals.map((item, index) => (
             <SwiperSlide key={index}>
               <ReviewCard item={item} />
@@ -114,9 +127,17 @@ export default function Carousel({
           ))
         ) : (
           <>
-            <SwiperSlide>
-              {Component}
-            </SwiperSlide>
+            {data?.map((item, index) =>
+              <SwiperSlide key={index}>
+                <TaskCard index={index}
+                  title={item.musicTemplate}
+                  des={item.jokes}
+                  plan={item.plan}
+                  songGenre={item.songGenre}
+                  bgStory={item.backgroundStory}
+                  currentStage={item.currentStage} />
+              </SwiperSlide>
+            )}
           </>
         )}
       </Swiper>

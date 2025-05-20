@@ -11,6 +11,7 @@ import PendingApproval from "./PendingApproval";
 import RejectedUsers from "./RejectedUsers";
 import UserCard from './UserCard';
 import UserRole from "./UserRole";
+import useNotificationStore from "@/store/notification";
 
 const components = [
   UserCard,
@@ -21,7 +22,6 @@ const components = [
 ]
 
 function CustomComopnent({ Component, users, isLoading, index }) {
-  // console.log(index)
   return <Component users={users} isLoading={isLoading} />
 }
 
@@ -30,10 +30,17 @@ export default function craftersManagment() {
   const [allUsers, setAllUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const { addAllUser, isFetched, setIsUpdate } = useAllUsers()
-
+  const { tabValue, isClicked } = useNotificationStore()
+  const [tabValueIndex, setTabValueIndex] = useState(0)
   useEffect(() => {
     fetchAllUsers()
   }, [isFetched])
+
+  useEffect(() => {
+    if (tabValue && isClicked) {
+      setTabValueIndex(`1`)
+    }
+  }, [tabValue])
 
   const fetchAllUsers = async () => {
     try {
@@ -53,7 +60,10 @@ export default function craftersManagment() {
 
   return (
     <>
-      <Tabs defaultValue="0" className={'w-full flex'}>
+      <Tabs defaultValue={`${tabValueIndex}`}
+        value={`${tabValueIndex}`}
+        onValueChange={setTabValueIndex}
+        className={'w-full flex'}>
         <TabsList
           className={`grid grid-cols-4 grid-rows-2 place-items-center
           gap-3 mt-3 mb-6  max-xl:grid max-xl:grid-cols-2

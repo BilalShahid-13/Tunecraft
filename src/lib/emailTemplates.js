@@ -37,7 +37,8 @@ export const forgotPassword = (otp) => {
 
 export const userApproved = (username, email, password) => {
   return {
-    to: email,
+    // to: email,
+    to: "bcsm-f21-249@superior.edu.pk",
     subject: "🎉 Your Account Has Been Approved!",
     html: `<div style="font-family: Arial, sans-serif; max-width: 600px;
     margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
@@ -51,7 +52,8 @@ export const userApproved = (username, email, password) => {
      </td><td><code>${password}</code></td></tr>
      </table> <p style="margin-top: 20px;">
      Click below to get started:</p>
-     <a href="https://your-app.com/login"
+     <a href=${process.env.hosturl}/Register
+      target="_blank" rel="noopener noreferrer"
      style="display:inline-block; padding: 10px 15px;
       background-color: #ff7e6e; color: white; text-decoration: none;
        border-radius: 4px;">Login Now</a> <p style="margin-top: 30px;
@@ -61,4 +63,3 @@ export const userApproved = (username, email, password) => {
         The Tunecraft Team</p> </div>`,
   };
 };
-

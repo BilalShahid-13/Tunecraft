@@ -1,24 +1,20 @@
 "use client";
-import useSidebarWidth from '@/store/sidebarWidth';
-import useTasks from '@/store/tasks';
-import { GetServerLoading } from '@/utils/GetServerLoading';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { Suspense, useEffect, useState } from 'react';
 import TaskCard from './TaskCard';
-
-function NoAvailableTasks({ msg }) {
-  return (
-    <p className='text-zinc-600 font-inter italic ml-zinc-600 ml-23'>No {msg} Task Yet</p>
-  )
-}
+import Carousel from '@/components/Carousel';
+import { GetServerLoading } from '@/utils/GetServerLoading';
+import useSidebarWidth from '@/store/sidebarWidth';
+import useTasks from '@/store/tasks';
 export default function Dashboard() {
   const { data } = useSession()
   const [session, setSession] = useState(null)
   const [activeTask, setActiveTask] = useState([]);
   const [availableTask, setAvailableTask] = useState([]);
+  const [selectedTaskLoading, setselectedTaskLoading] = useState(false)
   const { width } = useSidebarWidth();
-  const { fetchedTasks, setFetchedTasks } = useTasks()
+  const { activeTasks, fetchedTasks, setFetchedTasks } = useTasks()
 
   useEffect(() => {
     setSession(data)
@@ -26,20 +22,27 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (session) {
-      fetchAvailableTask()
-      fetchActiveTask()
+      fetchOrders()
     }
   }, [session])
 
   useEffect(() => {
     if (fetchedTasks) {
-      fetchAvailableTask();
-      fetchActiveTask();
+      fetchOrders()
       setFetchedTasks(false)
     }
   }, [fetchedTasks])
 
-  const fetchAvailableTask = async () => {
+  useEffect(() => {
+    if (activeTasks) {
+      setActiveTask(activeTasks)
+    }
+  }, [activeTasks])
+
+  console.log('dashboard', activeTasks)
+
+
+  const fetchOrders = async () => {
     console.log(session)
     try {
       const res = await axios.post('/api/availableTasks', {
@@ -52,22 +55,6 @@ export default function Dashboard() {
       console.error(error.response.data);
     }
   }
-  const fetchActiveTask = async () => {
-    console.log(session)
-    try {
-      const res = await axios.post('/api/activeTask', {
-        role: session.user.role,
-        userId: session.user.id
-      })
-      if (res.statusText === 'OK') {
-        setActiveTask(res.data.data)
-      }
-    } catch (error) {
-      console.error(error.response.data);
-    }
-  }
-
-  console.log(activeTask[0]?.crafters[session.user.role].assignedAtTime)
 
   if (!data) {
     return (
@@ -89,37 +76,30 @@ export default function Dashboard() {
       '>
           <h2 className='border-l-6 border-l-[#ff7e6e] rounded-xs
       text-2xl font-medium font-inter px-4 max-sm:text-lg'>Active Task</h2>
-          {/* Active Task */}
+          {/* <ActiveTask /> */}
           <Suspense
             fallback={<GetServerLoading session={data} />}>
             <div className={`grid ${width ? 'grid-cols-4 max-md:grid-cols-2 max-lg:grid-cols-2 max-xl:grid-cols-3' :
               'grid-cols-3 max-lg:grid-cols-1 max-md:grid-cols-1 max-xl:grid-cols-2'}
               gap-4 max-sm:grid-cols-1 max-xs:grid-cols-1`}>
-              {(!activeTask || activeTask.length === 0) ? (
-                <NoAvailableTasks msg={"Active"} />
-              ) : (
-                activeTask.map((item, index) => (
-                  <TaskCard
-                    key={index}
-                    badge="active"
-                    session={session}
-                    index={index}
-                    assignedAtTime={item.crafters[session.user.role].assignedAtTime}
-                    title={item.musicTemplate}
-                    des={item.jokes}
-                    plan={item.plan}
-                    songGenre={item.songGenre}
-                    item={item}
-                    bgStory={item.backgroundStory}
-                    currentStage={item.currentStage}
-                  />
-                ))
-              )}
-
+              {activeTask.length > 0 && activeTask.map((item, index) => (
+                <TaskCard
+                  key={index}
+                  badge='active'
+                  isLoading={selectedTaskLoading}
+                  session={session}
+                  index={index}
+                  title={item.musicTemplate}
+                  des={item.jokes}
+                  plan={item.plan}
+                  songGenre={item.songGenre}
+                  item={item}
+                  bgStory={item.backgroundStory}
+                  currentStage={item.currentStage} />
+              ))}
             </div>
           </Suspense>
         </div>
-        {/* available task */}
         <div
           className='space-y-4 w-full relative max-sm:gap-3 overflow-x-hidden'
         >
@@ -130,21 +110,20 @@ text-2xl font-medium font-inter px-4 max-sm:text-lg'>Available Task</h2>
             <div className={`grid ${width ? 'grid-cols-4 max-md:grid-cols-2 max-lg:grid-cols-2 max-xl:grid-cols-3' :
               'grid-cols-3 max-lg:grid-cols-1 max-md:grid-cols-1 max-xl:grid-cols-2'}
               gap-4 max-sm:grid-cols-1 max-xs:grid-cols-1`}>
-              {(!availableTask || availableTask.length === 0) ?
-                <NoAvailableTasks msg={"Available"} /> :
-                availableTask.map((item, index) => (
-                  <TaskCard
-                    key={index}
-                    session={session}
-                    index={index}
-                    title={item.musicTemplate}
-                    des={item.jokes}
-                    plan={item.plan}
-                    songGenre={item.songGenre}
-                    item={item}
-                    bgStory={item.backgroundStory}
-                    currentStage={item.currentStage} />
-                ))}
+              {availableTask.length > 0 && availableTask.map((item, index) => (
+                <TaskCard
+                  key={index}
+                  isLoading={selectedTaskLoading}
+                  session={session}
+                  index={index}
+                  title={item.musicTemplate}
+                  des={item.jokes}
+                  plan={item.plan}
+                  songGenre={item.songGenre}
+                  item={item}
+                  bgStory={item.backgroundStory}
+                  currentStage={item.currentStage} />
+              ))}
             </div>
           </Suspense>
         </div>

@@ -4,6 +4,7 @@ import { sendMail } from "@/utils/emailService";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import User from "@/Schema/User";
+import Order from "@/Schema/Order";
 export async function PATCH(request) {
   const { id, password, email, username } = await request.json();
 
@@ -20,7 +21,7 @@ export async function PATCH(request) {
 
     const updatedUser = await User.findOneAndUpdate(
       { _id: id },
-      { $set: { userStatus: "approved", password: hashedPassword } },
+      { $set: { approvalStatus: "approved", password: hashedPassword } },
       { new: true }
     );
 
@@ -30,6 +31,29 @@ export async function PATCH(request) {
         { status: 404 }
       );
     }
+
+    if (updatedUser.role === "lyricist") {
+      try {
+        const order = await Order.updateMany(
+          {
+            "crafters.lyricist.assignedCrafterId": null, // 🧠 Target only unassigned orders
+          },
+          {
+            $set: {
+              "crafters.lyricist.assignedCrafterId": updatedUser._id,
+              "crafters.lyricist.submissionStatus": "available",
+              currentStage: "lyricist",
+            },
+          }
+        );
+      } catch (error) {
+        return NextResponse.json(
+          { error: "Error updating orders", error: error.message },
+          { status: 500 }
+        );
+      }
+    }
+    // order.
 
     try {
       const { html, subject, to } = userApproved(username, email, password);
