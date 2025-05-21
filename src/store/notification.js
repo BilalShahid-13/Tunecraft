@@ -20,20 +20,6 @@ const useNotificationStore = create((set) => ({
       totalNotifications: notifications.length,
     })),
 
-  // setClickedNotification: (id, approvalStatus) => {
-  //   set((state) => {
-  //     const tabValue =
-  //       approvalStatus === "pending" || approvalStatus === "true"
-  //         ? adminPanel[0].name
-  //         : "crafterManagement"; // or whatever fallback tab name you want
-
-  //     return {
-  //       notificationId: id,
-  //       tabValue,
-  //     };
-  //   });
-  // },
-
   removeNotification: (id) => {
     set((state) => ({
       notifications: state.notifications.filter(

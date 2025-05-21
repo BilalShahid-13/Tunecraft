@@ -5,7 +5,7 @@ import NotificationCard from "./NotificationCard";
 export default function Notification() {
   const { notifications, setTabValue, setClicked } = useNotificationStore()
   return (
-    <>
+    <div className="flex flex-col gap-4">
       {notifications.approvalNotification.map((item, index) => (
         <NotificationCard key={index} time={item.createdAt}
           onClick={() => {
@@ -15,6 +15,6 @@ export default function Notification() {
             }
           }} />
       ))}
-    </>
+    </div>
   )
 }

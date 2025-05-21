@@ -26,9 +26,9 @@ export function useCountdown(startTime, durationHours = 3) {
       const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
       setTimeLeft(
-        `${hrs}:${mins.toString().padStart(2, "0")}:${secs
+        `${hrs}hr : ${mins.toString().padStart(2, "0")}min : ${secs
           .toString()
-          .padStart(2, "0")}`
+          .padStart(2, "0")}sec`
       );
       return true;
     };

@@ -58,6 +58,13 @@ export default function NavbarRoot() {
     }
   }
 
+  useEffect(() => {
+    // setTabValue((isAdmin ? adminPanel[0].name
+    //   : 'Dashboard'))
+    setTabValue((isAdmin ? adminPanel[0].name
+      : 'Tasks'))
+  }, [items])
+
 
   return (
     <>
@@ -71,8 +78,7 @@ export default function NavbarRoot() {
             }}
           >
             <Tabs
-              // defaultValue={`${(isAdmin ? adminPanel[2].name
-              //   : SidebarItems[0].name)}`}
+              defaultValue={`${tabValue}`}
               value={tabValue}
               onValueChange={setTabValue}
               className="w-full flex flex-row justify-start items-start">
@@ -82,7 +88,7 @@ export default function NavbarRoot() {
                 toggleSidebar={toggleSidebar} />
               <main
                 className={`relative transition-all duration-300
-                  p-0 w-full m-0`}
+              p-0 w-full m-0`}
               >
                 {/* sidebar trigger */}
                 <div className='flex flex-row justify-start items-start bg-background w-full'>
@@ -122,11 +128,12 @@ export default function NavbarRoot() {
                 </ScrollArea>
               </main>
             </Tabs>
-          </SidebarProvider>
+          </SidebarProvider >
         ) : (
           <Navbar />
-        )}
-      </div>
+        )
+        }
+      </div >
     </>
   );
 }

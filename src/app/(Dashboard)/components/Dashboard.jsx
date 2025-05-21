@@ -3,9 +3,16 @@ import useSidebarWidth from '@/store/sidebarWidth';
 import useTasks from '@/store/tasks';
 import { GetServerLoading } from '@/utils/GetServerLoading';
 import axios from 'axios';
+import { AlertCircle } from "lucide-react"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
 import { useSession } from 'next-auth/react';
 import { Suspense, useEffect, useState } from 'react';
 import TaskCard from './TaskCard';
+import useCrafterTask from '@/store/crafterTask';
 
 function NoAvailableTasks({ msg }) {
   return (
@@ -18,7 +25,9 @@ export default function Dashboard() {
   const [activeTask, setActiveTask] = useState([]);
   const [availableTask, setAvailableTask] = useState([]);
   const { width } = useSidebarWidth();
+  const [timeOutError, setTimeOutError] = useState(false)
   const { fetchedTasks, setFetchedTasks } = useTasks()
+  const { setCrafterTask } = useCrafterTask()
 
   useEffect(() => {
     setSession(data)
@@ -61,10 +70,24 @@ export default function Dashboard() {
       })
       if (res.statusText === 'OK') {
         setActiveTask(res.data.data)
+        setCrafterTask({
+          orderId: res.data.data[0]?._id,
+          title: res.data.data[0]?.musicTemplate,
+          des: res.data.data[0]?.jokes,
+          requirements: res.data.data[0]?.backgroundStory,
+          clientName: res.data.data[0]?.name,
+          dueData: res.data.data[0]?.createdAt,
+        })
+        console.log('active task', res.data.data[0])
       }
     } catch (error) {
       console.error(error.response.data);
     }
+  }
+
+  function setGracePeriodError(error) {
+    setTimeOutError(error)
+    console.log('setGracePeriodError', error)
   }
 
   console.log(activeTask[0]?.crafters[session.user.role].assignedAtTime)
@@ -92,13 +115,20 @@ export default function Dashboard() {
           {/* Active Task */}
           <Suspense
             fallback={<GetServerLoading session={data} />}>
+            {timeOutError && (
+              <Alert className="w-fit" variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{timeOutError}</AlertDescription>
+              </Alert>
+            )}
             <div className={`grid ${width ? 'grid-cols-4 max-md:grid-cols-2 max-lg:grid-cols-2 max-xl:grid-cols-3' :
               'grid-cols-3 max-lg:grid-cols-1 max-md:grid-cols-1 max-xl:grid-cols-2'}
               gap-4 max-sm:grid-cols-1 max-xs:grid-cols-1`}>
               {(!activeTask || activeTask.length === 0) ? (
                 <NoAvailableTasks msg={"Active"} />
-              ) : (
-                activeTask.map((item, index) => (
+              ) : <>
+                {activeTask.map((item, index) => (
                   <TaskCard
                     key={index}
                     badge="active"
@@ -110,11 +140,13 @@ export default function Dashboard() {
                     plan={item.plan}
                     songGenre={item.songGenre}
                     item={item}
+                    setGracePeriodError={setGracePeriodError}
                     bgStory={item.backgroundStory}
                     currentStage={item.currentStage}
                   />
-                ))
-              )}
+                ))}
+              </>
+              }
 
             </div>
           </Suspense>

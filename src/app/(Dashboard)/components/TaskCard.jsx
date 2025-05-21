@@ -26,20 +26,22 @@ import { Clock, Loader2, MoveRight } from 'lucide-react';
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+
 export default function TaskCard({
   badge = 'New',
   title = 'Birthday Song',
   des = 'i want song like o repiya sung by rahet',
   plan, item, session, assignedAtTime,
-  time = '3hr', bgStory, currentStage, songGenre
+  time = '3hr', bgStory, currentStage, songGenre, setGracePeriodError
 }) {
+  let defaultTime = 3;
   const [userPlan, setUserPlan] = useState({ title: '', price: 0 })
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  // const [time, setTime] = useState(null)
+  const [timeUpHandled, setTimeUpHandled] = useState(false)
   const { width } = useSidebarWidth();
   const { setFetchedTasks } = useTasks()
-  const countdown = useCountdown(assignedAtTime, 3)
+  const countdown = useCountdown(assignedAtTime, defaultTime)
 
   useEffect(() => {
     if (plan) {
@@ -51,11 +53,33 @@ export default function TaskCard({
   }, [plan])
 
   useEffect(() => {
-    if(countdown === '0:00:00') {
-      // setDialogOpen(false)
-      console.warn('time is up')
+    if (countdown === '0:00:00' && !timeUpHandled) {
+      TimeUp();
     }
-  }, [countdown])
+  }, [countdown, timeUpHandled])
+
+  async function TimeUp() {
+    if (countdown === '0:00:00') {
+      try {
+        const res = await axios.patch('/api/extend-crafter-time', {
+          orderId: item._id,
+          role: session.user.role,
+          crafterId: session.user.id
+        })
+        if (res.status === 200) {
+          defaultTime = 2
+          setFetchedTasks(true)
+          setTimeUpHandled(true)
+
+          toast.success(res.data.message)
+          console.log(res.data.message)
+        }
+      } catch (error) {
+        console.error(error.response.data.error);
+        setGracePeriodError(error.response.data.error)
+      }
+    }
+  }
 
 
   const startWorking = async (item) => {
@@ -82,7 +106,8 @@ export default function TaskCard({
 
   return (
     <>
-      <Card className={`${width ? 'w-[320px] max-xl:w-[320px]' : 'w-[350px] max-xl:w-[330px]'} font-inter max-xs:w-full max-sm:w-full`}>
+      <Card className={`${width ? 'w-[440px] max-xl:w-[420px]' :
+        'w-[420px] max-xl:w-[430px]'} font-inter max-xs:w-full max-sm:w-full`}>
         <CardHeader className={'flex flex-row justify-between items-center'}>
           <div>
             <CardTitle>{title}</CardTitle>
@@ -95,7 +120,6 @@ export default function TaskCard({
         <CardFooter className={'flex flex-row  justify-between items-center'}>
           <div className='text-zinc-400 text-sm flex items-center gap-2'>
             <Clock size={14} />
-            {/* <p className='font-inter'>{time}</p> */}
             <p className='font-inter'>{badge === 'New' ? time : countdown}</p>
           </div>
           <div className='text-zinc-400 text-sm flex items-center gap-2'>
@@ -121,12 +145,12 @@ export default function TaskCard({
                     </span>
                     <span className="font-semibold"> Description</span>
                     <span className="font-inter capitalize">{des}</span>
-                    <span className="font-semibold"> User Comments</span>
+                    <span className="font-semibold"> Client Comments</span>
                     <span className="font-inter capitalize">{bgStory}</span>
                     {/* {`${index}`} */}
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
+                {badge === 'New' && <DialogFooter>
                   <Button className={'text-white cursor-pointer'}
                     onClick={() => startWorking(item)} disabled={isLoading}>
                     {isLoading ? <React.Fragment>
@@ -134,7 +158,7 @@ export default function TaskCard({
                       Loading
                     </React.Fragment> : 'Start Working'}
                   </Button>
-                </DialogFooter>
+                </DialogFooter>}
               </DialogContent>
             </Dialog>
           </div>

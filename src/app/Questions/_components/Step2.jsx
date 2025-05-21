@@ -36,7 +36,7 @@ const schema = z
       required_error: "Please select a relationship",
     }),
     memories: z.string().optional(),
-    backgroundStory: z.string().min(10, { message: "Background story required" }),
+    backgroundStory: z.string().min(40, { message: "Background story required" }),
     relationshipValue: z.string().optional(),
   })
   .superRefine((data, ctx) => {

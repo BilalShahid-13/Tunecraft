@@ -10,6 +10,7 @@ export async function POST(req) {
     const assignedCrafterIdField = `crafters.${role}.assignedCrafterId`;
     const tasks = await Order.find({
       [assignedCrafterIdField]: userId,
+      [`crafters.${role}.submissionStatus`]: "assigned",
       currentStage: role,
     }).populate("plan");
 

@@ -26,6 +26,10 @@ const craftersObject = {
       type: Date,
       default: null,
     },
+    gracePeriodGranted: {
+      type: Boolean,
+      default: false,
+    },
     submittedAtTime: {
       type: Date,
       default: null,

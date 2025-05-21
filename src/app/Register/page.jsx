@@ -124,9 +124,6 @@ export default function page() {
       console.error(error.response?.data.msg || error.message);
     }
   };
-
-
-
   const watchRole = signupForm.watch("role")
 
   const handleTabChange = (value) => {

@@ -34,6 +34,7 @@ import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
 import Dashboard from "@/app/(Dashboard)/components/Dashboard";
 import Notification from "@/app/admin/components/Notification";
+import Tasks from "@/components/Tasks";
 
 export const Currency = "MX$";
 
@@ -369,7 +370,7 @@ export const SidebarItems = [
   {
     name: "Tasks",
     Icon: ClipboardCheck,
-    route: UpdatePassword,
+    route: Tasks,
   },
   {
     name: "Account",
