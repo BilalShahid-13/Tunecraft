@@ -1,5 +1,5 @@
 import { uploadFile } from "@/lib/cloudinary";
-import { submissionStatusEnum } from "@/lib/Constant";
+import { currentStageEnum, submissionStatusEnum } from "@/lib/Constant";
 import { dbConnect } from "@/lib/dbConnect";
 import Order from "@/Schema/Order";
 import { NextResponse } from "next/server";
@@ -45,7 +45,7 @@ export async function POST(request) {
         { status: 403 }
       );
     }
-
+    task.currentStage = currentStageEnum[2];
     task.crafters[role].submissionStatus = submissionStatusEnum[3]; // "submitted"
     task.crafters[role].submittedFileUrl = res.secure_url;
     task.crafters[role].adminFeedback = comments;
