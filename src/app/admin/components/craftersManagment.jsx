@@ -12,6 +12,7 @@ import RejectedUsers from "./RejectedUsers";
 import UserCard from './UserCard';
 import UserRole from "./UserRole";
 import useNotificationStore from "@/store/notification";
+import useTabValue from "@/store/tabValue";
 
 const components = [
   UserCard,
@@ -21,7 +22,7 @@ const components = [
   UserRole
 ]
 
-function CustomComopnent({ Component, users, isLoading, index }) {
+function CustomComponent({ Component, users, isLoading, index }) {
   return <Component users={users} isLoading={isLoading} />
 }
 
@@ -30,15 +31,16 @@ export default function craftersManagment() {
   const [allUsers, setAllUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const { addAllUser, isFetched, setIsUpdate } = useAllUsers()
-  const { tabValue, isClicked } = useNotificationStore()
-  const [tabValueIndex, setTabValueIndex] = useState(0)
+  const { isClicked, notifications } = useNotificationStore()
+  const { tabValue, userStatus } = useTabValue()
+  const [tabValueIndex, setTabValueIndex] = useState('0')
   useEffect(() => {
     fetchAllUsers()
   }, [isFetched])
 
   useEffect(() => {
     if (tabValue && isClicked) {
-      setTabValueIndex(`1`)
+      setTabValueIndex(userStatus)
     }
   }, [tabValue])
 
@@ -60,8 +62,8 @@ export default function craftersManagment() {
 
   return (
     <>
-      <Tabs defaultValue={`${tabValueIndex}`}
-        value={`${tabValueIndex}`}
+      <Tabs defaultValue={tabValueIndex}
+        value={tabValueIndex}
         onValueChange={setTabValueIndex}
         className={'w-full flex'}>
         <TabsList
@@ -96,7 +98,7 @@ export default function craftersManagment() {
 
         {components.map((Items, index) => (
           <TabsContent key={index} value={`${index}`} className="mt-6">
-            <CustomComopnent
+            <CustomComponent
               Component={Items}
               users={allUsers}
               isLoading={loading}

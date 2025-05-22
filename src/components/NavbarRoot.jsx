@@ -17,6 +17,7 @@ import DashboardNavbar from "./DashboardNavbar";
 import Navbar from "./Navbar";
 import { ScrollArea } from "./ui/scroll-area";
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
+import useTabValue from "@/store/tabValue";
 
 export default function NavbarRoot() {
   const location = usePathname();
@@ -27,7 +28,9 @@ export default function NavbarRoot() {
   const isMobile = useMediaQuery({ query: "(max-width: 639px)" });
   const items = isAdmin ? adminPanel : SidebarItems;
   const { addSidebarWidth } = useSidebarWidth()
-  const { tabValue, setTabValue } = useNotificationStore()
+  // const { tabValue, setTabValue } = useNotificationStore()
+  const { setTabValue, tabValue, userStatus } = useTabValue()
+
 
   useEffect(() => {
     setIsProtectedRoute(protectedRoutes.includes(location));
@@ -59,12 +62,9 @@ export default function NavbarRoot() {
   }
 
   useEffect(() => {
-    // setTabValue((isAdmin ? adminPanel[0].name
-    //   : 'Dashboard'))
-    setTabValue((isAdmin ? adminPanel[0].name
+    setTabValue((isAdmin ? tabValue
       : 'Tasks'))
   }, [items])
-
 
   return (
     <>
@@ -78,7 +78,8 @@ export default function NavbarRoot() {
             }}
           >
             <Tabs
-              defaultValue={`${tabValue}`}
+              defaultValue={`${(isAdmin ? adminPanel[0].name
+                : 'Dashboard')}`}
               value={tabValue}
               onValueChange={setTabValue}
               className="w-full flex flex-row justify-start items-start">

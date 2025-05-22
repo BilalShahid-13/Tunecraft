@@ -11,7 +11,9 @@ export default function TaskCard({ title = 'Birthday Song',
         <div className='flex flex-col gap-2'>
           <h1 className="text-2xl font-bold font-inter">{title}</h1>
           {/* days remaining */}
-          <div className='flex flex-row gap-12 font-inter text-sm justify-start items-center'>
+          <div className='flex flex-row gap-12
+          max-sm:flex-col max-sm:items-start max-sm:gap-3
+          font-inter text-sm justify-start items-center'>
             <Badge className='bg-[#4d2c28] text-zinc-300 flex flex-row gap-2'>
               <Clock size={30} />{countdown} remaming</Badge>
             <ul className='flex flex-row gap-12 font-inter text-sm justify-center items-center'>
@@ -21,15 +23,23 @@ export default function TaskCard({ title = 'Birthday Song',
           </div>
         </div>
         {/* des */}
-        <div className='font-inter flex flex-col gap-4'>
+        <div className='font-inter flex flex-col gap-4 max-w-4xl
+         max-md:max-w-xl max-lg:max-w-lg max-sm:max-w-sm'>
           <h1 className='text-2xl font-semibold text-zinc-300'>Description</h1>
-          <p className='text-zinc-400'>{des}</p>
+          <p className='text-zinc-400
+           max-h-48 overflow-auto break-words whitespace-normal
+        capitalize p-2'>{des}</p>
         </div>
 
         {/* requirement */}
-        <div className='font-inter flex flex-col gap-4'>
+        <div className='font-inter flex flex-col gap-4 max-w-4xl
+         max-md:max-w-xl max-lg:max-w-lg max-sm:max-w-sm'>
           <h1 className='text-2xl font-semibold text-zinc-300'>Requirements</h1>
-          <p className='text-zinc-400'>{requirements}</p>
+          <p className='text-zinc-400
+           max-h-48 overflow-auto break-words whitespace-normal
+        capitalize p-2'>
+            {requirements}
+          </p>
         </div>
       </div>
     </>

@@ -1,0 +1,90 @@
+"use client";
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import TaskCard from './TaskCard';
+
+export default function TaskManagment() {
+  const [allSubmission, setAllSubmissions] = useState();
+  const [allcrafters, setAllCrafters] = useState([])
+  const [user, setUser] = useState([])
+  const [role, setRole] = useState('lyricist')
+  const [isLoading, setIsLoading] = useState(false)
+  useEffect(() => {
+    fetchReviewSubmissions();
+  }, [])
+
+  const fetchReviewSubmissions = async () => {
+    try {
+      const response = await axios.get('/api/admin/crafters-submission-review/')
+      if (response.status === 200) {
+        console.log('all', response.data.data)
+        setAllSubmissions(response.data.data.tasks)
+        const a = allSubmission?.map((items) => {
+          const { lyricist, singer, engineer } = items.crafters;
+          const obj = {};
+          if (lyricist?.submissionStatus === "submitted") obj.lyricist = lyricist
+          if (singer?.submissionStatus === "submitted") obj.singer = singer
+          if (engineer?.submissionStatus === "submitted") obj.engineer = engineer
+          setAllCrafters(obj)
+        })
+        setAllCrafters(a)
+        setUser(response.data.data.crafter.tasksWithCrafters);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  console.log('user', user,allSubmission)
+  useEffect(() => {
+    const a = allSubmission?.map((items) => {
+      const { lyricist, singer, engineer } = items.crafters;
+      const obj = {};
+      if (lyricist?.submissionStatus === "submitted") {
+        obj.lyricist = lyricist
+        setRole('singer')
+      }
+      if (singer?.submissionStatus === "submitted") {
+        obj.singer = singer
+        setRole('engineer')
+      }
+      if (engineer?.submissionStatus === "submitted") {
+        obj.engineer = engineer
+        setRole('engineer')
+      }
+      return obj
+    })
+    setAllCrafters(a)
+  }, [allSubmission])
+
+
+  const onApprove = async (id) => {
+    console.log('onclick', id, role)
+    try {
+      setIsLoading(id)
+      const res = await axios.patch('/api/admin/crafter-approve', {
+        orderId: id,
+        role: role
+      })
+      if (res.status === 200) {
+        // fetchReviewSubmissions()
+        console.log(res.data)
+      }
+    }
+    catch (error) {
+      console.error(error.response.data.error);
+    }
+    finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className='flex flex-col gap-3'>
+      {allSubmission && allSubmission.map((item, index) =>
+        <TaskCard key={index}
+          // isLoading={isLoading}
+          time={item.createdAt}
+          onClick={() => onApprove(item._id)} />)}
+    </div>
+  )
+}

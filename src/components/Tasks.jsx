@@ -2,7 +2,7 @@
 import useCrafterTask from '@/store/crafterTask';
 import useNotificationStore from '@/store/notification';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoaderCircle } from 'lucide-react';
+import { ArrowUpLeft, LoaderCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import CustomFileInput from './CustomFileInput';
@@ -57,10 +57,8 @@ export default function Tasks() {
     try {
       const res = await axios.post('/api/taskSubmission', formData)
       if (res.status === 200) {
-        console.log(res.data)
-        taskForm.reset();
         taskForm.setValue('file', '');
-
+        taskForm.reset();
         toast.success(res.data.message)
       }
     } catch (error) {
@@ -80,58 +78,62 @@ export default function Tasks() {
   return (
     <>
       {
-        // isTaskEmpty ? <div className='flex flex-col gap-4 justify-center items-center text-zinc-400 h-[50vh]'>
-        //   <Button className={'text-white cursor-pointer'}
-        //     onClick={tabHandler}> <ArrowUpLeft /> Go to Dashboard to pick one of them</Button>
-        // </div> :
-        <div className='flex flex-col gap-12'>
-          <TaskCard title={crafterTask.title}
-            des={crafterTask.des}
-            dueDate={crafterTask.dueData}
-            timeAgo={'03 hr'}
-            requirements={crafterTask.requirements}
-            client={crafterTask.clientName} />
+        isTaskEmpty ? <div className='flex flex-col gap-4 justify-center items-center text-zinc-400 h-[50vh]'>
+          <Button className={'text-white cursor-pointer'}
+            onClick={tabHandler}> <ArrowUpLeft /> Go to Dashboard to pick one of them</Button>
+        </div> :
+          <div className='flex flex-col gap-12'>
+            <TaskCard title={crafterTask.title}
+              des={crafterTask.des}
+              dueDate={crafterTask.dueData}
+              timeAgo={'03 hr'}
+              requirements={crafterTask.requirements}
+              client={crafterTask.clientName} />
 
-          <form onSubmit={taskForm.handleSubmit(handleSubmit)}>
-            <div className='bg-[#111111] flex flex-col gap-8 p-4 rounded-lg'>
-              <h1 className="text-2xl font-bold font-inter">Your Subission</h1>
-              <div className='space-y-3'>
-                <p className='text-zinc-400'>Upload your work</p>
-                <CustomFileInput
-                  signupForm={taskForm}
-                  acceptedTypes={acceptedTypes}
-                  onReset={taskForm.formState.isSubmitSuccessful}
-                  className={`h-[40vh] border-2 border-dashed
-                   bg-zinc-900 border-neutral-600
+            <form onSubmit={taskForm.handleSubmit(handleSubmit)}>
+              <div className='bg-[#111111] flex flex-col gap-8 p-4 rounded-lg
+              max-sm:max-w-sm
+              '>
+                <h1 className="text-2xl font-bold font-inter">Your Subission</h1>
+                <div className='space-y-3 max-md:max-w-xl
+                 max-lg:max-w-lg w-full'>
+                  <p className='text-zinc-400'>Upload your work</p>
+                  <CustomFileInput
+                    signupForm={taskForm}
+                    acceptedTypes={acceptedTypes}
+                    onReset={taskForm.formState.isSubmitSuccessful}
+                    className={`h-[40vh] border-2 border-dashed
+                   bg-zinc-900 border-neutral-600 text-center
                     rounded-lg`} />
-                {taskForm.formState.errors.file && (
-                  <p className="input-error">{taskForm.formState.errors.file.message}</p>
-                )}
-              </div>
+                  {taskForm.formState.errors.file && (
+                    <p className="input-error">{taskForm.formState.errors.file.message}</p>
+                  )}
+                </div>
 
-              <div className="grid w-full gap-1.5 space-y-1">
-                <Label htmlFor="comment"
-                  className={'text-zinc-300 font-inter'}>Comments (Optional)</Label>
-                <Textarea
-                  {...taskForm.register('comments')}
-                  className={'h-[20vh]'}
-                  placeholder="Add any notes or
+                <div className="grid w-full gap-1.5 space-y-1
+                max-md:max-w-xl max-lg:max-w-lg ">
+                  <Label htmlFor="comment"
+                    className={'text-zinc-300 font-inter'}>Comments (Optional)</Label>
+                  <Textarea
+                    {...taskForm.register('comments')}
+                    className={'h-[20vh]'}
+                    placeholder="Add any notes or
                comments about your submission..."
-                  id="comment" />
-                {taskForm.formState.errors.comments && <p className="input-error">{taskForm.formState.errors.comments.message}</p>}
+                    id="comment" />
+                  {taskForm.formState.errors.comments && <p className="input-error">{taskForm.formState.errors.comments.message}</p>}
+                </div>
+                <Button type={'submit'}
+                  disabled={taskForm.formState.isSubmitting}
+                  className={'bg-primary text-white w-fit cursor-pointer'}>
+                  {taskForm.formState.isSubmitting ? (
+                    <>
+                      <p>Submiting Work</p> <LoaderCircle className="animate-spin" />
+                    </>
+                  ) : "Submit Work"}
+                </Button>
               </div>
-              <Button type={'submit'}
-                disabled={taskForm.formState.isSubmitting}
-                className={'bg-primary text-white w-fit cursor-pointer'}>
-                {taskForm.formState.isSubmitting ? (
-                  <>
-                    <p>Submiting Work</p> <LoaderCircle className="animate-spin" />
-                  </>
-                ) : "Submit Work"}
-              </Button>
-            </div>
-          </form>
-        </div>}
+            </form>
+          </div>}
 
     </>
   )

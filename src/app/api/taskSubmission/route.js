@@ -45,7 +45,8 @@ export async function POST(request) {
         { status: 403 }
       );
     }
-    task.currentStage = currentStageEnum[2];
+    task.currentStage = `review_${role}`;
+    // task.currentStage = currentStageEnum[2];
     task.crafters[role].submissionStatus = submissionStatusEnum[3]; // "submitted"
     task.crafters[role].submittedFileUrl = res.secure_url;
     task.crafters[role].adminFeedback = comments;

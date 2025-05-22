@@ -11,7 +11,7 @@ import X from "../../public/footer/x.png";
 
 // questions
 import craftersManagment from "@/app/admin/components/craftersManagment";
-import projectManagment from "@/app/admin/components/projectManagment";
+import projectManagment from "@/app/admin/components/TaskManagment";
 import UpdatePassword from "@/components/UpdatePassword";
 import {
   Bell,
@@ -397,7 +397,7 @@ export const adminPanel = [
     route: craftersManagment,
   },
   {
-    name: "Project Managment",
+    name: "Task Managment",
     Icon: Clipboard,
     route: projectManagment,
   },

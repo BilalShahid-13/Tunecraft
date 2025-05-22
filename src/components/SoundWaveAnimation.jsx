@@ -9,7 +9,7 @@ import Wave2 from '../../public/heroSection/Waves Orange (2).svg';
 import Wave3 from '../../public/heroSection/Waves Orange (3).svg';
 import Wave from '../../public/heroSection/Waves Orange.svg';
 
-export default function SoundWaveAnimation({ className, toggleAnimation }) {
+export default function SoundWaveAnimation({ className, toggleAnimation = true }) {
   const wave1Ref = useRef(null)
   const wave2Ref = useRef(null)
   const wave3Ref = useRef(null)

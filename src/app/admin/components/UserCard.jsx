@@ -36,6 +36,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import UpdateUser from "./UpdateUser";
 import useNotificationStore from "@/store/notification";
+import { _userStatus } from "@/lib/utils";
 
 function Loader() {
   return (
@@ -58,7 +59,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
   const [isOpen, setOpen] = useState(false)
   const [frameLoading, setFrameLoading] = useState(null)
   const { setIsUpdate } = useAllUsers()
-  const { notifications, isClicked, setClicked } = useNotificationStore()
+  const { isClicked, setClicked, notificationId } = useNotificationStore()
   const cardRefs = useRef({});
   useEffect(() => {
     if (users) {
@@ -70,11 +71,10 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
   }, [users, isLoading])
 
   const scrollToCard = useCallback(() => {
-    const clickedNotificationId = notifications.approvalNotification?.[0]?._id;
+    const clickedNotificationId = notificationId;
     if (
-      clickedNotificationId &&
-      cardRefs.current[clickedNotificationId] &&
-      userStatus === 'pending'
+      notificationId &&
+      cardRefs.current[clickedNotificationId]
     ) {
       cardRefs.current[clickedNotificationId].scrollIntoView({
         behavior: "smooth",
@@ -82,7 +82,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
       });
       setClicked(false);
     }
-  }, [notifications.approvalNotification, userStatus]);
+  }, [notificationId]);
 
   useEffect(() => {
     // Delay the scroll by a short time to ensure the element is rendered
@@ -90,18 +90,6 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
       setTimeout(scrollToCard, 200);
     }
   }, [scrollToCard]);
-
-  function _userStatus(status) {
-    if (status === 'pending') {
-      return { label: 'Pending', colorClass: 'bg-blue-400' };  // Blue for pending
-    }
-    if (status === 'approved') {
-      return { label: 'Approved', colorClass: 'bg-green-400' };  // Green for approved
-    }
-    if (status === 'rejected') {
-      return { label: 'Rejected', colorClass: 'bg-red-400' };  // Red for rejected
-    }
-  }
 
   async function onApprove(user) {
     setApproveLoading(user._id);
@@ -115,9 +103,10 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
         password: password,
       });
       if (res) {
-        setIsUpdate(true);
+        console.log('userCard', res)
       }
-      toast.success(res.data.message);
+      toast.success(`${user.crafterId} ${res.data.message}`);
+      setIsUpdate(true);
     } catch (error) {
       const msg = error.response?.data?.error || 'Failed to send reset link';
       console.error(msg);
@@ -134,7 +123,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
         data: { id: user._id }
       });
       if (res.statusText === 'OK') {
-        toast.success('Application Discarded');
+        toast.success(user.crafterId + 'Application Discarded');
         setTimeout(() => setIsUpdate(), 500);
 
       }
@@ -210,6 +199,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
                   }
                 </CardTitle>
                 <CardDescription className={'flex flex-col gap-2'}>
+                  <p className="capitalize font-inter flex flex-row gap-2 justify-start items-center"> # <span className="italic"> {items?.crafterId}</span></p>
                   <p className="capitalize font-inter flex flex-row gap-2 justify-start items-center"> <User size={13} /> {items?.username}</p>
                   <a href={`tel:${items.phone}`} className='flex flex-row justify-start items-center gap-1 hover:underline'>
                     <Phone size={13} />

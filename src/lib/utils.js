@@ -19,7 +19,7 @@ export const formatTimeHMSS = (timestamp) => {
   const hours = String(date.getUTCHours()).padStart(2, "0");
   const minutes = String(date.getUTCMinutes()).padStart(2, "0");
   const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-  return `${hours}hr:${minutes}min:${seconds}sec`;
+  return `${hours}hr : ${minutes}min : ${seconds}sec`;
 };
 
 // export const formatTimeHMSS = (timestamp) => {
@@ -51,4 +51,17 @@ export function timeAgo(timestamp) {
   if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
   if (seconds > 0) return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
   return "just now";
+}
+
+
+export function _userStatus(status) {
+  if (status === "pending") {
+    return { label: "Pending", colorClass: "bg-blue-400" }; // Blue for pending
+  }
+  if (status === "approved") {
+    return { label: "Approved", colorClass: "bg-green-400" }; // Green for approved
+  }
+  if (status === "rejected") {
+    return { label: "Rejected", colorClass: "bg-red-400" }; // Red for rejected
+  }
 }

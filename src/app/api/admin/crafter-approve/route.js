@@ -1,0 +1,25 @@
+import { currentStageEnum, submissionStatusEnum } from "@/lib/Constant";
+import { dbConnect } from "@/lib/dbConnect";
+import Order from "@/Schema/Order";
+import { NextResponse } from "next/server";
+
+export async function PATCH(res) {
+  const { orderId, role } = await res.json();
+  if (!orderId || !role) {
+    return NextResponse.json(
+      { error: "orderId and role is required" },
+      { status: 400 }
+    );
+  }
+  try {
+    await dbConnect();
+    const order = await Order.findById(orderId)
+    
+    order.currentStage = currentStageEnum[3];
+    order.crafters[role].submissionStatus = submissionStatusEnum[1];
+    await order.save();
+    return NextResponse.json({ message: "Order updated successfully" });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

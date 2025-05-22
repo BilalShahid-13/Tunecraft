@@ -6,22 +6,27 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { formatTimeHMSS, timeAgo } from '@/lib/utils'
+import { _userStatus, formatTimeHMSS, timeAgo } from '@/lib/utils'
 
-export default function NotificationCard({ time, onClick = () => { } }) {
+export default function NotificationCard({ approvalStatus, time, username, role, crafterId, onClick = () => { } }) {
   return (
     <>
       <MagicCard gradientFrom='#ff6467' gradientTo='#ff7e6e'
         className='rounded-lg cursor-pointer' bgColor='bg-zinc-900'
-        // onClick={onClick}
       >
         <div className="p-4 font-inter flex flex-col gap-2" onClick={onClick}>
-          <div className='flex flex-row justify-between items-center'>
-            <p className='text-sm font-semibold'>Lyricist</p>
-            <Badge className={'bg-blue-400 text-white text-xs'}>Pending</Badge>
+          <div className='flex flex-row justify-between items-center '>
+            <p className='text-sm font-semibold font-inter capitalize
+            flex flex-row gap-3'>{role}
+              <div className='text-zinc-500 font-light'>
+                # <span className="italic"> {crafterId}</span>
+              </div>
+            </p>
+            <Badge className={`${_userStatus(approvalStatus).colorClass} text-xs`}>{_userStatus(approvalStatus).label}</Badge>
           </div>
           <div className='flex flex-row justify-between items-center'>
-            <span className='text-sm text-zinc-400 font-inter'>Bilal Shahid</span>
+            <p className='text-sm text-zinc-400 font-inter capitalize'>{username}
+            </p>
             <div className='flex flex-col justify-between items-center gap-1'>
               <TooltipProvider>
                 <Tooltip>

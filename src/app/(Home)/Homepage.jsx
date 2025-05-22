@@ -33,7 +33,7 @@ const Homepage = () => {
           Create Musical Magic For Every Occasion
         </h2>
         <CustomButton onClick={() => navigate.push('/Questions')} />
-        <SoundWaveAnimation />
+        <SoundWaveAnimation/>
         {/* eclipse img */}
         <div className="absolute right-0 top-0 -z-10 w-[400px] h-[300px] py-4 rounded-full">
           <Image
