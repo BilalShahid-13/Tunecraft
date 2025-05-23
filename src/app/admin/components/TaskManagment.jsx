@@ -1,7 +1,7 @@
 "use client";
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import TaskCard from './TaskCard';
+import AdminTaskCard from './AdminTaskCard';
 
 export default function TaskManagment() {
   const [allSubmission, setAllSubmissions] = useState();
@@ -15,46 +15,36 @@ export default function TaskManagment() {
 
   const fetchReviewSubmissions = async () => {
     try {
-      const response = await axios.get('/api/admin/crafters-submission-review/')
+      const response = await axios.get('/api/admin/crafters-submission-review')
       if (response.status === 200) {
         console.log('all', response.data.data)
-        setAllSubmissions(response.data.data.tasks)
-        const a = allSubmission?.map((items) => {
-          const { lyricist, singer, engineer } = items.crafters;
-          const obj = {};
-          if (lyricist?.submissionStatus === "submitted") obj.lyricist = lyricist
-          if (singer?.submissionStatus === "submitted") obj.singer = singer
-          if (engineer?.submissionStatus === "submitted") obj.engineer = engineer
-          setAllCrafters(obj)
-        })
-        setAllCrafters(a)
-        setUser(response.data.data.crafter.tasksWithCrafters);
+        setAllSubmissions(response.data.data)
       }
     } catch (error) {
       console.error(error);
     }
   }
-  console.log('user', user,allSubmission)
-  useEffect(() => {
-    const a = allSubmission?.map((items) => {
-      const { lyricist, singer, engineer } = items.crafters;
-      const obj = {};
-      if (lyricist?.submissionStatus === "submitted") {
-        obj.lyricist = lyricist
-        setRole('singer')
-      }
-      if (singer?.submissionStatus === "submitted") {
-        obj.singer = singer
-        setRole('engineer')
-      }
-      if (engineer?.submissionStatus === "submitted") {
-        obj.engineer = engineer
-        setRole('engineer')
-      }
-      return obj
-    })
-    setAllCrafters(a)
-  }, [allSubmission])
+  // console.log('allCrafters', allcrafters, 'allSubmission', allSubmission)
+  // useEffect(() => {
+  //   const a = allSubmission?.map((items) => {
+  //     const { lyricist, singer, engineer } = items.crafters;
+  //     const obj = {};
+  //     if (lyricist?.submissionStatus === "submitted") {
+  //       obj.lyricist = lyricist
+  //       setRole('singer')
+  //     }
+  //     if (singer?.submissionStatus === "submitted") {
+  //       obj.singer = singer
+  //       setRole('engineer')
+  //     }
+  //     if (engineer?.submissionStatus === "submitted") {
+  //       obj.engineer = engineer
+  //       setRole('engineer')
+  //     }
+  //     return obj
+  //   })
+  //   setAllCrafters(a)
+  // }, [allSubmission])
 
 
   const onApprove = async (id) => {
@@ -66,7 +56,6 @@ export default function TaskManagment() {
         role: role
       })
       if (res.status === 200) {
-        // fetchReviewSubmissions()
         console.log(res.data)
       }
     }
@@ -78,13 +67,21 @@ export default function TaskManagment() {
     }
   }
 
+  // console.log(allSubmission[0]?.submittedCrafter.assignedCrafterId.username)
+
   return (
     <div className='flex flex-col gap-3'>
       {allSubmission && allSubmission.map((item, index) =>
-        <TaskCard key={index}
-          // isLoading={isLoading}
-          time={item.createdAt}
-          onClick={() => onApprove(item._id)} />)}
+        <AdminTaskCard key={index}
+          index={index}
+          item={item}
+          username={item.submittedCrafter.assignedCrafterId.username}
+          email={item.submittedCrafter.assignedCrafterId.email}
+          file={item.submittedCrafter.submittedFileUrl}
+          time={item.submittedCrafter.submittedAtTime}
+          isLoading={isLoading}
+          // time={item.createdAt}
+          onClick={() => onApprove(item?._id)} />)}
     </div>
   )
 }

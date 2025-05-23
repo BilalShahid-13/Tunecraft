@@ -10,12 +10,13 @@ import Instagram from "../../public/footer/instagram logo.png";
 import X from "../../public/footer/x.png";
 
 // questions
+import Dashboard from "@/app/(Dashboard)/components/Dashboard";
 import craftersManagment from "@/app/admin/components/craftersManagment";
+import Notification from "@/app/admin/components/Notification";
 import projectManagment from "@/app/admin/components/TaskManagment";
 import UpdatePassword from "@/components/UpdatePassword";
 import {
   Bell,
-  Check,
   Clipboard,
   ClipboardCheck,
   Clock,
@@ -32,9 +33,7 @@ import Celebration from "../../public/question/celebration.png";
 import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
-import Dashboard from "@/app/(Dashboard)/components/Dashboard";
-import Notification from "@/app/admin/components/Notification";
-import Tasks from "@/components/Tasks";
+import Tasks from "@/app/(Role)/(Task)/components/Tasks";
 
 export const Currency = "MX$";
 

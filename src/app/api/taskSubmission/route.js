@@ -45,9 +45,25 @@ export async function POST(request) {
         { status: 403 }
       );
     }
+    const assignedAt = new Date(task.crafters[role].assignedAtTime);
+    const now = new Date();
+
+    // Calculate submission deadline: 3 hours after assignedAtTime
+    const submissionDeadline = new Date(
+      assignedAt.getTime() + 3 * 60 * 60 * 1000
+    );
+
+    if (now > submissionDeadline) {
+      return NextResponse.json(
+        { error: "Submission time is over. You missed the 3-hour deadline." },
+        { status: 400 }
+      );
+    }
+
     task.currentStage = `review_${role}`;
     // task.currentStage = currentStageEnum[2];
     task.crafters[role].submissionStatus = submissionStatusEnum[3]; // "submitted"
+    task.crafters[role].submittedAtTime = new Date(); // "submitted"
     task.crafters[role].submittedFileUrl = res.secure_url;
     task.crafters[role].adminFeedback = comments;
 

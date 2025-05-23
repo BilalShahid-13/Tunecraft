@@ -7,53 +7,59 @@ export async function GET() {
   try {
     await dbConnect();
 
-    // Define review stages
-    const reviewStages = [
-      "review_lyricist",
-      "review_singer",
-      "review_engineer",
-    ];
-
-    // Fetch orders where any crafter (lyricist, singer, or engineer) has submitted their work
-    const tasks = await Order.find({
+    const orders = await Order.find({
       $or: [
         { "crafters.lyricist.submissionStatus": "submitted" },
         { "crafters.singer.submissionStatus": "submitted" },
         { "crafters.engineer.submissionStatus": "submitted" },
       ],
-      currentStage: { $in: reviewStages }, // Tasks in review stages
+    }).populate([
+      "crafters.lyricist.assignedCrafterId",
+      "crafters.singer.assignedCrafterId",
+      "crafters.engineer.assignedCrafterId",
+    ]);
+
+    // Format the response with single submitted crafter
+    const formattedOrders = orders.map((order) => {
+      const orderObj = order.toObject();
+      let submittedCrafter = null;
+
+      // Check each crafter role and get the first submitted one
+      const roles = ["lyricist", "singer", "engineer"];
+
+      for (const role of roles) {
+        if (orderObj.crafters[role]?.submissionStatus === "submitted") {
+          submittedCrafter = {
+            role: role,
+            ...orderObj.crafters[role],
+          };
+          break; // Take the first submitted crafter
+        }
+      }
+
+      // Return the order with single submitted crafter
+      return {
+        _id: orderObj._id,
+        name: orderObj.name,
+        phone: orderObj.phone,
+        email: orderObj.email,
+        songGenre: orderObj.songGenre,
+        jokes: orderObj.jokes,
+        backgroundStory: orderObj.backgroundStory,
+        plan: orderObj.plan,
+        musicTemplate: orderObj.musicTemplate,
+        currentStage: orderObj.currentStage,
+        orderStatus: orderObj.orderStatus,
+        finalSongUrl: orderObj.finalSongUrl,
+        createdAt: orderObj.createdAt,
+        updatedAt: orderObj.updatedAt,
+        submittedCrafter: submittedCrafter, // Single object instead of nested roles
+      };
     });
 
-    // Process each task to find the assigned crafter based on who has submitted
-    const tasksWithCrafters = [];
-
-    let crafter = null;
-    for (const task of tasks) {
-
-      // Check which crafter has "submitted" status and fetch the assignedCrafterId
-      if (task.crafters.lyricist.submissionStatus === "submitted") {
-        crafter = await User.findById(task.crafters.lyricist.assignedCrafterId);
-      } else if (task.crafters.singer.submissionStatus === "submitted") {
-        crafter = await User.findById(task.crafters.singer.assignedCrafterId);
-      } else if (task.crafters.engineer.submissionStatus === "submitted") {
-        crafter = await User.findById(task.crafters.engineer.assignedCrafterId);
-      }
-
-      // If a crafter is found, add the task and crafter info to the result
-      if (crafter) {
-        tasksWithCrafters.push({
-          ...task.toObject(),
-          crafter: crafter // Add crafter details
-        });
-      }
-    }
-
     return NextResponse.json({
-      message: "Data fetched successfully",
-      data: {
-        tasks: tasks,
-        crafter:{tasksWithCrafters,crafter}
-       },
+      message: "Submitted crafters fetched successfully",
+      data: formattedOrders,
     });
   } catch (error) {
     console.error(error);

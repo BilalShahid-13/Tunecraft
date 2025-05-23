@@ -14,20 +14,28 @@ export const formatCentsToDollars = (cents) => {
   return `${(cents / 100).toFixed(2)}`;
 };
 
+// export const formatTimeHMSS = (timestamp) => {
+//   const date = new Date(timestamp);
+//   const hours = String(date.getHours()).padStart(2, "0"); // local hours
+//   const minutes = String(date.getMinutes()).padStart(2, "0"); // local minutes
+//   const seconds = String(date.getSeconds()).padStart(2, "0"); // local seconds
+//   return `${hours}hr : ${minutes}min : ${seconds}sec`;
+// };
 export const formatTimeHMSS = (timestamp) => {
   const date = new Date(timestamp);
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-  const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-  return `${hours}hr : ${minutes}min : ${seconds}sec`;
+  const hours = String(date.getHours()).padStart(2, "0");    // local hours
+  const minutes = String(date.getMinutes()).padStart(2, "0"); // local minutes
+  const seconds = String(date.getSeconds()).padStart(2, "0"); // local seconds
+  return `${hours}:${minutes}:${seconds}`;
 };
+
 
 // export const formatTimeHMSS = (timestamp) => {
 //   const date = new Date(timestamp);
 //   const hours = String(date.getUTCHours()).padStart(2, "0");
 //   const minutes = String(date.getUTCMinutes()).padStart(2, "0");
 //   const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-//   return `${hours}:${minutes}:${seconds}`;
+//   return `${hours}hr : ${minutes}min : ${seconds}sec`;
 // };
 
 export function timeAgo(timestamp) {
@@ -52,7 +60,6 @@ export function timeAgo(timestamp) {
   if (seconds > 0) return `${seconds} second${seconds > 1 ? "s" : ""} ago`;
   return "just now";
 }
-
 
 export function _userStatus(status) {
   if (status === "pending") {

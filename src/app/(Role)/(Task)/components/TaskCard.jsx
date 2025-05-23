@@ -1,7 +1,7 @@
 "use client";
 import { Clock } from 'lucide-react';
-import { Badge } from './ui/badge';
 import { useCountdown } from '@/hooks/useCountdown';
+import { Badge } from '@/components/ui/badge';
 export default function TaskCard({ title = 'Birthday Song',
   des, dueDate = '12/12/2023', requirements, client = 'atif', timeAgo }) {
   const countdown = useCountdown(dueDate, 3);

@@ -15,20 +15,21 @@ export async function PATCH(req) {
     }
     const existingInProgressOrder = await Order.findOne({
       [`crafters.${role}.assignedCrafterId`]: userId,
-      [`crafters.${role}.submissionStatus`]: "assigned", // or "in-progress" depending on your status logic
+      // [`crafters.${role}.submissionStatus`]: { $in: ["assigned", "submitted"] },
+      [`crafters.${role}.submissionStatus`]: "assigned",
       orderStatus: "in-progress",
     });
+
     if (existingInProgressOrder) {
-      if (existingInProgressOrder) {
-        return NextResponse.json(
-          {
-            error:
-              "You must complete your current order before picking a new one.",
-          },
-          { status: 400 }
-        );
-      }
+      return NextResponse.json(
+        {
+          error:
+            "You must complete your current order before picking a new one.",
+        },
+        { status: 400 }
+      );
     }
+
     const order = await Order.findById({
       _id: orderId,
     });

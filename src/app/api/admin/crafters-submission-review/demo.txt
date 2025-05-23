@@ -1,0 +1,71 @@
+import { dbConnect } from "@/lib/dbConnect";
+import Order from "@/Schema/Order";
+import User from "@/Schema/User";
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  try {
+    await dbConnect();
+
+    // Review stages indicating tasks waiting for admin approval
+    const reviewStages = [
+      "review_lyricist",
+      "review_singer",
+      "review_engineer",
+    ];
+
+    // Find orders where any crafter has submitted and is in a review stage
+    const tasks = await Order.find({
+      $or: [
+        { "crafters.lyricist.submissionStatus": "submitted" },
+        { "crafters.singer.submissionStatus": "submitted" },
+        { "crafters.engineer.submissionStatus": "submitted" },
+      ],
+      currentStage: { $in: reviewStages },
+    });
+
+    const tasksWithCrafters = [];
+
+    for (const task of tasks) {
+      let submittingCrafter = null;
+      let submittingRole = null;
+
+      // Detect which crafter submitted this task
+      if (task.crafters.lyricist.submissionStatus === "submitted") {
+        submittingCrafter = await User.findById(
+          task.crafters.lyricist.assignedCrafterId
+        );
+        submittingRole = "lyricist";
+      } else if (task.crafters.singer.submissionStatus === "submitted") {
+        submittingCrafter = await User.findById(
+          task.crafters.singer.assignedCrafterId
+        );
+        submittingRole = "singer";
+      } else if (task.crafters.engineer.submissionStatus === "submitted") {
+        submittingCrafter = await User.findById(
+          task.crafters.engineer.assignedCrafterId
+        );
+        submittingRole = "engineer";
+      }
+
+      if (submittingCrafter) {
+        tasksWithCrafters.push({
+          task: task.toObject(),
+          crafter: submittingCrafter.toObject(),
+          role: submittingRole,
+        });
+      }
+    }
+
+    return NextResponse.json({
+      message: "Data fetched successfully",
+      data: {
+        tasks,
+        tasksWithCrafters,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

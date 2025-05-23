@@ -19,7 +19,9 @@ import {
 } from "@/components/ui/dialog";
 import { useCountdown } from "@/hooks/useCountdown";
 import { musicPlans } from "@/lib/Constant";
+import { formatTimeHMSS } from "@/lib/utils";
 import useSidebarWidth from "@/store/sidebarWidth";
+import useTabValue from "@/store/tabValue";
 import useTasks from "@/store/tasks";
 import axios from "axios";
 import { Clock, Loader2, MoveRight } from 'lucide-react';
@@ -40,23 +42,23 @@ const DialogDetails = memo(({ title, songGenre, userPlan, des, bgStory, badge, s
         </span>
 
         <span className="max-xs:text-left font-semibold">Description</span>
-        <div className="max-h-48 max-xs:max-h-24 overflow-auto break-words
+        <span className="max-h-48 max-xs:max-h-24 overflow-auto break-words
         max-xs:text-xs max-xs:text-left
                     whitespace-normal font-inter capitalize p-2
                     rounded-md">
           {des}
-        </div>
+        </span>
 
         <span className="font-semibold max-xs:text-left">Client Comments</span>
-        <div className="max-h-48 overflow-auto break-words
+        <span className="max-h-48 overflow-auto break-words
         w-full max-xs:text-xs max-xs:max-h-24 max-xs:text-left
         whitespace-normal font-inter capitalize p-2 rounded-md">
           {bgStory}
-        </div>
+        </span>
       </DialogDescription>
     </DialogHeader>
 
-    {badge === 'New' && (
+    {badge === 'available' && (
       <DialogFooter>
         <Button
           className="text-white cursor-pointer"
@@ -79,10 +81,10 @@ const DialogDetails = memo(({ title, songGenre, userPlan, des, bgStory, badge, s
 
 
 export default function TaskCard({
-  badge = 'New',
+  badge = 'available',
   title = 'Birthday Song',
   des = 'i want song like o repiya sung by rahet',
-  plan, item, session, assignedAtTime,
+  plan, item, session, assignedAtTime, index, inReview,
   time = '3hr', bgStory, currentStage, songGenre, setGracePeriodError
 }) {
   let defaultTime = 3;
@@ -90,15 +92,21 @@ export default function TaskCard({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [timeUpHandled, setTimeUpHandled] = useState(false)
+  const [activeCardHover, setActiveCardHover] = useState(false);
   const { width } = useSidebarWidth();
   const { setFetchedTasks } = useTasks()
+  const { setTabValue } = useTabValue()
   const countdown = useCountdown(assignedAtTime, defaultTime)
 
   useEffect(() => {
     if (plan) {
+      let stageKey = currentStage;
       const musicPlan = musicPlans.find(item => item.plan === plan.name)
+      if (currentStage.includes('review_lyricist') || currentStage.includes('review_singer') || currentStage.includes('review_engineer')) {
+        stageKey = currentStage.split('_')[1];
+      }
       if (musicPlan) {
-        setUserPlan({ price: musicPlan[currentStage], title: musicPlan.plan })
+        setUserPlan({ price: musicPlan[stageKey], title: musicPlan.plan })
       }
     }
   }, [plan])
@@ -113,7 +121,7 @@ export default function TaskCard({
     if (countdown === '0:00:00') {
       try {
         const res = await axios.patch('/api/extend-crafter-time', {
-          orderId: item._id,
+          orderId: item?._id,
           role: session.user.role,
           crafterId: session.user.id
         })
@@ -123,7 +131,6 @@ export default function TaskCard({
           setTimeUpHandled(true)
 
           toast.success(res.data.message)
-          console.log(res.data.message)
         }
       } catch (error) {
         console.error(error.response.data.error);
@@ -132,16 +139,35 @@ export default function TaskCard({
     }
   }
 
+  function TaskStatus(badge) {
+    switch (badge) {
+      case 'available':
+        return {
+          text: 'text-[#0E8FD5]/70',
+          bg: 'bg-[#0E8FD5]/70'
+        }
+      case 'active':
+        return {
+          text: 'text-red-400',
+          bg: 'bg-red-400'
+        };
+      case 'completed':
+        return {
+          text: 'text-green-400',
+          bg: 'bg-green-600'
+        };
+    }
+  }
+
   const startWorking = async (item) => {
     setIsLoading(true)
     try {
       const res = await axios.patch('/api/startWorking', {
-        orderId: item._id,
+        orderId: item?._id,
         role: session.user.role,
         userId: session.user.id
       })
       if (res.statusText === 'OK') {
-        console.log('order started successfully', res)
         setFetchedTasks(true)
         setDialogOpen(false)
       }
@@ -153,19 +179,43 @@ export default function TaskCard({
       setIsLoading(false)
     }
   }
-
   return (
     <>
-      <Card className={`${width ? 'w-[340px] max-w-md max-xl:w-[420px]' :
-        'max-w-[320px] w-md max-xl:w-[430px]'} font-inter max-xs:w-full max-sm:w-full`}>
+      <Card
+        onClick={() => {
+          if (badge === 'active') {
+            setTabValue({ value: 'Tasks' })
+          }
+        }}
+        onMouseEnter={() => {
+          if (!(inReview && badge === 'active')) {
+            setActiveCardHover(index)
+          }
+        }}
+        onMouseLeave={() => {
+          if (!(inReview && badge === 'active')) {
+            setActiveCardHover(false)
+          }
+        }}
+        className={`${width ?
+          `
+          ${badge === 'available' ? 'w-[330px] max-lg:w-[340px] max-xl:w-[420px]' :
+            `w-[420px] max-xl:w-[300px] max-lg:w-[340px]`}` :
+          `
+          ${badge === 'available' ? 'w-[320px] max-lg:w-[380px]' :
+            `w-[420px] max-lg:w-[380px] max-xl:w-[430px]`} font-inter`}
+           max-xs:w-full max-sm:w-full
+        ${badge === 'active' && (activeCardHover === index) ?
+            'border-red-400 cursor-pointer' : ''} transition-all ease-in duration-150`}>
         <CardHeader className={'flex flex-row justify-between items-center'}>
           <div>
             <CardTitle>{title}</CardTitle>
           </div>
-          <Badge className={`${badge === 'New' ? 'bg-[#0E8FD5]' : 'bg-[#4d2c28]'} text-white`}>{badge}</Badge>
+          <Badge className={`${inReview ? TaskStatus('pending').bg : TaskStatus(badge).bg} text-white capitalize max-xs:text-xs`}>{inReview ? 'pending' : badge}</Badge>
         </CardHeader>
-        <CardContent className="font-light text-zinc-600 text-sm max-w-lg
-         break-words whitespace-normal max-h-[10vh]"
+        <CardContent className="font-light text-zinc-600
+        text-sm max-w-lg max-xs:text-xs
+         break-words whitespace-normal max-h-[10vh] min-h-[9vh]"
           style={{
             display: '-webkit-box',
             WebkitLineClamp: 3,        // number of lines to show
@@ -175,18 +225,23 @@ export default function TaskCard({
           }}>
           {des}
         </CardContent>
-        <CardFooter className={'flex flex-row  justify-between items-center'}>
-          <div className='text-zinc-400 text-sm flex items-center gap-2'>
+        <CardFooter className={`flex flex-row
+           justify-between items-center`}>
+          <div className='text-zinc-400 text-sm max-xs:text-xs flex items-center gap-2'>
             <Clock size={14} />
-            <p className='font-inter'>{badge === 'New' ? time : countdown}</p>
+            <p className='font-inter'>{badge === 'available' && time}</p>
+            <p className='font-inter'>{badge === 'completed' && formatTimeHMSS(assignedAtTime)}</p>
+            {inReview ? <p className='font-inter'>
+              {(inReview && badge === 'active') && formatTimeHMSS(assignedAtTime)}</p> :
+              <p className='font-inter'>{badge === 'active' && countdown}</p>}
           </div>
-          <div className='text-zinc-400 text-sm flex items-center gap-2'>
+          <div className='text-zinc-400 text-sm flex items-center gap-2 max-xs:text-xs'>
             <h2 className='font-semibold font-inter'>MX$</h2>
             <p className='font-inter'>{userPlan.price}</p>
           </div>
-          <div className={` text-sm
+          {badge === 'available' && <div className={` text-sm
           flex items-center gap-2
-          ${badge === 'New' ? 'text-[#0E8FD5]/70' : 'text-red-400'}`}>
+          ${TaskStatus(badge).text}`}>
             <Dialog open={dialogOpen}
               onOpenChange={setDialogOpen}>
               <DialogTrigger className={'cursor-pointer max-sm:text-xs flex justify-center items-center gap-2'}>  <p>View Details</p>
@@ -208,7 +263,7 @@ export default function TaskCard({
                 </DialogContent>}
 
             </Dialog>
-          </div>
+          </div>}
         </CardFooter>
       </Card>
     </>
