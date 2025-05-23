@@ -211,7 +211,7 @@ export default function TaskCard({
           <div>
             <CardTitle>{title}</CardTitle>
           </div>
-          <Badge className={`${inReview ? TaskStatus('pending').bg : TaskStatus(badge).bg} text-white capitalize max-xs:text-xs`}>{inReview ? 'pending' : badge}</Badge>
+          <Badge className={`${inReview ? TaskStatus('active').bg : TaskStatus(badge).bg} text-white capitalize max-xs:text-xs`}>{inReview ? 'pending' : badge}</Badge>
         </CardHeader>
         <CardContent className="font-light text-zinc-600
         text-sm max-w-lg max-xs:text-xs

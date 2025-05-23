@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import AdminTaskCard from './AdminTaskCard';
+import useAllUsers from '@/store/allUsers';
 
 export default function TaskManagment() {
   const [allSubmission, setAllSubmissions] = useState();
@@ -9,9 +10,10 @@ export default function TaskManagment() {
   const [user, setUser] = useState([])
   const [role, setRole] = useState('lyricist')
   const [isLoading, setIsLoading] = useState(false)
+  const { isFetched } = useAllUsers()
   useEffect(() => {
     fetchReviewSubmissions();
-  }, [])
+  }, [isFetched])
 
   const fetchReviewSubmissions = async () => {
     try {
@@ -80,7 +82,6 @@ export default function TaskManagment() {
           file={item.submittedCrafter.submittedFileUrl}
           time={item.submittedCrafter.submittedAtTime}
           isLoading={isLoading}
-          // time={item.createdAt}
           onClick={() => onApprove(item?._id)} />)}
     </div>
   )

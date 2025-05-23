@@ -14,8 +14,11 @@ export async function PATCH(res) {
   try {
     await dbConnect();
     const order = await Order.findById(orderId);
-
-    order.currentStage = currentStageEnum[3];
+    if (role === "engineer") {
+      order.currentStage = "done";
+      order.crafters[role].submissionStatus = "approved";
+    }
+    order.currentStage = role;
     order.crafters[role].submissionStatus = "available";
     order.crafters[prevRole].submissionStatus = "approved";
     await order.save();

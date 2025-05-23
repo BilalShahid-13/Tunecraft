@@ -20,7 +20,7 @@ export default function TaskLayoutRoot({ taskName = 'active'
         return 'border-l-red-400'
       case 'available':
         return 'border-l-blue-400'
-      case 'complete':
+      case 'completed':
         return 'border-l-green-400'
     }
   }

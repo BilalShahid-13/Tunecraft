@@ -13,13 +13,13 @@ import {
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { formatTimeHMSS } from '@/lib/utils'
+import useAllUsers from '@/store/allUsers';
 export default function AdminTaskCard({ username = 'bilal',
   time = '12hr dummy', email = 'b', file,
-  // isLoading = false,
   item,
-  index,
-  onClick = () => { } }) {
+}) {
   const [isLoading, setIsLoading] = useState(false)
+  const { setIsUpdate } = useAllUsers()
 
   const onApprove = async (item) => {
     console.log('adminTask OnClick', item._id);
@@ -29,7 +29,7 @@ export default function AdminTaskCard({ username = 'bilal',
     } else if (item.submittedCrafter.role === 'singer') {
       setRole = 'engineer';
     } else if (item.submittedCrafter.role === 'engineer') {
-      setRole = 'done';
+      setRole = 'engineer';
     }
     console.log(item.submittedCrafter.role)
 
@@ -42,6 +42,7 @@ export default function AdminTaskCard({ username = 'bilal',
       })
       if (res.status === 200) {
         console.log(res.data)
+        setIsUpdate(true);
       }
     }
     catch (error) {
