@@ -354,12 +354,23 @@ export const tuneAudioItems = [
 ];
 
 export const roles = [
-  { name: "lyricist", route: "lyricist" },
-  { name: "engineer", route: "engineer" },
-  { name: "engineer", route: "engineer" },
-  { name: "singer", route: "singer" },
-  { name: "admin", route: "admin" },
-];
+  {
+    name: "lyricist",
+    route: "lyricist",
+  },
+  {
+    name: "engineer",
+    route: "engineer",
+  },
+  {
+    name: "singer",
+    route: "singer",
+  },
+  {
+    name: "admin",
+    route: "admin",
+  },
+]
 export const SidebarItems = [
   {
     name: "Dashboard",
