@@ -158,16 +158,16 @@ export const authOptions = {
 
   trustHost: true,
   secret: process.env.AUTH_SECRET, // Ensure this is set for secure sessions
-  cookies: {
-    sessionToken: {
-      name: "__Secure-next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: true,
-        domain: process.env.NEXTAUTH_URL?.replace(/https?:\/\//, ""),
-      },
-    },
-  },
+  // cookies: {
+  //   sessionToken: {
+  //     name: "__Secure-next-auth.session-token",
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       path: "/",
+  //       secure: true,
+  //       domain: process.env.NEXTAUTH_URL?.replace(/https?:\/\//, ""),
+  //     },
+  //   },
+  // },
 };
