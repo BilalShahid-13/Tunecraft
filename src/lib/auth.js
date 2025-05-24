@@ -150,16 +150,6 @@ export const authOptions = {
       }
       return session;
     },
-    // async redirect({ url, baseUrl, token }) {
-    //   // Check if the user's role matches any role in the roles array
-    //   const role = roles.find(r => r.name === token?.role);
-    //   if (role) {
-    //     // Redirect to the corresponding route based on role
-    //     return `${baseUrl}${role.route}`;
-    //   }
-    //   // Default redirect if no role matches
-    //   return baseUrl;
-    // },
   },
   pages: {
     signIn: "/Register", // Ensure this page is set for the sign-in flow
@@ -168,4 +158,16 @@ export const authOptions = {
 
   trustHost: true,
   secret: process.env.AUTH_SECRET, // Ensure this is set for secure sessions
+  cookies: {
+    sessionToken: {
+      name: "__Secure-next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+        domain: process.env.NEXTAUTH_URL?.replace(/https?:\/\//, ""),
+      },
+    },
+  },
 };
