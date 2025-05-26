@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 // Explicitly specify edge runtime
-export const runtime = "edge";
+// export const runtime = "edge";
 
 // Define your roles array
 const roles = [{ route: "admin" }, { route: "singer" }];
