@@ -10,16 +10,6 @@ export const authOptions = {
   session: {
     strategy: "jwt", // Use JWT for session management
   },
-  cookies: {
-    sessionToken: {
-      options: {
-        domain:
-          process.env.NODE_ENV === "production" ? process.env.NEXTAUTH_URL : undefined,
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
-
   providers: [
     Credentials({
       name: "Credentials",

@@ -4,14 +4,27 @@ import { roles } from "./lib/Constant";
 
 export default async function middleware(req) {
   const url = req.nextUrl;
+  console.log("=== MIDDLEWARE DEBUG ===");
+  console.log("Path:", url.pathname);
+  console.log("Headers:", Object.fromEntries(req.headers.entries()));
+
+  // Simplified token retrieval - let NextAuth handle cookie settings
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
-    secureCookie: process.env.NODE_ENV === "production", // Required for Vercel
   });
 
+  console.log("Token found:", !!token);
   console.log(
-    `[Middleware] Path: ${url.pathname} | Token: ${token ? token.role : "none"}`
+    "Token data:",
+    token ? { role: token.role, email: token.email } : "none"
+  );
+  console.log("========================");
+
+  console.log(
+    `[Middleware] Path: ${url.pathname} | Token: ${
+      token ? token.role : "none"
+    } | Email: ${token?.email || "none"}`
   );
 
   // Get all role routes
@@ -23,8 +36,7 @@ export default async function middleware(req) {
   // 1. Block unauthenticated access to role paths
   if (!token && isRoleRoute) {
     console.log(`Redirecting to /Register (unauthenticated)`);
-    const redirectUrl = new URL("/Register", url.origin);
-    return NextResponse.redirect(redirectUrl);
+    return NextResponse.redirect(new URL("/Register", url.origin));
   }
 
   // 2. Handle authenticated users
