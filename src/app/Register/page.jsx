@@ -83,8 +83,6 @@ export default function page() {
 
         if (session?.user?.role) {
           navigate.push(`/${session.user.role.toLowerCase()}`);
-        } else {
-          navigate.refresh();
         }
       } else {
         // signIn does not throw, it returns { ok: false, error: "message" }

@@ -1,44 +1,23 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { roles } from "./lib/Constant";
+import { roles } from "./lib/Constant"; // Assuming this contains the role-to-route mapping
 
-const protectedRoutes = ["/admin", "/singer", "/engineer", "/lyricist"];
 export default async function middleware(req) {
-  const { pathname } = req.nextUrl;
-  // console.log(first)
-
-  if (!protectedRoutes.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next();
-  }
   const token = await getToken({ req });
-
-  console.log(`Testing... ${pathname}: Token = ${!!token}`);
 
   if (!token) {
     const roleRoutes = roles.map((r) => r.route);
-    // Check if the current pathname matches any protected route
-    if (roleRoutes.some((route) => pathname.startsWith(`/${route}`))) {
+    if (roleRoutes.some((route) => req.url.includes(route))) {
       return NextResponse.redirect(new URL("/Register", req.url));
     }
   }
 
-  // If user is authenticated
-  if (token) {
-    // Find their role-based route
-    const roleRoute = roles.find((r) => r.name === token?.role);
+  // If user is logged in, find their role-based route
+  const roleRoute = roles.find((r) => r.name === token?.role);
 
-    if (roleRoute) {
-      const allowedPath = `/${roleRoute.route}`;
-
-      // If user is trying to access a different role's route, redirect to their allowed route
-      const otherRoleRoutes = roles
-        .filter((r) => r.name !== token?.role)
-        .map((r) => `/${r.route}`);
-
-      if (otherRoleRoutes.some((route) => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL(allowedPath, req.url));
-      }
-    }
+  // If the user is authenticated but trying to access a route not allowed for their role
+  if (token && roleRoute && !req.url.includes(roleRoute?.route)) {
+    return NextResponse.redirect(new URL(`/${roleRoute?.route}`, req.url));
   }
 
   // Let the request proceed if no issues
@@ -48,9 +27,9 @@ export default async function middleware(req) {
 export const config = {
   matcher: [
     "/Register",
-    "/lyricist/:path*",
-    "/engineer/:path*",
-    "/singer/:path*",
-    "/admin/:path*",
-  ],
+    "/lyricist",
+    "/engineer",
+    "/singer",
+    "/admin",
+  ], //
 };

@@ -8,7 +8,7 @@ function SongCard({ index, tune, currentSong, audioRef, handlePlayPause }) {
   return (
     <div className="mb-4 p-4 border rounded-lg shadow-md shadow-zinc-950 flex flex-col gap-3">
       <div className='flex flex-row justify-between items-center'>
-        <h2 className="text-2xl font-semibold max-sm:text-lg max-xs:text-sm">{tune.name}</h2>
+        <h2 className="text-xl font-semibold max-sm:text-lg max-xs:text-sm">{tune.name}</h2>
         <p className='max-sm:text-sm max-xs:text-sm'>{tune.songTemplate}</p>
       </div>
 

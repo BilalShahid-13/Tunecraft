@@ -15,7 +15,7 @@ export default function SubscriptionCard({ heading, des, price, list, gradientCo
           bg-gradient-to-r from-black/90 from-5%
            via-black via-90% to-black/90 to-5%'>
             <h1
-              className="text-5xl font-bold text-center uppercase max-sm:text-xl bg-clip-text text-transparent"
+              className="text-4xl font-bold text-center uppercase max-sm:text-xl bg-clip-text text-transparent"
               style={{
                 backgroundImage: `linear-gradient(${gradientColor})`
               }}

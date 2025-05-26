@@ -320,37 +320,37 @@ export const tuneAudioItems = [
       },
     ],
   },
-  {
-    model: "Tunecraft",
-    gradientColor: "0deg,#F70098,#FF7E6E",
-    tunes: [
-      {
-        name: "Love Declaration",
-        songTemplate: "Romance",
-        musicLink: "/audio/gardens-stylish-chill-303261.mp3",
-      },
-      {
-        name: "Inspirational Journey",
-        songTemplate: "Motivation",
-        musicLink: "/audio/gorila-315977.mp3",
-      },
-      {
-        name: "Love Declaration",
-        songTemplate: "Romance",
-        musicLink: "/audio/spinning-head-271171.mp3",
-      },
-      {
-        name: "Love Declaration",
-        songTemplate: "Romance",
-        musicLink: "/audio/stylish-deep-electronic-262632.mp3",
-      },
-      {
-        name: "Friendship Tribute",
-        songTemplate: "Personal",
-        musicLink: "/audio/tell-me-the-truth-260010.mp3",
-      },
-    ],
-  },
+  // {
+  //   model: "Tunecraft",
+  //   gradientColor: "0deg,#F70098,#FF7E6E",
+  //   tunes: [
+  //     {
+  //       name: "Love Declaration",
+  //       songTemplate: "Romance",
+  //       musicLink: "/audio/gardens-stylish-chill-303261.mp3",
+  //     },
+  //     {
+  //       name: "Inspirational Journey",
+  //       songTemplate: "Motivation",
+  //       musicLink: "/audio/gorila-315977.mp3",
+  //     },
+  //     {
+  //       name: "Love Declaration",
+  //       songTemplate: "Romance",
+  //       musicLink: "/audio/spinning-head-271171.mp3",
+  //     },
+  //     {
+  //       name: "Love Declaration",
+  //       songTemplate: "Romance",
+  //       musicLink: "/audio/stylish-deep-electronic-262632.mp3",
+  //     },
+  //     {
+  //       name: "Friendship Tribute",
+  //       songTemplate: "Personal",
+  //       musicLink: "/audio/tell-me-the-truth-260010.mp3",
+  //     },
+  //   ],
+  // },
 ];
 
 export const roles = [

@@ -38,7 +38,7 @@ export default function Page() {
           romantic melodies, or summer jams, we've got you covered.
         </p>
 
-        <div className="grid grid-cols-2 max-md:grid-cols-1 mx-3
+        <div className="grid grid-cols-3 max-md:grid-cols-1 mx-3
         gap-x-12 gap-y-32 max-sm:grid-cols-1 max-sm:gap-16
         max-lg:mx-8 max-xl:mx-8 max-sm:w-full
          max-lg:grid-cols-1 mt-12">
