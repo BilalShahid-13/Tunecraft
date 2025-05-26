@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   const { role } = await req.json();
-  if (!userId || !role) {
+  if (!role) {
     return NextResponse.json(
       { error: "userId and role is required" },
       { status: 400 }
@@ -17,6 +17,11 @@ export async function POST(req) {
     const tasks = await Order.find({
       [query]: "available",
       currentStage: role,
+      $or: [
+        {
+          orderStatus: "pending",
+        },
+      ],
     }).populate({
       path: "plan",
     });

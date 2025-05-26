@@ -44,7 +44,6 @@ export default function Dashboard() {
   }, [fetchedTasks])
 
   const fetchAvailableTask = async () => {
-    console.log(session)
     try {
       const res = await axios.post('/api/availableTasks', {
         role: session.user.role
