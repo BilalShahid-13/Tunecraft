@@ -4,9 +4,14 @@ import { dbConnect } from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
+  const { role } = await req.json();
+  if (!userId || !role) {
+    return NextResponse.json(
+      { error: "userId and role is required" },
+      { status: 400 }
+    );
+  }
   try {
-    const { role } = await req.json();
-    console.log("role", role);
     await dbConnect();
     const query = `crafters.${role}.submissionStatus`;
     const tasks = await Order.find({
