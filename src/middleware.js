@@ -1,57 +1,48 @@
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { roles } from "./lib/Constant";
 
-export default withAuth(
-  function middleware(req) {
-    const { pathname } = req.nextUrl;
-    const userRole = req.nextauth.token?.role;
+const protectedRoutes = ["/admin", "/singer", "/engineer", "/lyricist"];
+export default async function middleware(req) {
+  const { pathname } = req.nextUrl;
 
-    console.log(`Path: ${pathname}, Role: ${userRole}`);
+  if (!protectedRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+  const token = await getToken({ req });
 
-    // Role-based routing
-    const roleRoutes = {
-      admin: "/admin",
-      singer: "/singer",
-      engineer: "/engineer",
-      lyricist: "/lyricist",
-    };
+  console.log(`Testing ${pathname}: Token = ${!!token}`);
 
-    const allowedPath = roleRoutes[userRole];
+  if (!token) {
+    const roleRoutes = roles.map((r) => r.route);
+    // Check if the current pathname matches any protected route
+    if (roleRoutes.some((route) => pathname.startsWith(`/${route}`))) {
+      return NextResponse.redirect(new URL("/Register", req.url));
+    }
+  }
 
-    // If user is accessing wrong role route, redirect to their route
-    if (allowedPath && !pathname.startsWith(allowedPath)) {
-      const otherRoutes = Object.values(roleRoutes).filter(
-        (route) => route !== allowedPath
-      );
+  // If user is authenticated
+  if (token) {
+    // Find their role-based route
+    const roleRoute = roles.find((r) => r.name === token?.role);
 
-      if (otherRoutes.some((route) => pathname.startsWith(route))) {
-        console.log(
-          `Redirecting ${userRole} from ${pathname} to ${allowedPath}`
-        );
+    if (roleRoute) {
+      const allowedPath = `/${roleRoute.route}`;
+
+      // If user is trying to access a different role's route, redirect to their allowed route
+      const otherRoleRoutes = roles
+        .filter((r) => r.name !== token?.role)
+        .map((r) => `/${r.route}`);
+
+      if (otherRoleRoutes.some((route) => pathname.startsWith(route))) {
         return NextResponse.redirect(new URL(allowedPath, req.url));
       }
     }
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const { pathname } = req.nextUrl;
-        const protectedRoutes = ["/admin", "/singer", "/engineer", "/lyricist"];
-
-        // Allow access to non-protected routes
-        if (!protectedRoutes.some((route) => pathname.startsWith(route))) {
-          return true;
-        }
-
-        // Require authentication for protected routes
-        return !!token;
-      },
-    },
-    pages: {
-      signIn: "/Register",
-    },
   }
-);
+
+  // Let the request proceed if no issues
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
