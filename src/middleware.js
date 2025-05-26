@@ -3,41 +3,54 @@ import { getToken } from "next-auth/jwt";
 import { roles } from "./lib/Constant";
 
 export default async function middleware(req) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const { pathname } = req.nextUrl;
-  console.log("pathname", req.nextUrl, "token", token);
+  const url = req.nextUrl;
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+    secureCookie: process.env.NODE_ENV === "production", // Required for Vercel
+  });
 
- const roleRoutes = roles.map((r) => `/${r.route}`);
+  console.log(
+    `[Middleware] Path: ${url.pathname} | Token: ${token ? token.role : "none"}`
+  );
 
-  // Check if accessing a role-protected route
-  const isRoleRoute = roleRoutes.some(route => pathname.startsWith(route));
+  // Get all role routes
+  const roleRoutes = roles.map((r) => `/${r.route}`);
+  const isRoleRoute = roleRoutes.some((route) =>
+    url.pathname.startsWith(route)
+  );
 
-  // If not authenticated and trying to access role-protected route
+  // 1. Block unauthenticated access to role paths
   if (!token && isRoleRoute) {
-    console.log("Redirecting to Register - no token for protected route");
-    return NextResponse.redirect(new URL("/Register", req.url));
+    console.log(`Redirecting to /Register (unauthenticated)`);
+    const redirectUrl = new URL("/Register", url.origin);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  // If user is authenticated
+  // 2. Handle authenticated users
   if (token) {
-    // Find their role-based route
-    const roleRoute = roles.find((r) => r.name === token?.role);
+    const userRole = token.role;
+    const allowedRoute = roles.find((r) => r.name === userRole)?.route;
 
-    if (roleRoute) {
-      const allowedPath = `/${roleRoute.route}`;
+    // 2a. Redirect from /Register to dashboard if logged in
+    if (url.pathname === "/Register") {
+      console.log(
+        `Redirecting authenticated user from /Register to /${allowedRoute}`
+      );
+      return NextResponse.redirect(new URL(`/${allowedRoute}`, url.origin));
+    }
 
-      // If user is trying to access a different role's route, redirect to their allowed route
-      const otherRoleRoutes = roles
-        .filter((r) => r.name !== token?.role)
-        .map((r) => `/${r.route}`);
-
-      if (otherRoleRoutes.some((route) => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL(allowedPath, req.url));
-      }
+    // 2b. Enforce role-based routing
+    if (
+      allowedRoute &&
+      isRoleRoute &&
+      !url.pathname.startsWith(`/${allowedRoute}`)
+    ) {
+      console.log(`Role violation: ${userRole} accessing ${url.pathname}`);
+      return NextResponse.redirect(new URL(`/${allowedRoute}`, url.origin));
     }
   }
 
-  // Let the request proceed if no issues
   return NextResponse.next();
 }
 
