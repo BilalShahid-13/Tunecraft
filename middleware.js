@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { roles } from "./lib/Constant"; // Assuming this contains the role-to-route mapping
+import { roles } from "./src/lib/Constant"; // Assuming this contains the role-to-route mapping
 
 export default async function middleware(req) {
   const token = await getToken({ req });
