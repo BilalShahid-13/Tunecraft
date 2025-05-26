@@ -1,37 +1,36 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import { roles } from "./lib/Constant";
 
 export default withAuth(
-  // This middleware function runs AFTER authorization check passes
   function middleware(req) {
-    console.log("Middleware req token:", req.nextauth.token);
-
     const { pathname } = req.nextUrl;
-    const token = req.nextauth.token;
+    const userRole = req.nextauth.token?.role;
 
-    if (token) {
-      const userRole = token.role;
-      const roleRoute = roles.find((r) => r.name === userRole);
+    console.log(`Path: ${pathname}, Role: ${userRole}`);
 
-      if (roleRoute) {
-        const allowedPath = `/${roleRoute.route}`;
+    // Role-based routing
+    const roleRoutes = {
+      admin: "/admin",
+      singer: "/singer",
+      engineer: "/engineer",
+      lyricist: "/lyricist",
+    };
 
-        // If user is trying to access a different role's route
-        const otherRoleRoutes = roles
-          .filter((r) => r.name !== userRole)
-          .map((r) => `/${r.route}`);
+    const allowedPath = roleRoutes[userRole];
 
-        if (otherRoleRoutes.some((route) => pathname.startsWith(route))) {
-          console.log(
-            `Role violation: ${userRole} trying to access ${pathname}`
-          );
-          return NextResponse.redirect(new URL(allowedPath, req.url));
-        }
+    // If user is accessing wrong role route, redirect to their route
+    if (allowedPath && !pathname.startsWith(allowedPath)) {
+      const otherRoutes = Object.values(roleRoutes).filter(
+        (route) => route !== allowedPath
+      );
+
+      if (otherRoutes.some((route) => pathname.startsWith(route))) {
+        console.log(
+          `Redirecting ${userRole} from ${pathname} to ${allowedPath}`
+        );
+        return NextResponse.redirect(new URL(allowedPath, req.url));
       }
     }
-
-    return NextResponse.next();
   },
   {
     callbacks: {
@@ -39,24 +38,17 @@ export default withAuth(
         const { pathname } = req.nextUrl;
         const protectedRoutes = ["/admin", "/singer", "/engineer", "/lyricist"];
 
-        // If it's not a protected route, allow access
+        // Allow access to non-protected routes
         if (!protectedRoutes.some((route) => pathname.startsWith(route))) {
           return true;
         }
 
-        // If it's a protected route, require authentication
-        if (!token) {
-          console.log("No token, denying access");
-          return false; // This will redirect to sign-in page
-        }
-
-        // If authenticated, allow access (role checking happens in middleware above)
-        console.log("Token found, allowing access");
-        return true;
+        // Require authentication for protected routes
+        return !!token;
       },
     },
     pages: {
-      signIn: "/Register", // Redirect here when unauthorized
+      signIn: "/Register",
     },
   }
 );

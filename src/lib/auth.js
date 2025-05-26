@@ -9,6 +9,7 @@ export const authOptions = {
   adapter: MongoDBAdapter(client),
   session: {
     strategy: "jwt", // Use JWT for session management
+    maxAge: 1 * 24 * 60 * 60,
   },
   providers: [
     Credentials({
