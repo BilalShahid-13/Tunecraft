@@ -157,5 +157,5 @@ export const authOptions = {
   },
 
   trustHost: true,
-  secret: process.env.AUTH_SECRET, // Ensure this is set for secure sessions
+  secret: process.env.NEXTAUTH_SECRET, // Ensure this is set for secure sessions
 };

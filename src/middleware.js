@@ -3,16 +3,19 @@ import { getToken } from "next-auth/jwt";
 import { roles } from "./lib/Constant";
 
 export default async function middleware(req) {
-  const token = await getToken({ req });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
+  console.log("pathname", req.nextUrl, "token", token);
 
-  // If user is not authenticated
-  if (!token) {
-    const roleRoutes = roles.map((r) => r.route);
-    // Check if the current pathname matches any protected route
-    if (roleRoutes.some((route) => pathname.startsWith(`/${route}`))) {
-      return NextResponse.redirect(new URL("/Register", req.url));
-    }
+ const roleRoutes = roles.map((r) => `/${r.route}`);
+
+  // Check if accessing a role-protected route
+  const isRoleRoute = roleRoutes.some(route => pathname.startsWith(route));
+
+  // If not authenticated and trying to access role-protected route
+  if (!token && isRoleRoute) {
+    console.log("Redirecting to Register - no token for protected route");
+    return NextResponse.redirect(new URL("/Register", req.url));
   }
 
   // If user is authenticated
