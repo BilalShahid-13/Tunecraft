@@ -63,73 +63,73 @@ export const authOptions = {
         };
       },
     }),
-    Credentials({
-      name: "signin",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        await dbConnect();
+    // Credentials({
+    //   name: "signin",
+    //   credentials: {
+    //     email: { label: "Email", type: "email" },
+    //     password: { label: "Password", type: "password" },
+    //   },
+    //   async authorize(credentials) {
+    //     await dbConnect();
 
-        // Sign-in logic
-        const user = await User.findOne({ email: credentials?.email });
-        if (!user) throw new Error("No user found");
+    //     // Sign-in logic
+    //     const user = await User.findOne({ email: credentials?.email });
+    //     if (!user) throw new Error("No user found");
 
-        const isValid = await bcrypt.compare(
-          credentials?.password || "",
-          user.password
-        );
-        if (!isValid) throw new Error("Invalid password");
+    //     const isValid = await bcrypt.compare(
+    //       credentials?.password || "",
+    //       user.password
+    //     );
+    //     if (!isValid) throw new Error("Invalid password");
 
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          username: user.username,
-          role: user.role,
-        };
-      },
-    }),
-    Credentials({
-      name: "updateEmail",
-      credentials: {
-        username: { label: "Username", type: "text" },
-      },
-      async authorize(credentials) {
-        await dbConnect();
+    //     return {
+    //       id: user._id.toString(),
+    //       email: user.email,
+    //       username: user.username,
+    //       role: user.role,
+    //     };
+    //   },
+    // }),
+    // Credentials({
+    //   name: "updateEmail",
+    //   credentials: {
+    //     username: { label: "Username", type: "text" },
+    //   },
+    //   async authorize(credentials) {
+    //     await dbConnect();
 
-        // Sign-in logic
-        const user = await User.findOne({ email: credentials?.email });
-        if (!user) throw new Error("No email found");
+    //     // Sign-in logic
+    //     const user = await User.findOne({ email: credentials?.email });
+    //     if (!user) throw new Error("No email found");
 
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          username: user.username,
-          role: user.role,
-        };
-      },
-    }),
-    Credentials({
-      name: "updateUsername",
-      credentials: {
-        username: { label: "Username", type: "text" },
-      },
-      async authorize(credentials) {
-        await dbConnect();
+    //     return {
+    //       id: user._id.toString(),
+    //       email: user.email,
+    //       username: user.username,
+    //       role: user.role,
+    //     };
+    //   },
+    // }),
+    // Credentials({
+    //   name: "updateUsername",
+    //   credentials: {
+    //     username: { label: "Username", type: "text" },
+    //   },
+    //   async authorize(credentials) {
+    //     await dbConnect();
 
-        // Sign-in logic
-        const user = await User.findOne({ email: credentials?.username });
-        if (!user) throw new Error("No username found");
+    //     // Sign-in logic
+    //     const user = await User.findOne({ email: credentials?.username });
+    //     if (!user) throw new Error("No username found");
 
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          username: user.username,
-          role: user.role,
-        };
-      },
-    }),
+    //     return {
+    //       id: user._id.toString(),
+    //       email: user.email,
+    //       username: user.username,
+    //       role: user.role,
+    //     };
+    //   },
+    // }),
   ],
 
   callbacks: {
