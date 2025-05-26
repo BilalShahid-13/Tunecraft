@@ -1,7 +1,7 @@
 "use client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn, useSession } from "next-auth/react"
+import { getSession, signIn, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -77,15 +77,17 @@ export default function page() {
         redirect: false,
       });
 
-      if (res.status === 200) {
-        toast.success("Login successful!");
-        loginForm.reset();
+      if (res.ok) {
+        const session = await getSession(); // Fetch updated session
 
         if (session?.user?.role) {
+          toast.success("Login successful!");
+          loginForm.reset();
           navigate.push(`/${session.user.role.toLowerCase()}`);
+        } else {
+          toast.error("Role information missing in session.");
         }
       } else {
-        // signIn does not throw, it returns { ok: false, error: "message" }
         toast.error(res.error || "Invalid email or password");
       }
     } catch (error) {

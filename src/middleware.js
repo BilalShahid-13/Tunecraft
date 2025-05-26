@@ -4,6 +4,7 @@ import { roles } from "./lib/Constant"; // Assuming this contains the role-to-ro
 
 export default async function middleware(req) {
   const token = await getToken({ req });
+  console.log('token',token)
 
   if (!token) {
     const roleRoutes = roles.map((r) => r.route);

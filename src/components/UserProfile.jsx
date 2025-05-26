@@ -27,7 +27,7 @@ export default function UserProfile() {
   const handleLogout = async () => {
     setLoading(true)
     try {
-      await signOut({ callbackUrl: '/' })
+      await signOut({ callbackUrl: '/' });
     } catch (error) {
       console.error('logout error', error);
 
