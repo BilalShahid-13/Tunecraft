@@ -3,7 +3,8 @@ import { getToken } from "next-auth/jwt";
 import { roles } from "./lib/Constant"; // Assuming this contains the role-to-route mapping
 
 export default async function middleware(req) {
-  const token = await getToken({ req });
+  console.log("🔔 middleware running on path:", new URL(req.url).pathname);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   console.log("Token:", token);
   console.log("Headers:", req.headers);
   console.log("Cookies:", req.cookies);
@@ -35,5 +36,5 @@ export default async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/Register", "/lyricist", "/engineer", "/singer", "/admin"],
+  matcher: ["/Register", "/admin", "/engineer", "/lyricist", "/singer"],
 };
