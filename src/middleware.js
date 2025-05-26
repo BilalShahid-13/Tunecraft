@@ -35,32 +35,33 @@
 //   ], //
 // };
 
-
-
-
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { roles } from "./lib/Constant"; // Assuming this contains the role-to-route mapping
 
 export default async function middleware(req) {
   const token = await getToken({ req });
-  console.log('token', token);
+  console.log("token", token);
 
   // If no token and trying to access a role-based route, redirect to /Register
   if (!token) {
     const roleRoutes = roles.map((r) => r.route);
     const pathname = new URL(req.url).pathname;
 
-    if (roleRoutes.some((route) => pathname.includes(route))) {
+    // Only redirect if the path matches exactly
+    if (roleRoutes.some((route) => pathname === `/${route}`)) {
       return NextResponse.redirect(new URL("/Register", req.url));
     }
   }
-
   // If user is logged in, find their role-based route
   const roleRoute = roles.find((r) => r.name === token?.role);
 
   // If authenticated but trying to access a route not allowed for their role
-  if (token && roleRoute && !new URL(req.url).pathname.includes(roleRoute?.route)) {
+  if (
+    token &&
+    roleRoute &&
+    !new URL(req.url).pathname.includes(roleRoute?.route)
+  ) {
     return NextResponse.redirect(new URL(`/${roleRoute?.route}`, req.url));
   }
 
@@ -69,11 +70,5 @@ export default async function middleware(req) {
 }
 
 export const config = {
-  matcher: [
-    "/Register",
-    "/lyricist",
-    "/engineer",
-    "/singer",
-    "/admin",
-  ],
+  matcher: ["/Register", "/lyricist", "/engineer", "/singer", "/admin"],
 };
