@@ -11,7 +11,7 @@ export default async function middleware(req) {
   }
   const token = await getToken({ req });
 
-  console.log(`Testing ${pathname}: Token = ${!!token}`);
+  console.log(`Testing... ${pathname}: Token = ${!!token}`);
 
   if (!token) {
     const roleRoutes = roles.map((r) => r.route);
