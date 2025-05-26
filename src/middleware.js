@@ -1,5 +1,5 @@
 // import { getToken } from "next-auth/jwt";
-import { roles } from "./lib/Constant"; // Assuming this contains the role-to-route mapping
+// import { roles } from "./lib/Constant"; // Assuming this contains the role-to-route mapping
 
 // export default async function middleware(req) {
 //   console.log("🔔 middleware running on path:", new URL(req.url).pathname);
@@ -77,42 +77,77 @@ import { roles } from "./lib/Constant"; // Assuming this contains the role-to-ro
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
+// Define your roles array - make sure this matches your actual roles
+const roles = [
+  { route: "lyricist" },
+  { route: "engineer" },
+  { route: "singer" },
+  { route: "admin" },
+];
+
 export default withAuth(
   (req) => {
-    const token = req.nextauth.token; // your JWT payload
-    const url = new URL(req.url);
-    const pathname = url.pathname; // e.g. "/singer", "/admin/dashboard"
+    try {
+      const token = req.nextauth.token;
+      const url = new URL(req.url);
+      const pathname = url.pathname;
 
-    // build an array of protected role-paths: ["/admin", "/singer", …]
-    const protectedPaths = roles.map((r) => `/${r.route}`);
+      // Add logging to help debug on Vercel
+      console.log("🔍 Middleware Debug:", {
+        pathname,
+        hasToken: !!token,
+        userRole: token?.role,
+        host: url.host,
+        origin: url.origin,
+      });
 
-    // 1) NOT signed in → hitting any protectedPath? → send to /Register
-    if (!token && protectedPaths.some((p) => pathname === p)) {
-      return NextResponse.redirect(new URL("/Register", url));
-    }
+      // Build protected paths
+      const protectedPaths = roles.map((r) => `/${r.route}`);
+      console.log("🛡️ Protected paths:", protectedPaths);
 
-    // 2) signed in → dialing into someone else’s protectedPath?
-    if (token) {
-      // find what the user’s own base path would be
-      const myBase = `/${token.role}`;
-      // if they’re trying to hit *another* role’s root
-      if (protectedPaths.includes(pathname) && pathname !== myBase) {
-        return NextResponse.redirect(new URL(myBase, url));
+      // 1) NOT signed in → hitting any protectedPath? → send to /Register
+      if (!token && protectedPaths.some((p) => pathname.startsWith(p))) {
+        console.log("❌ No token, redirecting to Register");
+        const registerUrl = new URL("/Register", req.url);
+        return NextResponse.redirect(registerUrl);
       }
-    }
 
-    // otherwise allow through
-    return NextResponse.next();
+      // 2) signed in → check role-based access
+      if (token && token.role) {
+        const userRole = token.role;
+        const myBase = `/${userRole}`;
+
+        // Check if user is accessing a different role's path
+        const isAccessingWrongRole = protectedPaths.some(
+          (path) => pathname.startsWith(path) && !pathname.startsWith(myBase)
+        );
+
+        if (isAccessingWrongRole) {
+          console.log(`🔄 Wrong role access, redirecting to: ${myBase}`);
+          const roleUrl = new URL(myBase, req.url);
+          return NextResponse.redirect(roleUrl);
+        }
+      }
+
+      console.log("✅ Access allowed");
+      return NextResponse.next();
+    } catch (error) {
+      console.error("💥 Middleware error:", error);
+      // In case of error, allow the request to continue
+      return NextResponse.next();
+    }
   },
   {
     callbacks: {
-      // during dev/testing, let every request run your handler
-      authorized: () => true,
+      // This callback determines if the middleware should run
+      authorized: () => true, // Always run our custom logic above
     },
   }
 );
 
-// match all of your role routes (and sub-paths) in one go:
 export const config = {
-  matcher: roles.map((r) => `/${r.route}/:path*`),
+  matcher: [
+    // Match all role routes and their sub-paths
+    ...roles.flatMap((r) => [`/${r.route}`, `/${r.route}/:path*`]),
+  ],
 };
