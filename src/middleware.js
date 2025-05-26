@@ -5,6 +5,7 @@ import { roles } from "./lib/Constant";
 const protectedRoutes = ["/admin", "/singer", "/engineer", "/lyricist"];
 export default async function middleware(req) {
   const { pathname } = req.nextUrl;
+  // console.log(first)
 
   if (!protectedRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
