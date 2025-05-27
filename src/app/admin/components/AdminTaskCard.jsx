@@ -11,12 +11,21 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
-import { formatTimeHMSS } from '@/lib/utils'
+import { FileIcon, Loader2 } from 'lucide-react'
+import { formatCentsToDollars, formatTimeHMSS } from '@/lib/utils'
 import useAllUsers from '@/store/allUsers';
+import { Badge } from '@/components/ui/badge';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { ScrollArea } from '@/components/ui/scroll-area';
+
 export default function AdminTaskCard({ username = 'bilal',
-  time = '12hr dummy', email = 'b', file,
-  item,
+  time = '12hr dummy', email = 'b', file, role, orderName, planName, planPrice,
+  item, crafterId
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const { setIsUpdate } = useAllUsers()
@@ -55,8 +64,21 @@ export default function AdminTaskCard({ username = 'bilal',
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle className={'capitalize'}>{username}</CardTitle>
+        <CardHeader className={'w-full'}>
+          <CardTitle className={'flex flex-row gap-12 justify-between items-center w-full'}>
+            <h2 className='capitalize'> {orderName}</h2>
+            <div className='flex flex-col justify-end items-end gap-3'>
+              <Badge className='capitalize font-semibold text-sm'>{role}</Badge>
+              <div className='flex flex-col justify-end items-end gap-3'>
+                <p className='text-primary font-semibold'>{planName}</p>
+                <p>${formatCentsToDollars(planPrice)}</p>
+              </div>
+            </div>
+          </CardTitle>
+          <div className='flex flex-row gap-5'>
+            <h2 className='capitalize'> {username}</h2>
+            <h2 className='capitalize italic font-light text-zinc-400'># {crafterId}</h2>
+          </div>
           <CardDescription>
             <p>
               {formatTimeHMSS(time)}
@@ -64,26 +86,49 @@ export default function AdminTaskCard({ username = 'bilal',
             <p>{email}</p>
           </CardDescription>
         </CardHeader>
-        <CardContent className={'flex flex-row-reverse justify-start items-center gap-3'}>
+        <CardContent className={'flex flex-row-reverse justify-between items-center gap-3'}>
           <Button onClick={() => onApprove(item)}>{
             isLoading ?
               <>
                 <Loader2 className='animate-spin' /> Loading
               </> : 'Approve'
           }</Button>
-          <Button
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
+              <AccordionTrigger> View Submission</AccordionTrigger>
+              <AccordionContent className={'max-w-xl'}>
+                <div className="w-full overflow-x-auto">
+                  <div className="flex space-x-2 pb-2 max-w-xl flex-col">
+                    {file.map((file, index) => (
+                      <Button
+                        key={index}
+                        variant="link"
+                        className="cursor-pointer flex-shrink-0 whitespace-nowrap"
+                        onClick={() => window.open(file, "_blank", "noopener,noreferrer")}
+                      >
+                        <p className="truncate">{file}</p>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* <Button
             variant="link"
             className={'cursor-pointer'}
             onClick={() => window.open(file, "_blank", "noopener,noreferrer")}
           >
+
             View Submission
-          </Button>
+          </Button> */}
         </CardContent>
         <CardFooter>
           {/* <p>Card Footer</p> */}
 
         </CardFooter>
-      </Card>
+      </Card >
 
     </>
   )

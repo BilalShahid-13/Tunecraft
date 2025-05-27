@@ -22,7 +22,7 @@ const signupSchema = z.object({
     required_error: "Please select a role",
   }),
   select: z.string().optional().nullable(),
-  file: z.instanceof(File).optional(),
+  file: z.array(z.instanceof(File)).min(1, "At least one file required"),
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().length(10, { message: "Phone number must be 10 digits" }),
@@ -99,7 +99,7 @@ export default function page() {
   // const formData = new FormData();
   const onhandleSignup = async (data) => {
     const formData = new FormData();
-    console.log(data.textField)
+    console.log('file', data.file)
     formData.append("username", data.fullName);
     formData.append("email", data.email);
     formData.append("role", data.role);
@@ -107,11 +107,10 @@ export default function page() {
     formData.append("details", data.textField);
     formData.append("musicTemplate", data.select || "");
     if (data.file) {
-      formData.append("cv", data.file);
+      formData.append("cv", data.file[0]);
     }
     try {
-      const res = await axios.post('/api/create-user', formData);
-
+        const res = await axios.post('/api/create-user', formData);
       if (res.data.success) {
         toast.success("You will be notify by admin 2-3 working days");
         signupForm.reset();
@@ -174,7 +173,6 @@ export default function page() {
             selectRole={selectRole}
             selectedRole={selectedRole}
             watchRole={watchRole}
-            // formData={formData}
             signupForm={signupForm} />
         </TabsContent>
       </Tabs>

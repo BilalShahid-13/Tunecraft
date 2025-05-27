@@ -17,8 +17,7 @@ export default function Signup({
   signupForm,
   selectRole,
   selectedRole,
-  watchRole,
-  formData
+  watchRole
 }) {
   const [role, setRole] = useState(null);
 
@@ -148,10 +147,10 @@ export default function Signup({
         {signupForm.formState.errors.textField && (
           <p className="input-error">{signupForm.formState.errors.textField.message}</p>
         )}
-
-        {/* cv */}
-        <CustomFileInput signupForm={signupForm}
-          formData={formData}
+        <CustomFileInput
+          signupForm={signupForm}
+          fieldName="file"  // Since your schema uses 'file' not 'files'
+          acceptedTypes={['application/pdf']}  // Add accepted types
         />
         {signupForm.formState.errors.file && (
           <p className="text-red-500">{signupForm.formState.errors.file.message}</p>

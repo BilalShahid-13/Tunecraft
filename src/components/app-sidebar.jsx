@@ -10,24 +10,32 @@ import {
 } from "@/components/ui/sidebar";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import axios from "axios";
 import useNotificationStore from "@/store/notification";
 import { Badge } from "./ui/badge";
+import { GetServerLoading } from "@/utils/GetServerLoading";
 
 export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items }) {
   const [loading, setLoading] = useState(false)
-  const { setApprovalNotifications, totalNotifications, setIsUpdate, isFetched } = useNotificationStore()
+  const { data: session } = useSession()
+  const { setApprovalNotifications, setCraftersNotifications,
+    totalNotifications, notifications, setIsUpdate, isFetched } = useNotificationStore()
   useEffect(() => {
-    const notificationItem = items.find((item) => item.name === 'Notifications');
-    if (notificationItem && !isFetched) {
-      getNotificationCount()
-      setIsUpdate(true)
+    if (session?.user.role === 'admin') {
+      const notificationItem = items.find((item) => item.name === 'Notifications');
+      if (notificationItem && !isFetched) {
+        getNotificationCount()
+        fetchReviewSubmissions()
+        setIsUpdate(true)
+      }
     }
-  }, [items, isFetched])
+  }, [session])
+
+  console.log('craftersNotification', notifications.craftersNotification)
 
   const getNotificationCount = async () => {
     try {
@@ -40,6 +48,34 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
 
     }
   }
+
+  const fetchReviewSubmissions = async () => {
+    try {
+      const response = await axios.get('/api/admin/crafters-submission-review');
+      if (response.status === 200) {
+        const allCrafters = response.data.data;
+
+        // Map over each item and prepare it to be added as an array to setCraftersNotifications
+        const newNotifications = allCrafters.map((items) => ({
+          orderName: items.musicTemplate,
+          Price: items.plan.price,
+          PlanName: items.plan.name,
+          assignedAtTime: items.submittedCrafter.submittedAtTime,
+          crafterId: items.submittedCrafter.assignedCrafterId.crafterId,
+          crafterName: items.submittedCrafter.assignedCrafterId.username,
+          crafterEmail: items.submittedCrafter.assignedCrafterId.email, // Fixed email field access
+          crafterRole: items.submittedCrafter.role,
+          fileUrls: items.submittedCrafter.submittedFileUrl,
+        }));
+        console.log('newNotifications', newNotifications)
+        // Now, pass the newNotifications as an array to setCraftersNotifications
+        setCraftersNotifications(newNotifications);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
 
   const handleLogout = async () => {
     setLoading(true)

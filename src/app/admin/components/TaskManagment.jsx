@@ -6,7 +6,6 @@ import useAllUsers from '@/store/allUsers';
 
 export default function TaskManagment() {
   const [allSubmission, setAllSubmissions] = useState();
-  const [allcrafters, setAllCrafters] = useState([])
   const [user, setUser] = useState([])
   const [role, setRole] = useState('lyricist')
   const [isLoading, setIsLoading] = useState(false)
@@ -26,28 +25,6 @@ export default function TaskManagment() {
       console.error(error);
     }
   }
-  // console.log('allCrafters', allcrafters, 'allSubmission', allSubmission)
-  // useEffect(() => {
-  //   const a = allSubmission?.map((items) => {
-  //     const { lyricist, singer, engineer } = items.crafters;
-  //     const obj = {};
-  //     if (lyricist?.submissionStatus === "submitted") {
-  //       obj.lyricist = lyricist
-  //       setRole('singer')
-  //     }
-  //     if (singer?.submissionStatus === "submitted") {
-  //       obj.singer = singer
-  //       setRole('engineer')
-  //     }
-  //     if (engineer?.submissionStatus === "submitted") {
-  //       obj.engineer = engineer
-  //       setRole('engineer')
-  //     }
-  //     return obj
-  //   })
-  //   setAllCrafters(a)
-  // }, [allSubmission])
-
 
   const onApprove = async (id) => {
     console.log('onclick', id, role)
@@ -69,14 +46,17 @@ export default function TaskManagment() {
     }
   }
 
-  // console.log(allSubmission[0]?.submittedCrafter.assignedCrafterId.username)
-
   return (
     <div className='flex flex-col gap-3'>
       {allSubmission && allSubmission.map((item, index) =>
         <AdminTaskCard key={index}
           index={index}
           item={item}
+          orderName={item.musicTemplate}
+          planName={item.plan.name}
+          planPrice={item.plan.price}
+          crafterId={item.submittedCrafter.assignedCrafterId.crafterId}
+          role={item.submittedCrafter.role}
           username={item.submittedCrafter.assignedCrafterId.username}
           email={item.submittedCrafter.assignedCrafterId.email}
           file={item.submittedCrafter.submittedFileUrl}

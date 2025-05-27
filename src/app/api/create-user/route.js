@@ -32,6 +32,7 @@ export async function POST(request) {
       );
     }
     // Convert file to buffer
+    console.log('Upload File',file);
     const buffer = Buffer.from(await file.arrayBuffer());
     const res = await uploadFile(buffer, "/Tunecraft/cv");
     const newUser = await new User({

@@ -4,7 +4,19 @@ const useNotificationStore = create((set) => ({
   //  unused state notifications
   notifications: {
     approvalNotification: [],
-    craftersNotification: [],
+    craftersNotification: [
+      {
+        orderName: "Birthday Song",
+        Price: 1500,
+        PlanName: "Basic",
+        assignedAtTime: "2023-10-01T10:00:00Z",
+        crafterId: "T001",
+        crafterName: "John Doe",
+        crafterEmail: "",
+        crafterRole: "",
+        fileUrls: [],
+      },
+    ],
   },
   totalNotifications: 0,
   notificationId: null,
@@ -27,8 +39,28 @@ const useNotificationStore = create((set) => ({
       return {
         notifications: {
           approvalNotification: sortedNotifications,
+          type: "User Registration",
         },
         totalNotifications: totalPendingNotifications,
+      };
+    }),
+
+  setCraftersNotifications: (newNotifications) =>
+    set((state) => {
+      // safely grab existing array (or default to empty)
+      const existing = Array.isArray(state.notifications?.craftersNotification)
+        ? state.notifications.craftersNotification
+        : [];
+
+      return {
+        notifications: {
+          ...state.notifications, // keep approvalNotification, etc.
+          craftersNotification: [
+            ...existing,
+            ...newNotifications, // append new crafter notifications
+          ],
+          type: "Crafter Submission", // add your crafters‐notification type here
+        },
       };
     }),
 

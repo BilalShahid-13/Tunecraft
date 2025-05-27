@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { adminPanel, roles, SidebarItems } from '@/lib/Constant';
-import useNotificationStore from "@/store/notification";
 import useSidebarWidth from "@/store/sidebarWidth";
+import useTabValue from "@/store/tabValue";
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AppSidebar } from './app-sidebar';
@@ -17,7 +17,6 @@ import DashboardNavbar from "./DashboardNavbar";
 import Navbar from "./Navbar";
 import { ScrollArea } from "./ui/scroll-area";
 import { SidebarProvider, SidebarTrigger } from './ui/sidebar';
-import useTabValue from "@/store/tabValue";
 
 export default function NavbarRoot() {
   const location = usePathname();
@@ -28,7 +27,6 @@ export default function NavbarRoot() {
   const isMobile = useMediaQuery({ query: "(max-width: 639px)" });
   const items = isAdmin ? adminPanel : SidebarItems;
   const { addSidebarWidth } = useSidebarWidth()
-  // const { tabValue, setTabValue } = useNotificationStore()
   const { setTabValue, tabValue, userStatus } = useTabValue()
 
 
@@ -82,7 +80,8 @@ export default function NavbarRoot() {
                 : 'Dashboard')}`}
               value={tabValue}
               onValueChange={setTabValue}
-              className="w-full flex flex-row justify-start items-start">
+              className="flex flex-row justify-start items-start w-full"
+            >
               <AppSidebar sidebarCollapsed={sidebarCollapsed}
                 isMobile={isMobile}
                 items={items}
@@ -120,12 +119,14 @@ export default function NavbarRoot() {
                 <ScrollArea style={{
                   height: 'calc(100vh - 64px)' // Adjust based on your navbar height
                 }}>
-                  {items.map((item) => (
-                    <TabsContent key={item.name}
-                      value={item.name} className="p-4">
-                      <item.route />
-                    </TabsContent>
-                  ))}
+                  <div>
+                    {items.map((item) => (
+                      <TabsContent key={item.name}
+                        value={item.name} className="p-4">
+                        <item.route />
+                      </TabsContent>
+                    ))}
+                  </div>
                 </ScrollArea>
               </main>
             </Tabs>

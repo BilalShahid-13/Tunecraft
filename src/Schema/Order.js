@@ -35,7 +35,7 @@ const craftersObject = {
       default: null,
     },
     submittedFileUrl: {
-      type: String,
+      type: [String],
       default: null,
     },
     revisionAttempts: { type: Number, default: 0 },
@@ -89,7 +89,7 @@ const craftersObject = {
       default: null,
     },
     submittedFileUrl: {
-      type: String,
+      type: [String],
       default: null,
     },
     revisionAttempts: { type: Number, default: 0 },

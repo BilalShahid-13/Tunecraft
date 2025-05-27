@@ -31,7 +31,7 @@ export default function craftersManagment() {
   const [allUsers, setAllUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const { addAllUser, isFetched, setIsUpdate } = useAllUsers()
-  const { isClicked, notifications } = useNotificationStore()
+  const { isClicked } = useNotificationStore()
   const { tabValue, userStatus } = useTabValue()
   const [tabValueIndex, setTabValueIndex] = useState('0')
   useEffect(() => {

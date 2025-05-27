@@ -1,5 +1,6 @@
 import { dbConnect } from "@/lib/dbConnect";
 import Order from "@/Schema/Order";
+import Plan from "@/Schema/Plan";
 import User from "@/Schema/User";
 import { NextResponse } from "next/server";
 
@@ -14,9 +15,13 @@ export async function GET() {
         { "crafters.engineer.submissionStatus": "submitted" },
       ],
     }).populate([
+      // {
+      //   path: "user",
+      // },
       "crafters.lyricist.assignedCrafterId",
       "crafters.singer.assignedCrafterId",
       "crafters.engineer.assignedCrafterId",
+      { path: "plan" },
     ]);
 
     // Format the response with single submitted crafter

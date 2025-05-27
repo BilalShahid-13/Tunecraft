@@ -20,6 +20,7 @@ import {
 import { useCountdown } from "@/hooks/useCountdown";
 import { musicPlans } from "@/lib/Constant";
 import { formatTimeHMSS } from "@/lib/utils";
+import useCrafterTask from "@/store/crafterTask";
 import useSidebarWidth from "@/store/sidebarWidth";
 import useTabValue from "@/store/tabValue";
 import useTasks from "@/store/tasks";
@@ -96,6 +97,7 @@ export default function TaskCard({
   const { width } = useSidebarWidth();
   const { setFetchedTasks } = useTasks()
   const { setTabValue } = useTabValue()
+  const { setCrafterTask } = useCrafterTask()
   const countdown = useCountdown(assignedAtTime, defaultTime)
 
   useEffect(() => {
@@ -111,11 +113,27 @@ export default function TaskCard({
     }
   }, [plan])
 
+  // useEffect(() => {
+  //   if (countdown === '0:00:00' && !timeUpHandled) {
+  //     TimeUp();
+  //   }
+  // }, [countdown, timeUpHandled])
+
   useEffect(() => {
-    if (countdown === '0:00:00' && !timeUpHandled) {
-      TimeUp();
+    if (!(inReview && badge === 'active')) {
+      setCrafterTask({
+        crafterTask: {
+          orderId: "",
+          title: "",
+          des: "",
+          requirements: "",
+          clientName: "",
+          dueData: "",
+        },
+      })
     }
-  }, [countdown, timeUpHandled])
+  }, [badge])
+
 
   async function TimeUp() {
     if (countdown === '0:00:00') {
@@ -183,12 +201,12 @@ export default function TaskCard({
     <>
       <Card
         onClick={() => {
-          if (badge === 'active') {
+          if (!inReview && (badge === 'active')) {
             setTabValue({ value: 'Tasks' })
           }
         }}
         onMouseEnter={() => {
-          if (!(inReview && badge === 'active')) {
+          if (!inReview && (badge === 'active')) {
             setActiveCardHover(index)
           }
         }}
