@@ -32,6 +32,7 @@ export async function PATCH(request) {
       );
     }
 
+    // to make sure all orders will go to lyricist dashboard
     if (updatedUser.role === "lyricist") {
       try {
         const order = await Order.updateMany(

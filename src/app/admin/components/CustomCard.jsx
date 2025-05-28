@@ -10,7 +10,6 @@ export default function CustomCard({ name, Icon }) {
   const { width } = useSidebarWidth()
   return (
     <>
-    {/* w-[250px] */}
       <Card className={`flex flex-col items-start
         justify-start w-full max-sm:w-full
          ${width ? 'max-lg:w-[350px] max-xl:w-full' : 'max-lg:w-full'} `}>

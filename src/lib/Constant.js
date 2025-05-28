@@ -34,6 +34,7 @@ import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
 import Tasks from "@/app/(Role)/(Task)/components/Tasks";
+import Payments from "@/app/(Role)/(Payments)/Payments";
 
 export const Currency = "MX$";
 
@@ -380,7 +381,7 @@ export const SidebarItems = [
   {
     name: "Payments",
     Icon: Wallet2,
-    route: UpdatePassword,
+    route: Payments,
   },
   {
     name: "Log out",

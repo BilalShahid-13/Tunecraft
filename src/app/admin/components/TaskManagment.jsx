@@ -1,20 +1,37 @@
 "use client";
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import AdminTaskCard from './AdminTaskCard';
 import useAllUsers from '@/store/allUsers';
+import useNotificationStore from '@/store/notification';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function SkeletonCard() {
+  return (
+    <div className="flex flex-col space-y-3">
+      <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[250px]" />
+        <Skeleton className="h-4 w-[200px]" />
+      </div>
+    </div>
+  )
+}
 
 export default function TaskManagment() {
   const [allSubmission, setAllSubmissions] = useState();
   const [user, setUser] = useState([])
   const [role, setRole] = useState('lyricist')
   const [isLoading, setIsLoading] = useState(false)
+  const cardRefs = useRef({});
   const { isFetched } = useAllUsers()
+  const { isClicked, setClicked, notificationId } = useNotificationStore()
   useEffect(() => {
     fetchReviewSubmissions();
   }, [isFetched])
 
   const fetchReviewSubmissions = async () => {
+    // setIsLoading(true)
     try {
       const response = await axios.get('/api/admin/crafters-submission-review')
       if (response.status === 200) {
@@ -23,6 +40,9 @@ export default function TaskManagment() {
       }
     } catch (error) {
       console.error(error);
+    }
+    finally {
+      // setIsLoading(false)
     }
   }
 
@@ -46,23 +66,49 @@ export default function TaskManagment() {
     }
   }
 
+  const scrollToCard = useCallback(() => {
+    const clickedNotificationId = notificationId;
+    if (
+      notificationId &&
+      cardRefs.current[clickedNotificationId]
+    ) {
+      cardRefs.current[clickedNotificationId].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      setClicked(false);
+    }
+  }, [notificationId]);
+
+  useEffect(() => {
+    // Delay the scroll by a short time to ensure the element is rendered
+    if (isClicked) {
+      setTimeout(scrollToCard, 200);
+    }
+  }, [scrollToCard]);
+
   return (
-    <div className='flex flex-col gap-3'>
-      {allSubmission && allSubmission.map((item, index) =>
-        <AdminTaskCard key={index}
-          index={index}
-          item={item}
-          orderName={item.musicTemplate}
-          planName={item.plan.name}
-          planPrice={item.plan.price}
-          crafterId={item.submittedCrafter.assignedCrafterId.crafterId}
-          role={item.submittedCrafter.role}
-          username={item.submittedCrafter.assignedCrafterId.username}
-          email={item.submittedCrafter.assignedCrafterId.email}
-          file={item.submittedCrafter.submittedFileUrl}
-          time={item.submittedCrafter.submittedAtTime}
-          isLoading={isLoading}
-          onClick={() => onApprove(item?._id)} />)}
+    <div className='flex flex-col gap-3 justify-center items-center w-full'>
+      <Suspense fallback={<SkeletonCard />}>
+        {allSubmission && allSubmission.map((item, index) =>
+          <AdminTaskCard key={index}
+            index={index}
+            ref={(el) => {
+              cardRefs.current[item._id] = el;
+            }}
+            item={item}
+            orderName={item.musicTemplate}
+            planName={item.plan.name}
+            planPrice={item.plan.price}
+            crafterId={item.submittedCrafter.assignedCrafterId.crafterId}
+            role={item.submittedCrafter.role}
+            username={item.submittedCrafter.assignedCrafterId.username}
+            email={item.submittedCrafter.assignedCrafterId.email}
+            file={item.submittedCrafter.submittedFileUrl}
+            time={item.submittedCrafter.submittedAtTime}
+            isLoading={isLoading}
+            onClick={() => onApprove(item?._id)} />)}
+      </Suspense>
     </div>
   )
 }

@@ -1,7 +1,12 @@
 "use client";
-import axios from 'axios'
-import { useState } from 'react'
-import React from 'react'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,23 +14,18 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from '@/components/ui/button'
-import { FileIcon, Loader2 } from 'lucide-react'
-import { formatCentsToDollars, formatTimeHMSS } from '@/lib/utils'
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { formatCentsToDollars, formatDateTime, formatTimeHMSS } from '@/lib/utils';
 import useAllUsers from '@/store/allUsers';
-import { Badge } from '@/components/ui/badge';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { ScrollArea } from '@/components/ui/scroll-area';
+import axios from 'axios';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from "sonner";
 
 export default function AdminTaskCard({ username = 'bilal',
   time = '12hr dummy', email = 'b', file, role, orderName, planName, planPrice,
-  item, crafterId
+  item, crafterId, ref
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const { setIsUpdate } = useAllUsers()
@@ -52,6 +52,7 @@ export default function AdminTaskCard({ username = 'bilal',
       if (res.status === 200) {
         console.log(res.data)
         setIsUpdate(true);
+        toast.success(res.data.message)
       }
     }
     catch (error) {
@@ -63,40 +64,47 @@ export default function AdminTaskCard({ username = 'bilal',
   }
   return (
     <>
-      <Card>
-        <CardHeader className={'w-full'}>
+      <Card className={'w-full'} ref={ref}>
+        <CardHeader className={'w-full '}>
           <CardTitle className={'flex flex-row gap-12 justify-between items-center w-full'}>
-            <h2 className='capitalize'> {orderName}</h2>
+            {/* order Template */}
+            <div className="flex flex-col gap-2">
+              <h2 className='capitalize italic font-light text-zinc-400'># {crafterId}</h2>
+              <h2 className='capitalize text-3xl max-sm:text-xl max-xs:text-sm'> {orderName}</h2>
+            </div>
             <div className='flex flex-col justify-end items-end gap-3'>
-              <Badge className='capitalize font-semibold text-sm'>{role}</Badge>
+              <Badge className='capitalize font-semibold text-sm max-xs:text-xs'>{role}</Badge>
               <div className='flex flex-col justify-end items-end gap-3'>
-                <p className='text-primary font-semibold'>{planName}</p>
-                <p>${formatCentsToDollars(planPrice)}</p>
+                <p className='text-primary font-semibold max-sm:text-sm'>{planName}</p>
+                <p className="max-xs:text-sm">${formatCentsToDollars(planPrice)}</p>
               </div>
             </div>
           </CardTitle>
-          <div className='flex flex-row gap-5'>
-            <h2 className='capitalize'> {username}</h2>
-            <h2 className='capitalize italic font-light text-zinc-400'># {crafterId}</h2>
-          </div>
-          <CardDescription>
-            <p>
-              {formatTimeHMSS(time)}
-            </p>
-            <p>{email}</p>
+          <Separator className="my-4" />
+          <CardDescription className={'flex flex-row justify-between items-center'}>
+            <div className='flex flex-col gap-1'>
+              <h2 className='capitalize text-zinc-200 font-medium text-xl max-sm:text-lg max-xs:text-sm max-xs:font-bold'> {username}</h2>
+              <a href={`mailto:${email}`} className="hover:underline">{email}</a>
+            </div>
+            <div className='flex flex-col justify-end items-end'>
+              <p>{formatDateTime(time).date} </p>
+              <p>{formatDateTime(time).time} </p>
+            </div>
           </CardDescription>
         </CardHeader>
-        <CardContent className={'flex flex-row-reverse justify-between items-center gap-3'}>
-          <Button onClick={() => onApprove(item)}>{
-            isLoading ?
-              <>
-                <Loader2 className='animate-spin' /> Loading
-              </> : 'Approve'
-          }</Button>
-          <Accordion type="single" collapsible>
-            <AccordionItem value="item-1">
-              <AccordionTrigger> View Submission</AccordionTrigger>
-              <AccordionContent className={'max-w-xl'}>
+        <CardContent className={'flex flex-row-reverse max-sm:flex-col-reverse justify-between items-center gap-3'}>
+          <Button
+            className={'max-sm:w-full'}
+            onClick={() => onApprove(item)}>{
+              isLoading ?
+                <>
+                  <Loader2 className='animate-spin' /> Loading
+                </> : 'Approve'
+            }</Button>
+          <Accordion type="single" collapsible className={'max-xs:w-full max-sm:w-full'}>
+            <AccordionItem value="item-1" >
+              <AccordionTrigger className={'max-xs:text-xs'}> View Submission Links</AccordionTrigger>
+              <AccordionContent className={'max-w-lg max-sm:max-w-xs max-xs:max-w-[250px]'}>
                 <div className="w-full overflow-x-auto">
                   <div className="flex space-x-2 pb-2 max-w-xl flex-col">
                     {file.map((file, index) => (
@@ -106,7 +114,7 @@ export default function AdminTaskCard({ username = 'bilal',
                         className="cursor-pointer flex-shrink-0 whitespace-nowrap"
                         onClick={() => window.open(file, "_blank", "noopener,noreferrer")}
                       >
-                        <p className="truncate">{file}</p>
+                        <p className="truncate max-xs:text-xs">{file}</p>
                       </Button>
                     ))}
                   </div>
@@ -114,19 +122,8 @@ export default function AdminTaskCard({ username = 'bilal',
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-
-          {/* <Button
-            variant="link"
-            className={'cursor-pointer'}
-            onClick={() => window.open(file, "_blank", "noopener,noreferrer")}
-          >
-
-            View Submission
-          </Button> */}
         </CardContent>
         <CardFooter>
-          {/* <p>Card Footer</p> */}
-
         </CardFooter>
       </Card >
 

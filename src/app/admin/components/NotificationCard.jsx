@@ -19,16 +19,16 @@ export default function NotificationCard({ status = 'Crafter Registration', appr
           <div className='flex flex-row justify-between items-center '>
             <p className='text-sm font-semibold font-inter capitalize
             flex flex-row gap-3'>{role}
-              <div className='text-zinc-500 font-light'>
+              <span className='text-zinc-500 font-light'>
                 # <span className="italic"> {crafterId}</span>
-              </div>
+              </span>
             </p>
             <Badge className={`${_userStatus(approvalStatus).colorClass} text-xs`}>{_userStatus(approvalStatus).label}</Badge>
           </div>
           <div className='flex flex-row justify-between items-center'>
             <div className='flex flex-col justify-start items-start'>
               <p className='text-sm text-zinc-400 font-inter capitalize'>{username} </p>
-              {email && <p className='text-sm text-zinc-400 font-inter capitalize'>{email} </p>}
+              {/* {email && <p className='text-sm text-zinc-400 font-inter hover:underline'>{email} </p>} */}
             </div>
             <div className='flex flex-col justify-between items-center gap-1'>
               <TooltipProvider>

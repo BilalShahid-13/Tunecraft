@@ -4,17 +4,18 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import useCrafterTask from "@/store/crafterTask"
-import useNotificationStore from "@/store/notification"
+import useTabValue from "@/store/tabValue"
 import { GetServerLoading } from "@/utils/GetServerLoading"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
 import { ArrowUpLeft, LoaderCircle } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import TaskCard from "./TaskCard"
-import useTabValue from "@/store/tabValue"
+import AllSubmittedFiles from "@/app/(Role)/(Task)/components/AllSubmittedFiles"
 
 const acceptedTypes = ["application/pdf", "audio/mpeg", "audio/wav", "application/msword"]
 
@@ -35,6 +36,7 @@ export default function Tasks() {
   const { data: session, status } = useSession();
   const { crafterTask } = useCrafterTask();
   const { setTabValue } = useTabValue();
+  const [onFileReset, setOnFileReset] = useState(false);
 
   const isTaskEmpty =
     !crafterTask.title &&
@@ -62,16 +64,13 @@ export default function Tasks() {
     formData.append("role", session.user.role)
     formData.append("orderId", crafterTask.orderId)
     formData.append("crafterId", session.user.id)
-
-    console.log("Task files:", data.file)
-    console.log("Number of files:", data.file?.length || 0)
-
     try {
       const res = await axios.post("/api/taskSubmission", formData)
       if (res.status === 200) {
-        taskForm.setValue("file", [])
-        taskForm.reset()
+        setOnFileReset(true);
+        taskForm.reset();
         toast.success(res.data.message)
+        setTabValue({ value: 'Dashboard' })
       }
     } catch (error) {
       console.error(error.response?.data?.error)
@@ -82,6 +81,8 @@ export default function Tasks() {
   if (status === "loading") {
     return <GetServerLoading session={session} />
   }
+
+  console.log('crafterTask', crafterTask)
 
   return (
     <>
@@ -101,7 +102,7 @@ export default function Tasks() {
             requirements={crafterTask.requirements}
             client={crafterTask.clientName}
           />
-
+          {crafterTask.submittedFileUrls && <AllSubmittedFiles files={crafterTask.submittedFileUrls} />}
           <form onSubmit={taskForm.handleSubmit(handleSubmit)}>
             <div className="bg-[#111111] flex flex-col gap-8 p-4 rounded-lg max-sm:max-w-sm">
               <h1 className="text-2xl font-bold font-inter">Your Submission</h1>
@@ -111,7 +112,8 @@ export default function Tasks() {
                   signupForm={taskForm}
                   acceptedTypes={acceptedTypes}
                   multiple={true}
-                  fieldName="file" // Changed to match schema field name
+                  onReset={onFileReset}
+                  fieldName="file"
                   maxFiles={6}
                   className={`h-[300px] border-2 border-dashed bg-zinc-900 border-neutral-600 text-center rounded-lg`}
                 />
@@ -120,7 +122,7 @@ export default function Tasks() {
                 )}
               </div>
 
-              <div className="grid gap-1.5 space-y-1 max-md:max-w-xl max-lg:max-w-lg w-4xl">
+              <div className="grid gap-1.5 space-y-1 max-md:max-w-xl max-lg:max-w-lg w-5xl">
                 <Label htmlFor="comment" className={"text-zinc-300 font-inter"}>
                   Comments (Optional)
                 </Label>

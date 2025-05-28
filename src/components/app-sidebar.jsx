@@ -23,7 +23,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
   const [loading, setLoading] = useState(false)
   const { data: session } = useSession()
   const { setApprovalNotifications, setCraftersNotifications,
-    totalNotifications, notifications, setIsUpdate, isFetched } = useNotificationStore()
+    totalNotifications, notifications, setIsUpdate, isFetched, addNotifications } = useNotificationStore()
   useEffect(() => {
     if (session?.user.role === 'admin') {
       const notificationItem = items.find((item) => item.name === 'Notifications');
@@ -42,6 +42,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       const notifcations = await axios.get('/api/notification/getAllPending')
       if (notifcations.statusText === 'OK') {
         setApprovalNotifications(notifcations.data.data)
+        addNotifications(notifcations.data.data)
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -60,9 +61,9 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
           orderName: items.musicTemplate,
           Price: items.plan.price,
           PlanName: items.plan.name,
-          assignedAtTime: items.submittedCrafter.submittedAtTime,
+          createdAt: items.submittedCrafter.submittedAtTime,
           crafterId: items.submittedCrafter.assignedCrafterId.crafterId,
-          crafterName: items.submittedCrafter.assignedCrafterId.username,
+          username: items.submittedCrafter.assignedCrafterId.username,
           crafterEmail: items.submittedCrafter.assignedCrafterId.email, // Fixed email field access
           crafterRole: items.submittedCrafter.role,
           fileUrls: items.submittedCrafter.submittedFileUrl,
@@ -70,6 +71,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
         console.log('newNotifications', newNotifications)
         // Now, pass the newNotifications as an array to setCraftersNotifications
         setCraftersNotifications(newNotifications);
+        addNotifications(newNotifications);
       }
     } catch (error) {
       console.error(error);

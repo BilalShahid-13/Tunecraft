@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCountdown } from "@/hooks/useCountdown";
 import { musicPlans } from "@/lib/Constant";
-import { formatTimeHMSS } from "@/lib/utils";
+import { formatDateTime, formatTimeHMSS } from "@/lib/utils";
 import useCrafterTask from "@/store/crafterTask";
 import useSidebarWidth from "@/store/sidebarWidth";
 import useTabValue from "@/store/tabValue";
@@ -119,22 +119,6 @@ export default function TaskCard({
   //   }
   // }, [countdown, timeUpHandled])
 
-  useEffect(() => {
-    if (!(inReview && badge === 'active')) {
-      setCrafterTask({
-        crafterTask: {
-          orderId: "",
-          title: "",
-          des: "",
-          requirements: "",
-          clientName: "",
-          dueData: "",
-        },
-      })
-    }
-  }, [badge])
-
-
   async function TimeUp() {
     if (countdown === '0:00:00') {
       try {
@@ -197,10 +181,15 @@ export default function TaskCard({
       setIsLoading(false)
     }
   }
+
+  const fetchTaskData = (data) => {
+    // setCrafterTask({})
+  }
   return (
     <>
       <Card
         onClick={() => {
+          fetchTaskData();
           if (!inReview && (badge === 'active')) {
             setTabValue({ value: 'Tasks' })
           }
@@ -246,9 +235,12 @@ export default function TaskCard({
         <CardFooter className={`flex flex-row
            justify-between items-center`}>
           <div className='text-zinc-400 text-sm max-xs:text-xs flex items-center gap-2'>
-            <Clock size={14} />
+            <Clock size={badge === 'completed' ? 30 : 14} />
             <p className='font-inter'>{badge === 'available' && time}</p>
-            <p className='font-inter'>{badge === 'completed' && formatTimeHMSS(assignedAtTime)}</p>
+            {badge === 'completed' && <div className="flex flex-col w-full justify-start items-start">
+              <p className='font-inter text-sm font-normal'>{formatDateTime(assignedAtTime).date}</p>
+              <p className='font-inter font-light text-xs'>{formatDateTime(assignedAtTime).time}</p>
+            </div>}
             {inReview ? <p className='font-inter'>
               {(inReview && badge === 'active') && formatTimeHMSS(assignedAtTime)}</p> :
               <p className='font-inter'>{badge === 'active' && countdown}</p>}
@@ -283,7 +275,7 @@ export default function TaskCard({
             </Dialog>
           </div>}
         </CardFooter>
-      </Card>
+      </Card >
     </>
   )
 }

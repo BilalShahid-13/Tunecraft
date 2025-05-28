@@ -18,11 +18,31 @@ const useNotificationStore = create((set) => ({
       },
     ],
   },
+  allNotifications: [],
   totalNotifications: 0,
   notificationId: null,
   isFetched: false,
   isClicked: false,
 
+  addNotifications: (newNotifications) =>
+    set((state) => {
+      // Combine existing and new notifications
+      const combined = [...state.allNotifications, ...newNotifications];
+
+      // Sort combined notifications by createdAt descending
+      // const sorted = get().sortNotifications(combined);
+
+      // Optionally update totalNotifications based on some criteria
+      // For example, count how many have approvalStatus 'pending'
+      // const totalPending = sorted.filter(
+      //   (n) => n.approvalStatus === "pending"
+      // ).length;
+
+      return {
+        allNotifications: combined,
+        // totalNotifications: totalPending,
+      };
+    }),
   setApprovalNotifications: (notifications) =>
     set(() => {
       // Sort notifications descending by updatedAt

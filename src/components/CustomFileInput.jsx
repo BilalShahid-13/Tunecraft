@@ -28,33 +28,21 @@ const CustomFileInput = ({
   const clearFiles = () => {
     setFiles([])
     setUploadSuccess(false)
-    if (signupForm?.setValue) {
-      signupForm.setValue(formFieldName, [])
-      // Trigger validation if available
-      if (signupForm.trigger) {
-        signupForm.trigger(formFieldName)
-      }
-    }
+    // if (signupForm?.setValue) {
+    //   signupForm.setValue(formFieldName, [])
+    //   if (signupForm.trigger) {
+    //     signupForm.trigger(formFieldName)
+    //   }
+    // }
   }
+
+  // console.log('signupForm', signupForm)
 
   useEffect(() => {
     if (onReset) {
       clearFiles()
     }
   }, [onReset])
-
-  // Check if form is submitted and clear files
-  useEffect(() => {
-    if (!signupForm?.formState) return
-
-    const formState = signupForm.formState
-
-    // If form is successfully submitted, clear the files
-    if (formState.isSubmitted && formState.isSubmitSuccessful) {
-      console.log("Form submitted successfully, clearing files...")
-      clearFiles()
-    }
-  }, [signupForm])
 
   const getFileIcon = (fileType) => {
     if (fileType === "application/pdf") {
@@ -276,8 +264,9 @@ const CustomFileInput = ({
                 </button>
               )}
             </div>
-            <ScrollArea className="h-40 overflow-y-auto ">
-              <div className="space-y-2 pr-4 max-w-4xl text-wrap overflow-hidden">
+            <div className="max-h-40 min-h-12 overflow-y-auto hide-scrollbar">
+              <div className={`space-y-2 pr-4 text-wrap
+                 ${maxFiles === 1 ? 'w-md' : 'max-w-5xl min-w-5xl'} `}>
                 {files.map((f) => (
                   <div
                     key={f.id}
@@ -304,7 +293,7 @@ const CustomFileInput = ({
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           </div>
         )}
       </div>

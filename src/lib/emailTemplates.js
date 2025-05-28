@@ -37,8 +37,8 @@ export const forgotPassword = (otp) => {
 
 export const userApproved = (username, email, password) => {
   return {
-    // to: email,
-    to: "bcsm-f21-249@superior.edu.pk",
+    to: email,
+    // to: "bcsm-f21-249@superior.edu.pk",
     subject: "🎉 Your Account Has Been Approved!",
     html: `<div style="font-family: Arial, sans-serif; max-width: 600px;
     margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">

@@ -39,10 +39,11 @@ const signupSchema = z.object({
 });
 
 export default function page() {
-  const [activeTab, setActiveTab] = useState("login")
-  const [selectedRole, setSelectedRole] = useState(null)
-  const { data: session } = useSession()
-  const navigate = useRouter()
+  const [activeTab, setActiveTab] = useState("login");
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [onFileReset, setOnFileReset] = useState(false);
+  const { data: session } = useSession();
+  const navigate = useRouter();
 
   // Login form
   const loginForm = useForm({
@@ -63,7 +64,7 @@ export default function page() {
       email: "",
       select: '',
       password: "",
-      file: "",
+      file: [],
       phoneCode: "52",
       phone: "",
     },
@@ -110,11 +111,13 @@ export default function page() {
       formData.append("cv", data.file[0]);
     }
     try {
-        const res = await axios.post('/api/create-user', formData);
+      const res = await axios.post('/api/create-user', formData);
       if (res.data.success) {
-        toast.success("You will be notify by admin 2-3 working days");
+        setOnFileReset(true)
         signupForm.reset();
-        console.log(res.data)
+        console.log('signupForm File',signupForm.getValues('file'))
+        // signupForm.clearErrors('file');
+        toast.success(res.data.msg)
       } else {
         toast.error(res.data.msg || "Signup failed");
       }
@@ -122,9 +125,10 @@ export default function page() {
       toast.error(error.response?.data.msg || error.message);
       console.error(error.response?.data.msg || error.message);
     }
+
+
   };
   const watchRole = signupForm.watch("role")
-
   const handleTabChange = (value) => {
     setActiveTab(value)
   }
@@ -173,6 +177,7 @@ export default function page() {
             selectRole={selectRole}
             selectedRole={selectedRole}
             watchRole={watchRole}
+            onReset={onFileReset}
             signupForm={signupForm} />
         </TabsContent>
       </Tabs>

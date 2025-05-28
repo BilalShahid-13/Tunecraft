@@ -1,38 +1,43 @@
 "use client";
-
 import useCrafterTask from '@/store/crafterTask';
-import useSidebarWidth from '@/store/sidebarWidth';
-import useTasks from '@/store/tasks';
 import { GetServerLoading } from '@/utils/GetServerLoading';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import TaskLayoutRoot from './TaskLayoutRoot';
+import useTasks from '@/store/tasks';
+import { prevRole } from '@/lib/utils';
 
 // Custom hook to fetch tasks based on type
-const useFetchTasks = (session, setFetchedTasks) => {
+const useFetchTasks = (session, fetchedTasks, setFetchedTasks, setIsLoadingAvailableTask, setIsLoadingActiveTask, setIsCompletedTask) => {
   const [activeTask, setActiveTask] = useState([]);
   const [availableTask, setAvailableTask] = useState([]);
   const [pendingTask, setPendingTask] = useState([]);
   const [completedTask, setCompletedTask] = useState([]);
   const setCrafterTask = useCrafterTask((state) => state.setCrafterTask);
   const crafterTask = useCrafterTask((state) => state.crafterTask);
+
   const fetchAvailableTask = useCallback(async () => {
     if (!session) return;
+    setIsLoadingAvailableTask(true)
     try {
       const res = await axios.post('/api/availableTasks', {
         role: session.user.role,
       });
       if (res.status === 200) {
         setAvailableTask(res.data.data);
+        console.log('availableTask', res.data)
       }
     } catch (error) {
       console.error('Error fetching available tasks:', error?.response?.data || error.message);
+    } finally {
+      setIsLoadingAvailableTask(false)
     }
   }, [session]);
 
   const fetchActiveTask = useCallback(async () => {
     if (!session) return;
+    setIsLoadingActiveTask(true)
     try {
       const res = await axios.post('/api/activeTask', {
         role: session.user.role,
@@ -41,22 +46,28 @@ const useFetchTasks = (session, setFetchedTasks) => {
       if (res.status === 200) {
         const tasks = res.data.data;
         if (Array.isArray(tasks) && tasks.length > 0) {
-          setActiveTask(tasks);
-          const data = tasks[0];
-          setCrafterTask({
+          setActiveTask(tasks)
+          console.log('tasks', tasks)
+          const data = tasks[0]
+          const newTaskData = {
             orderId: data._id,
             title: data.musicTemplate,
             des: data.jokes,
             requirements: data.backgroundStory,
             clientName: data.name,
-            dueData: data.crafters[session.user.role]?.assignedAtTime || '',
-          });
+            dueData: data.crafters[session.user.role]?.assignedAtTime || "",
+            submittedFileUrls: data.crafters[prevRole(session.user.role)]?.submittedFileUrl
+          }
+          setCrafterTask(newTaskData) // Pass the actual data object
         }
       }
     } catch (error) {
       console.error('Error fetching active tasks:', error?.response?.data || error.message);
     }
-  }, [session, setCrafterTask]);
+    finally {
+      setIsLoadingActiveTask(false);
+    }
+  }, [session]);
 
   const fetchPendingTask = useCallback(async () => {
     if (!session) return;
@@ -75,6 +86,7 @@ const useFetchTasks = (session, setFetchedTasks) => {
 
   const fetchCompletedTask = useCallback(async () => {
     if (!session) return;
+    setIsCompletedTask(true)
     try {
       const res = await axios.post('/api/complete-task', {
         userId: session.user.id,
@@ -85,6 +97,8 @@ const useFetchTasks = (session, setFetchedTasks) => {
       }
     } catch (error) {
       console.error('Error fetching completed tasks:', error);
+    } finally {
+      setIsCompletedTask(false)
     }
   }, [session]);
 
@@ -98,16 +112,14 @@ const useFetchTasks = (session, setFetchedTasks) => {
   }, [session, fetchAvailableTask, fetchActiveTask, fetchPendingTask, fetchCompletedTask]);
 
   useEffect(() => {
-    if (setFetchedTasks) {
+    if (fetchedTasks) {
       fetchAvailableTask();
       fetchActiveTask();
       fetchPendingTask();
       fetchCompletedTask();
       setFetchedTasks(false);
     }
-  }, [setFetchedTasks, fetchAvailableTask, fetchActiveTask, fetchPendingTask, fetchCompletedTask]);
-
-  console.log('crafterTask', crafterTask)
+  }, [fetchedTasks, fetchAvailableTask, fetchActiveTask, fetchPendingTask, fetchCompletedTask]);
 
   return {
     activeTask,
@@ -122,7 +134,10 @@ export default function Dashboard() {
   const { data: sessionData, status } = useSession();
   const [session, setSession] = useState(null);
   const [timeOutError, setTimeOutError] = useState(false);
-
+  const [isLoadingAvailableTask, setIsLoadingAvailableTask] = useState();
+  const [isLoadingActiveTask, setIsLoadingActiveTask] = useState();
+  const [isLoadingCompletedTask, setIsCompletedTask] = useState();
+  const { fetchedTasks, setFetchedTasks } = useTasks();
   // Sync session data
   useEffect(() => {
     if (status === 'authenticated') {
@@ -131,7 +146,7 @@ export default function Dashboard() {
   }, [sessionData, status]);
 
   // Use custom hook to fetch tasks
-  const { activeTask, availableTask, pendingTask, completedTask } = useFetchTasks(session, setFetchedTasks);
+  const { activeTask, availableTask, pendingTask, completedTask } = useFetchTasks(session, fetchedTasks, setFetchedTasks, setIsLoadingAvailableTask, setIsLoadingActiveTask, setIsCompletedTask);
 
   // Optional: handle grace period error
   const setGracePeriodError = useCallback((error) => {
@@ -144,7 +159,7 @@ export default function Dashboard() {
   }
 
   if (!session) {
-    return <p>Loading user session...</p>;
+    return <GetServerLoading session={sessionData} />;
   }
 
   return (
@@ -161,9 +176,10 @@ export default function Dashboard() {
           inReview={activeTask.length === 0}
           tasks={activeTask.length > 0 ? activeTask : pendingTask}
           session={session}
+          isLoading={isLoadingActiveTask}
         />
-        <TaskLayoutRoot taskName="available" tasks={availableTask} session={session} />
-        <TaskLayoutRoot taskName="completed" tasks={completedTask} session={session} />
+        <TaskLayoutRoot taskName="available" tasks={availableTask} session={session} isLoading={isLoadingAvailableTask} />
+        <TaskLayoutRoot taskName="completed" tasks={completedTask} session={session} isLoading={isLoadingCompletedTask} />
       </div>
     </div>
   );

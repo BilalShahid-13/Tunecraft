@@ -17,7 +17,7 @@ export default function Signup({
   signupForm,
   selectRole,
   selectedRole,
-  watchRole
+  watchRole, onReset
 }) {
   const [role, setRole] = useState(null);
 
@@ -149,7 +149,9 @@ export default function Signup({
         )}
         <CustomFileInput
           signupForm={signupForm}
-          fieldName="file"  // Since your schema uses 'file' not 'files'
+          multiple={false}
+          onReset={onReset}
+          fieldName="file"
           acceptedTypes={['application/pdf']}  // Add accepted types
         />
         {signupForm.formState.errors.file && (

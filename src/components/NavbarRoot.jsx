@@ -29,7 +29,6 @@ export default function NavbarRoot() {
   const { addSidebarWidth } = useSidebarWidth()
   const { setTabValue, tabValue, userStatus } = useTabValue()
 
-
   useEffect(() => {
     setIsProtectedRoute(protectedRoutes.includes(location));
     if (location === '/admin') {

@@ -17,11 +17,7 @@ export async function POST(req) {
     const tasks = await Order.find({
       [query]: "available",
       currentStage: role,
-      $or: [
-        {
-          orderStatus: "pending",
-        },
-      ],
+      $or: [{ orderStatus: "pending" }, { orderStatus: "in-progress" }],
     }).populate({
       path: "plan",
     });

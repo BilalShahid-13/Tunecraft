@@ -175,3 +175,12 @@ max-lg:text-6xl max-xs:text-2xl
 .inputfield-box > :nth-child(1) {
   @apply absolute left-3 top-[6px] w-5 text-zinc-500;
 }
+
+/* globals.css or a component-specific CSS file */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari, Opera */
+}

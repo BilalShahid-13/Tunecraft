@@ -3,14 +3,28 @@ import useSidebarWidth from '@/store/sidebarWidth';
 import { GetServerLoading } from '@/utils/GetServerLoading';
 import React, { Suspense } from 'react'
 import TaskCard from './TaskCard';
+import { Skeleton } from "@/components/ui/skeleton"
 
 function NoAvailableTasks({ msg }) {
   return (
     <p className='text-zinc-600 font-inter italic ml-zinc-600 ml-23'>No {msg} Task Yet</p>
   )
 }
+
+export function SkeletonCard() {
+  return (
+    <div className="flex flex-col space-y-3">
+      <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[250px]" />
+        <Skeleton className="h-4 w-[200px]" />
+      </div>
+    </div>
+  )
+}
+
 export default function TaskLayoutRoot({ taskName = 'active'
-  , tasks, session, inReview = false }) {
+  , tasks, session, inReview = false, isLoading }) {
   const { width } = useSidebarWidth();
 
 
@@ -33,7 +47,7 @@ export default function TaskLayoutRoot({ taskName = 'active'
        rounded-xs text-2xl font-medium font-inter
  px-4 max-sm:text-lg capitalize`}>{taskName} Task</h2>
         <Suspense
-          fallback={<GetServerLoading session={session} />}>
+          fallback={<SkeletonCard />}>
           <div className={`grid
           ${width ? `
           ${taskName === 'available' ? `grid-cols-4 max-lg:grid-cols-2
@@ -46,7 +60,7 @@ export default function TaskLayoutRoot({ taskName = 'active'
                 `grid-cols-2 max-lg:grid-cols-1
             max-md:grid-cols-1 max-xl:grid-cols-2`}`}
                    gap-4 max-sm:grid-cols-1 max-xs:grid-cols-1`}>
-            {(!tasks || tasks.length === 0) ?
+            {isLoading ? <SkeletonCard /> : (!tasks || tasks.length === 0) ?
               <NoAvailableTasks msg={taskName} /> :
               tasks?.map((item, index) => (
                 <React.Fragment key={index}>
@@ -57,12 +71,10 @@ export default function TaskLayoutRoot({ taskName = 'active'
                     inReview={inReview}
                     title={item?.songGenre}
                     session={session}
-                    // title={item?.musicTemplate}
                     des={item?.jokes}
                     plan={item?.plan}
                     songGenre={item?.songGenre}
                     item={item}
-                    // assignedAtTime={item?.crafters[session.user.role].submittedAtTime}
                     assignedAtTime={(taskName === 'completed' || inReview && taskName === 'active') ?
                       item?.crafters[session.user.role].submittedAtTime
                       : item?.crafters[session.user.role].assignedAtTime}
