@@ -66,6 +66,10 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
           username: items.submittedCrafter.assignedCrafterId.username,
           crafterEmail: items.submittedCrafter.assignedCrafterId.email, // Fixed email field access
           crafterRole: items.submittedCrafter.role,
+          submittedFile: {
+            fileName: items.submittedCrafter.submittedFileName,
+            fileUrl: items.submittedCrafter.submittedFileUrl
+          },
           fileUrls: items.submittedCrafter.submittedFileUrl,
         }));
         console.log('newNotifications', newNotifications)
@@ -77,7 +81,6 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       console.error(error);
     }
   };
-
 
   const handleLogout = async () => {
     setLoading(true)
@@ -91,7 +94,6 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       setLoading(false)
     }
   }
-
 
   return (
     <Sidebar className={'relative h-screen'}>

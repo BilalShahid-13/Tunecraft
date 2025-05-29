@@ -104,7 +104,7 @@ export default function TaskManagment() {
             role={item.submittedCrafter.role}
             username={item.submittedCrafter.assignedCrafterId.username}
             email={item.submittedCrafter.assignedCrafterId.email}
-            file={item.submittedCrafter.submittedFileUrl}
+            file={item.submittedCrafter.submittedFile}
             time={item.submittedCrafter.submittedAtTime}
             isLoading={isLoading}
             onClick={() => onApprove(item?._id)} />)}

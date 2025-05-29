@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { handleDownloadWithFetch } from "@/lib/handleDownloadWithName";
 import { formatCentsToDollars, formatDateTime, formatTimeHMSS } from '@/lib/utils';
 import useAllUsers from '@/store/allUsers';
 import axios from 'axios';
@@ -62,6 +63,8 @@ export default function AdminTaskCard({ username = 'bilal',
       setIsLoading(false)
     }
   }
+
+  console.log('file', file)
   return (
     <>
       <Card className={'w-full'} ref={ref}>
@@ -107,14 +110,16 @@ export default function AdminTaskCard({ username = 'bilal',
               <AccordionContent className={'max-w-lg max-sm:max-w-xs max-xs:max-w-[250px]'}>
                 <div className="w-full overflow-x-auto">
                   <div className="flex space-x-2 pb-2 max-w-xl flex-col">
-                    {file.map((file, index) => (
+                    {file?.map((file, index) => (
                       <Button
                         key={index}
                         variant="link"
-                        className="cursor-pointer flex-shrink-0 whitespace-nowrap"
-                        onClick={() => window.open(file, "_blank", "noopener,noreferrer")}
+                        className="cursor-pointer flex-shrink-0 whitespace-nowrap flex justify-start"
+                        onClick={() => {
+                          handleDownloadWithFetch(file.fileUrl, file.fileName)
+                        }}
                       >
-                        <p className="truncate max-xs:text-xs">{file}</p>
+                        <p className="max-xs:text-xs text-left">{file.fileName}</p>
                       </Button>
                     ))}
                   </div>

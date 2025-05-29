@@ -26,18 +26,34 @@ const craftersObject = {
       type: Date,
       default: null,
     },
-    gracePeriodGranted: {
-      type: Boolean,
-      default: false,
+    // extension
+    extension: {
+      granted: { type: Boolean, default: false }, // have they used their +3h?
+      until: { type: Date, default: null }, // when that +3h expires
     },
+    // plenty if crafters not submit order
+    penaltyCount: { type: Number, default: 0 },
     submittedAtTime: {
       type: Date,
       default: null,
     },
-    submittedFileUrl: {
-      type: [String],
-      default: null,
+    // rejected user if crafter not submit the order after extension
+    rejectedCrafters: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      default: [], // ← ensure every new doc has an empty array
     },
+
+    submittedFile: [
+      {
+        fileName: { type: String, default: "" },
+        fileUrl: { type: String, default: "" },
+      },
+    ],
     revisionAttempts: { type: Number, default: 0 },
     adminFeedback: { type: String, default: "" },
   },
@@ -57,14 +73,34 @@ const craftersObject = {
       type: Date,
       default: null,
     },
+    // extension
+    extension: {
+      granted: { type: Boolean, default: false }, // have they used their +3h?
+      until: { type: Date, default: null }, // when that +3h expires
+    },
+    // plenty if crafters not submit order
+    penaltyCount: { type: Number, default: 0 },
     submittedAtTime: {
       type: Date,
       default: null,
     },
-    submittedFileUrl: {
-      type: [String],
-      default: null,
+    // rejected user if crafter not submit the order after extension
+    rejectedCrafters: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      default: [], // ← ensure every new doc has an empty array
     },
+
+    submittedFile: [
+      {
+        fileName: { type: String, default: "" },
+        fileUrl: { type: String, default: "" },
+      },
+    ],
     revisionAttempts: { type: Number, default: 0 },
     adminFeedback: { type: String, default: "" },
   },
@@ -84,14 +120,34 @@ const craftersObject = {
       type: Date,
       default: null,
     },
+    // extension
+    extension: {
+      granted: { type: Boolean, default: false }, // have they used their +3h?
+      until: { type: Date, default: null }, // when that +3h expires
+    },
+    // plenty if crafters not submit order
+    penaltyCount: { type: Number, default: 0 },
     submittedAtTime: {
       type: Date,
       default: null,
     },
-    submittedFileUrl: {
-      type: [String],
-      default: null,
+    // rejected user if crafter not submit the order after extension
+    rejectedCrafters: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      default: [], // ← ensure every new doc has an empty array
     },
+
+    submittedFile: [
+      {
+        fileName: { type: String, default: "" },
+        fileUrl: { type: String, default: "" },
+      },
+    ],
     revisionAttempts: { type: Number, default: 0 },
     adminFeedback: { type: String, default: "" },
   },

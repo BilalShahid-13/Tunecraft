@@ -51,7 +51,7 @@ export async function POST(request) {
         { status: 403 }
       );
     }
-
+    const fileNames = files.map((r) => r.name);
     // Deadline check: 3 hours from assignedAtTime
     const assignedAt = new Date(assigned.assignedAtTime);
     const now = new Date();
@@ -78,7 +78,10 @@ export async function POST(request) {
     order.crafters[role].submissionStatus = submissionStatusEnum[3]; // "submitted"
     order.crafters[role].submittedAtTime = now;
     // Save array of URLs or single URL if only one
-    order.crafters[role].submittedFileUrl = secureUrls;
+    order.crafters[role].submittedFile = fileNames.map((items, index) => ({
+      fileName: items,
+      fileUrl: secureUrls[index],
+    }));
     order.crafters[role].adminFeedback = comments;
 
     await order.save();

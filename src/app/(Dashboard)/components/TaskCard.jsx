@@ -28,6 +28,7 @@ import axios from "axios";
 import { Clock, Loader2, MoveRight } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { toast } from "sonner";
+import ExtendTimeline from "./ExtendTimeline";
 
 const DialogDetails = memo(({ title, songGenre, userPlan, des, bgStory, badge, startWorking, isLoading, item }) => (
   <>
@@ -88,16 +89,17 @@ export default function TaskCard({
   plan, item, session, assignedAtTime, index, inReview,
   time = '3hr', bgStory, currentStage, songGenre, setGracePeriodError
 }) {
-  let defaultTime = 3;
+  let defaultTime = 0;
   const [userPlan, setUserPlan] = useState({ title: '', price: 0 })
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false)
   const [timeUpHandled, setTimeUpHandled] = useState(false)
   const [activeCardHover, setActiveCardHover] = useState(false);
+  const [timeUp, setTimeUp] = useState(false);
   const { width } = useSidebarWidth();
   const { setFetchedTasks } = useTasks()
   const { setTabValue } = useTabValue()
-  const { setCrafterTask } = useCrafterTask()
   const countdown = useCountdown(assignedAtTime, defaultTime)
 
   useEffect(() => {
@@ -113,33 +115,13 @@ export default function TaskCard({
     }
   }, [plan])
 
-  // useEffect(() => {
-  //   if (countdown === '0:00:00' && !timeUpHandled) {
-  //     TimeUp();
-  //   }
-  // }, [countdown, timeUpHandled])
-
-  async function TimeUp() {
-    if (countdown === '0:00:00') {
-      try {
-        const res = await axios.patch('/api/extend-crafter-time', {
-          orderId: item?._id,
-          role: session.user.role,
-          crafterId: session.user.id
-        })
-        if (res.status === 200) {
-          defaultTime = 2
-          setFetchedTasks(true)
-          setTimeUpHandled(true)
-
-          toast.success(res.data.message)
-        }
-      } catch (error) {
-        console.error(error.response.data.error);
-        setGracePeriodError(error.response.data.error)
-      }
+  useEffect(() => {
+    if (countdown === '0:00:00' && !timeUpHandled) {
+      // TimeUp();
+      setTimeUp(true)
+      console.warn('timeup')
     }
-  }
+  }, [countdown, timeUpHandled])
 
   function TaskStatus(badge) {
     switch (badge) {
@@ -182,18 +164,27 @@ export default function TaskCard({
     }
   }
 
-  const fetchTaskData = (data) => {
-    // setCrafterTask({})
+  console.log('extend time', timeUp)
+  const cardClick = () => {
+    setAlertDialogOpen(true)
+    if (timeUp) {
+      return <ExtendTimeline />
+    } else {
+      if (!inReview && (badge === 'active')) {
+        setTabValue({ value: 'Tasks' })
+      }
+    }
   }
+
   return (
     <>
+      {(badge === 'active' && timeUp) && <ExtendTimeline orderId={item?._id}
+        setTimeUpHandled={setTimeUpHandled}
+        timeUp={timeUp}
+        role={session.user.role} userId={session.user.id}
+        isOpen={alertDialogOpen} onOpenChange={setAlertDialogOpen} />}
       <Card
-        onClick={() => {
-          fetchTaskData();
-          if (!inReview && (badge === 'active')) {
-            setTabValue({ value: 'Tasks' })
-          }
-        }}
+        onClick={cardClick}
         onMouseEnter={() => {
           if (!inReview && (badge === 'active')) {
             setActiveCardHover(index)

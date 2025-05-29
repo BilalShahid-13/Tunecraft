@@ -23,6 +23,7 @@ const useFetchTasks = (session, fetchedTasks, setFetchedTasks, setIsLoadingAvail
     try {
       const res = await axios.post('/api/availableTasks', {
         role: session.user.role,
+        userId:session.user.id
       });
       if (res.status === 200) {
         setAvailableTask(res.data.data);

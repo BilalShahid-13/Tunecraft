@@ -1,9 +1,8 @@
 "use client";
+import { Skeleton } from "@/components/ui/skeleton";
 import useSidebarWidth from '@/store/sidebarWidth';
-import { GetServerLoading } from '@/utils/GetServerLoading';
-import React, { Suspense } from 'react'
+import React, { Suspense } from 'react';
 import TaskCard from './TaskCard';
-import { Skeleton } from "@/components/ui/skeleton"
 
 function NoAvailableTasks({ msg }) {
   return (
