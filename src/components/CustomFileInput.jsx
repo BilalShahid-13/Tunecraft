@@ -1,9 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Loader, Upload, X, FileText, ImageIcon } from "lucide-react"
+import { FileText, ImageIcon, Loader, Upload, X } from "lucide-react"
 import { useEffect, useState } from "react"
-import { ScrollArea } from "./ui/scroll-area"
 
 const CustomFileInput = ({
   signupForm,
@@ -13,6 +12,7 @@ const CustomFileInput = ({
   multiple = false,
   maxFiles = 1,
   fieldName,
+  disabled = false
 }) => {
   const [files, setFiles] = useState([])
   const [loading, setLoading] = useState(false)
@@ -198,7 +198,8 @@ const CustomFileInput = ({
   }
 
   return (
-    <div className="flex flex-col items-start justify-start gap-4">
+    <div className="flex flex-col items-start justify-start
+    gap-4 w-full">
 
       {/* Hidden File Input */}
       <input
@@ -208,6 +209,7 @@ const CustomFileInput = ({
         onChange={handleFileChange}
         className="hidden"
         multiple={multiple}
+        disabled={disabled}
       />
 
       {/* Custom Upload Button */}
@@ -247,7 +249,7 @@ const CustomFileInput = ({
       </div>
 
       {/* Uploaded Files List */}
-      <div className=" ">
+      <div className="w-full">
         {files.length > 0 && (
           <div className="space-y-2">
             <div className="flex justify-between items-center">
@@ -265,20 +267,20 @@ const CustomFileInput = ({
               )}
             </div>
             <div className="max-h-40 min-h-12 overflow-y-auto hide-scrollbar">
-              <div className={`space-y-2 pr-4 text-wrap
-                 ${maxFiles === 1 ? 'w-md' : 'max-w-5xl min-w-5xl'} `}>
+              <div className={`space-y-2 text-wrap relative w-full`}>
                 {files.map((f) => (
                   <div
                     key={f.id}
-                    className="flex w-full items-center justify-between bg-zinc-800 p-3 rounded-lg"
+                    className="relative flex w-full items-center
+                    justify-between bg-zinc-800 p-3 rounded-lg"
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
                       {getFileIcon(f.type)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-zinc-300 truncate font-medium">
+                        <p className="text-sm max-xs:text-sm text-zinc-300 truncate font-medium">
                           {f.name}
                         </p>
-                        <p className="text-xs text-zinc-500">
+                        <p className="text-xs text-zinc-500 max-xs:text-xs">
                           {formatFileSize(f.size)}
                         </p>
                       </div>

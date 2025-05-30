@@ -10,9 +10,10 @@ const useCrafterTask = create((set) => ({
     dueData: "",
     submittedFileUrls: [],
   },
+  userStatus: "active",
 
-  setCrafterTask: (task) => {
-    set({ crafterTask: task });
+  setCrafterTask: (task, status) => {
+    set({ crafterTask: task, userStatus: status });
   },
 }));
 

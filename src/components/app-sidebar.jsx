@@ -23,7 +23,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
   const [loading, setLoading] = useState(false)
   const { data: session } = useSession()
   const { setApprovalNotifications, setCraftersNotifications,
-    totalNotifications, notifications, setIsUpdate, isFetched, addNotifications } = useNotificationStore()
+    totalNotifications, setIsUpdate, isFetched, addNotifications, allNotifications } = useNotificationStore()
   useEffect(() => {
     if (session?.user.role === 'admin') {
       const notificationItem = items.find((item) => item.name === 'Notifications');
@@ -35,14 +35,26 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
     }
   }, [session])
 
-  console.log('craftersNotification', notifications.craftersNotification)
-
   const getNotificationCount = async () => {
     try {
       const notifcations = await axios.get('/api/notification/getAllPending')
       if (notifcations.statusText === 'OK') {
         setApprovalNotifications(notifcations.data.data)
-        addNotifications(notifcations.data.data)
+        const data = notifcations.data.data;
+        const newNotifications = data.map((items) => (
+          {
+            orderName: items.musicTemplate,
+            submittedAtTime: items.submittedAtTime,
+            createdAt: items.updatedAt,
+            approvalStatus: items.approvalStatus,
+            status: "Crafter Registration",
+            crafterId: items?.crafterId,
+            _id: items._id,
+            username: items.username,
+            role: items.role,
+          }
+        ))
+        addNotifications(newNotifications)
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -55,32 +67,45 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       const response = await axios.get('/api/admin/crafters-submission-review');
       if (response.status === 200) {
         const allCrafters = response.data.data;
-
-        // Map over each item and prepare it to be added as an array to setCraftersNotifications
-        const newNotifications = allCrafters.map((items) => ({
-          orderName: items.musicTemplate,
-          Price: items.plan.price,
-          PlanName: items.plan.name,
-          createdAt: items.submittedCrafter.submittedAtTime,
-          crafterId: items.submittedCrafter.assignedCrafterId.crafterId,
-          username: items.submittedCrafter.assignedCrafterId.username,
-          crafterEmail: items.submittedCrafter.assignedCrafterId.email, // Fixed email field access
-          crafterRole: items.submittedCrafter.role,
-          submittedFile: {
-            fileName: items.submittedCrafter.submittedFileName,
-            fileUrl: items.submittedCrafter.submittedFileUrl
-          },
-          fileUrls: items.submittedCrafter.submittedFileUrl,
-        }));
-        console.log('newNotifications', newNotifications)
-        // Now, pass the newNotifications as an array to setCraftersNotifications
-        setCraftersNotifications(newNotifications);
+        const newNotifications = allCrafters.map((items) => (
+          {
+            orderName: items.musicTemplate,
+            createdAt: items.submittedCrafter.submittedAtTime,
+            updatedAt: items.updatedAt,
+            // approvalStatus: items.approvalStatus,
+            approvalStatus: "pending",
+            status: "Task Submission",
+            crafterId: items?.orderId,
+            // _id: items?.orderId,
+            _id: items.submittedCrafter.assignedCrafterId._id,
+            username: items.name,
+            role: items.submittedCrafter.assignedCrafterId.role,
+          }
+        ))
         addNotifications(newNotifications);
       }
     } catch (error) {
       console.error(error);
     }
   };
+
+  const fetchCraftersPlenty = async () => {
+    try {
+      const response = await axios.get('/api/crafter-penalties-detailed');
+      if (response.status === 200) {
+        const allPlentyCrafters = response.data.data;
+
+        /**
+         addNotifications({
+
+         })
+         *
+         */
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const handleLogout = async () => {
     setLoading(true)

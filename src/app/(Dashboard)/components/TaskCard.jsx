@@ -43,7 +43,7 @@ const DialogDetails = memo(({ title, songGenre, userPlan, des, bgStory, badge, s
           </span>
         </span>
 
-        <span className="max-xs:text-left font-semibold">Description</span>
+        <span className="max-xs:text-left font-semibold max-xs:text-sm">Description</span>
         <span className="max-h-48 max-xs:max-h-24 overflow-auto break-words
         max-xs:text-xs max-xs:text-left
                     whitespace-normal font-inter capitalize p-2
@@ -117,7 +117,6 @@ export default function TaskCard({
 
   useEffect(() => {
     if (countdown === '0:00:00' && !timeUpHandled) {
-      // TimeUp();
       setTimeUp(true)
       console.warn('timeup')
     }
@@ -167,10 +166,10 @@ export default function TaskCard({
   console.log('extend time', timeUp)
   const cardClick = () => {
     setAlertDialogOpen(true)
-    if (timeUp) {
+    if (timeUp && !inReview) {
       return <ExtendTimeline />
     } else {
-      if (!inReview && (badge === 'active')) {
+      if (inReview || (badge === 'active')) {
         setTabValue({ value: 'Tasks' })
       }
     }
@@ -178,7 +177,7 @@ export default function TaskCard({
 
   return (
     <>
-      {(badge === 'active' && timeUp) && <ExtendTimeline orderId={item?._id}
+      {(badge === 'active' && timeUp && !inReview) && <ExtendTimeline orderId={item?._id}
         setTimeUpHandled={setTimeUpHandled}
         timeUp={timeUp}
         role={session.user.role} userId={session.user.id}
@@ -186,12 +185,12 @@ export default function TaskCard({
       <Card
         onClick={cardClick}
         onMouseEnter={() => {
-          if (!inReview && (badge === 'active')) {
+          if (inReview || (badge === 'active')) {
             setActiveCardHover(index)
           }
         }}
         onMouseLeave={() => {
-          if (!(inReview && badge === 'active')) {
+          if ((inReview || badge === 'active')) {
             setActiveCardHover(false)
           }
         }}

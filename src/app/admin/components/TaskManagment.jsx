@@ -23,12 +23,35 @@ export default function TaskManagment() {
   const [user, setUser] = useState([])
   const [role, setRole] = useState('lyricist')
   const [isLoading, setIsLoading] = useState(false)
-  const cardRefs = useRef({});
   const { isFetched } = useAllUsers()
-  const { isClicked, setClicked, notificationId } = useNotificationStore()
   useEffect(() => {
     fetchReviewSubmissions();
   }, [isFetched])
+
+  const { isClicked, setClicked, notificationId } = useNotificationStore()
+  const cardRefs = useRef({});
+
+  const scrollToCard = useCallback(() => {
+    console.log("Scrolling to notificationId:", notificationId);
+    if (notificationId && cardRefs.current[notificationId]) {
+      console.log("Found card ref for:", notificationId);
+      cardRefs.current[notificationId].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      setClicked(false);
+    } else {
+      console.log("No card ref found for:", notificationId);
+    }
+  }, [notificationId]);
+
+
+  useEffect(() => {
+    // Delay the scroll by a short time to ensure the element is rendered
+    if (isClicked) {
+      setTimeout(scrollToCard, 200);
+    }
+  }, [scrollToCard]);
 
   const fetchReviewSubmissions = async () => {
     // setIsLoading(true)
@@ -66,36 +89,12 @@ export default function TaskManagment() {
     }
   }
 
-  const scrollToCard = useCallback(() => {
-    const clickedNotificationId = notificationId;
-    if (
-      notificationId &&
-      cardRefs.current[clickedNotificationId]
-    ) {
-      cardRefs.current[clickedNotificationId].scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-      setClicked(false);
-    }
-  }, [notificationId]);
-
-  useEffect(() => {
-    // Delay the scroll by a short time to ensure the element is rendered
-    if (isClicked) {
-      setTimeout(scrollToCard, 200);
-    }
-  }, [scrollToCard]);
-
   return (
     <div className='flex flex-col gap-3 justify-center items-center w-full'>
       <Suspense fallback={<SkeletonCard />}>
         {allSubmission && allSubmission.map((item, index) =>
           <AdminTaskCard key={index}
             index={index}
-            ref={(el) => {
-              cardRefs.current[item._id] = el;
-            }}
             item={item}
             orderName={item.musicTemplate}
             planName={item.plan.name}

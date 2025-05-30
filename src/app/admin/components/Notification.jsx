@@ -13,7 +13,6 @@ export default function Notification() {
   const [sortOrder, setSortOrder] = useState("desc"); // default descending
   const { allNotifications, setClicked, clickedNotification } = useNotificationStore();
   const { setTabValue } = useTabValue();
-
   useEffect(() => {
     if (allNotifications) {
       const sortedData = [...allNotifications].sort((a, b) => {
@@ -24,6 +23,8 @@ export default function Notification() {
       setSortedData(sortedData);
     }
   }, [allNotifications, sortOrder]);
+
+  
 
   return (
     <div className="space-y-3">
@@ -50,18 +51,20 @@ export default function Notification() {
           <NotificationCard
             key={item._id || index}
             time={item.createdAt}
-            approvalStatus={item.approvalStatus ? item.approvalStatus : "pending"}
-            status={item.approvalStatus ? "Crafter Registration" : "Task Submission"}
+            approvalStatus={item?.approvalStatus}
+            status={item?.status}
             username={item.username}
             role={item.role}
             crafterId={item.crafterId}
             onClick={() => {
-              if (item.approvalStatus) {
+              if (item.status === "Crafter Registration") {
                 setClicked(true);
                 clickedNotification(item._id);
+
                 setTabValue({ value: adminPanel[0].name, userStatus: item.approvalStatus });
-              } else {
+              } if (item.status === "Task Submission") {
                 setClicked(true);
+                console.log('task submission id',item._id)
                 clickedNotification(item._id);
                 setTabValue({ value: adminPanel[1].name, userStatus: item.approvalStatus });
               }

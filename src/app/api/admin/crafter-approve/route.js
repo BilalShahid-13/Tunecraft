@@ -1,4 +1,3 @@
-import { currentStageEnum, submissionStatusEnum } from "@/lib/Constant";
 import { dbConnect } from "@/lib/dbConnect";
 import Order from "@/Schema/Order";
 import { NextResponse } from "next/server";
@@ -16,7 +15,10 @@ export async function PATCH(res) {
     const order = await Order.findById(orderId);
     if (role === "engineer") {
       order.currentStage = "done";
+      order.orderStatus = "completed";
       order.crafters[role].submissionStatus = "approved";
+      await order.save();
+      return NextResponse.json({ message: "Order completed successfully" });
     }
     order.currentStage = role;
     order.crafters[role].submissionStatus = "available";

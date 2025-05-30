@@ -115,9 +115,9 @@ export default function page() {
       if (res.data.success) {
         setOnFileReset(true)
         signupForm.reset();
-        console.log('signupForm File',signupForm.getValues('file'))
-        // signupForm.clearErrors('file');
+        console.log('signupForm File', signupForm.getValues('file'))
         toast.success(res.data.msg)
+        navigate.push('/')
       } else {
         toast.error(res.data.msg || "Signup failed");
       }

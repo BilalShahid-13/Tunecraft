@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
     },
     crafterId: {
       type: String,
-      default: "T001",
+      default: "C001",
     },
     musicTemplate: {
       type: String,
@@ -64,42 +64,41 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
-// Pre-save middleware to generate sequential crafterId
 userSchema.pre("save", async function (next) {
-  // Skip if crafterId is already set (not a new user)
-  if (this.crafterId !== "T001") {
-    return next()
+  // Skip if crafterId is already set (not a new order)
+  if (this.crafterId && this.crafterId !== "C001") {
+    return next();
   }
 
   try {
-    // Find the user with the highest crafterId
-    const highestUser = await mongoose.models.User.findOne({}, { crafterId: 1 })
-      .sort({ crafterId: -1 }) // Sort in descending order to get the highest
-      .limit(1)
+    // Find the order with the highest crafterId
+    const highestOrder = await mongoose.models.Order.findOne({}, { crafterId: 1 })
+      .sort({ crafterId: -1 }) // Sort descending by crafterId
+      .limit(1);
 
-    if (!highestUser) {
-      // If no users exist yet, use the default T001
-      this.crafterId = "T001"
+    if (!highestOrder) {
+      // If no orders exist yet, use the default C001
+      this.crafterId = "C001";
     } else {
-      // Extract the number part from the highest crafterId
-      const currentId = highestUser.crafterId
-      const numericPart = Number.parseInt(currentId.substring(1), 10)
+      // Extract the numeric part from the highest crafterId, e.g. "T005" -> 5
+      const currentId = highestOrder.crafterId;
+      const numericPart = Number.parseInt(currentId.substring(1), 10);
 
       // Increment the number
-      const nextNumericPart = numericPart + 1
+      const nextNumericPart = numericPart + 1;
 
       // Format with leading zeros to maintain 3 digits
-      this.crafterId = `T${nextNumericPart.toString().padStart(3, "0")}`
+      this.crafterId = `T${nextNumericPart.toString().padStart(3, "0")}`;
     }
 
-    next()
+    next();
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
+});
 
-const User = mongoose.models.User || mongoose.model("User", userSchema)
-export default User
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+export default User;

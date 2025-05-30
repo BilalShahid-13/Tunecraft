@@ -45,6 +45,7 @@ export async function GET() {
       // Return the order with single submitted crafter
       return {
         _id: orderObj._id,
+        orderId: orderObj.orderId,
         name: orderObj.name,
         phone: orderObj.phone,
         email: orderObj.email,

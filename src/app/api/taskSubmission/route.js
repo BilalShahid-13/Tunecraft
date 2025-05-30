@@ -82,7 +82,7 @@ export async function POST(request) {
       fileName: items,
       fileUrl: secureUrls[index],
     }));
-    order.crafters[role].adminFeedback = comments;
+    order.crafters[role].crafterFeedback = comments;
 
     await order.save();
 

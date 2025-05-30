@@ -90,8 +90,10 @@ export default function NavbarRoot() {
               p-0 w-full m-0`}
               >
                 {/* sidebar trigger */}
-                <div className='flex flex-row justify-start items-start bg-background w-full'>
-                  <div className="inline-block max-sm:mt-1 justify-center items-center">
+                <div className='flex flex-row justify-start
+                items-start bg-background w-full'>
+                  <div className="inline-block max-sm:mt-1
+                  justify-center items-center">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -121,7 +123,7 @@ export default function NavbarRoot() {
                   <div>
                     {items.map((item) => (
                       <TabsContent key={item.name}
-                        value={item.name} className="p-4">
+                        value={item.name} className="p-0">
                         <item.route />
                       </TabsContent>
                     ))}

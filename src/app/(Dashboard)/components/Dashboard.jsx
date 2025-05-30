@@ -23,7 +23,7 @@ const useFetchTasks = (session, fetchedTasks, setFetchedTasks, setIsLoadingAvail
     try {
       const res = await axios.post('/api/availableTasks', {
         role: session.user.role,
-        userId:session.user.id
+        userId: session.user.id
       });
       if (res.status === 200) {
         setAvailableTask(res.data.data);
@@ -51,7 +51,7 @@ const useFetchTasks = (session, fetchedTasks, setFetchedTasks, setIsLoadingAvail
           console.log('tasks', tasks)
           const data = tasks[0]
           const newTaskData = {
-            orderId: data._id,
+            orderId: data?._id,
             title: data.musicTemplate,
             des: data.jokes,
             requirements: data.backgroundStory,
@@ -78,7 +78,20 @@ const useFetchTasks = (session, fetchedTasks, setFetchedTasks, setIsLoadingAvail
         role: session.user.role,
       });
       if (res.status === 200) {
+        const tasks = res.data.data;
+        console.log('tasks',tasks)
         setPendingTask(res.data.data);
+        const data = tasks[0]
+        const newTaskData = {
+          orderId: data._id,
+          title: data.musicTemplate,
+          des: data.jokes,
+          requirements: data.backgroundStory,
+          clientName: data.name,
+          dueData: data.crafters[session.user.role]?.assignedAtTime || "",
+          submittedFileUrls: data.crafters[prevRole(session.user.role)]?.submittedFile
+        }
+        setCrafterTask(newTaskData,'pending')
       }
     } catch (error) {
       console.error('Error fetching pending tasks:', error);

@@ -34,7 +34,7 @@ export default function Tasks() {
   })
 
   const { data: session, status } = useSession();
-  const { crafterTask } = useCrafterTask();
+  const { crafterTask, userStatus } = useCrafterTask();
   const { setTabValue } = useTabValue();
   const [onFileReset, setOnFileReset] = useState(false);
 
@@ -46,7 +46,7 @@ export default function Tasks() {
     !crafterTask.dueData
 
   const tabHandler = () => {
-    setTabValue("Dashboard")
+    setTabValue({ value: "Dashboard" })
   }
 
   const handleSubmit = async (data) => {
@@ -59,8 +59,8 @@ export default function Tasks() {
       })
       formData.append("fileCount", data.file.length.toString())
     }
-
-    formData.append("comment", data.comments || "")
+console.log('data.comments',data.comments)
+    formData.append("comment", data.comments)
     formData.append("role", session.user.role)
     formData.append("orderId", crafterTask.orderId)
     formData.append("crafterId", session.user.id)
@@ -102,33 +102,45 @@ export default function Tasks() {
             requirements={crafterTask.requirements}
             client={crafterTask.clientName}
           />
-          {crafterTask.submittedFileUrls && <AllSubmittedFiles files={crafterTask.submittedFileUrls} />}
+          <div className="flex w-full max-xs:max-w-md">
+            {crafterTask.submittedFileUrls && <AllSubmittedFiles files={crafterTask.submittedFileUrls} />}
+          </div>
           <form onSubmit={taskForm.handleSubmit(handleSubmit)}>
-            <div className="bg-[#111111] flex flex-col gap-8 p-4 rounded-lg max-sm:max-w-sm">
-              <h1 className="text-2xl font-bold font-inter">Your Submission</h1>
-              <div className="space-y-3 max-md:max-w-xl max-lg:max-w-lg">
-                <p className="text-zinc-400">Upload your work</p>
-                <CustomFileInput
-                  signupForm={taskForm}
-                  acceptedTypes={acceptedTypes}
-                  multiple={true}
-                  onReset={onFileReset}
-                  fieldName="file"
-                  maxFiles={6}
-                  className={`h-[300px] border-2 border-dashed bg-zinc-900 border-neutral-600 text-center rounded-lg`}
-                />
-                {taskForm.formState.errors.file && (
-                  <p className="input-error">{taskForm.formState.errors.file.message}</p>
-                )}
+            <div className="bg-[#111111] flex flex-col gap-8 p-4
+            rounded-lg max-xs:max-w-full max-sm:max-w-full w-full
+              max-md:gap-5">
+              <h1 className="text-2xl font-bold font-inter max-sm:text-xl">Your Submission</h1>
+              <div className="
+            justify-center items-center flex flex-col
+              ">
+                <div className="space-y-3 max-xs:max-w-xs max-xl:w-full w-full">
+                  <p className="text-zinc-400">Upload your work</p>
+                  <CustomFileInput
+                    signupForm={taskForm}
+                    acceptedTypes={acceptedTypes}
+                    multiple={true}
+                    onReset={onFileReset}
+                    fieldName="file"
+                    maxFiles={6}
+                    disabled={userStatus === "pending"}
+                    className={`h-[300px] border-2 border-dashed bg-zinc-900
+                     border-neutral-600 text-center rounded-lg
+                    ${userStatus === "pending" ? 'hover:cursor-not-allowed' : 'hover:cursor-pointer'}`}
+                  />
+                  {taskForm.formState.errors.file && (
+                    <p className="input-error">{taskForm.formState.errors.file.message}</p>
+                  )}
+                </div>
               </div>
 
-              <div className="grid gap-1.5 space-y-1 max-md:max-w-xl max-lg:max-w-lg w-5xl">
-                <Label htmlFor="comment" className={"text-zinc-300 font-inter"}>
+              <div className="flex flex-col gap-1.5 space-y-1 w-full max-md:mt-4">
+                <Label htmlFor="comment"
+                  className={"text-zinc-300 font-inter "}>
                   Comments (Optional)
                 </Label>
                 <Textarea
                   {...taskForm.register("comments")}
-                  className={"h-[20vh]"}
+                  className={"max-h-[20vh] min-h-[15vh] max-sm:h-[10vh] placeholder:max-xs:text-xs placeholder:max-md:text-sm"}
                   placeholder="Add any notes or comments about your submission..."
                   id="comment"
                 />
@@ -138,16 +150,19 @@ export default function Tasks() {
               </div>
               <Button
                 type={"submit"}
-                disabled={taskForm.formState.isSubmitting}
-                className={"bg-primary text-white w-fit cursor-pointer"}
+                disabled={taskForm.formState.isSubmitting || userStatus === "pending"}
+                className={"bg-primary text-white w-fit cursor-pointer max-xs:w-full"}
               >
                 {taskForm.formState.isSubmitting ? (
                   <>
                     <p>Submitting Work</p> <LoaderCircle className="animate-spin" />
                   </>
+                ) : (userStatus === "pending" ? (
+                  // ← when they’re already in “pending” state
+                  "Submission Pending Review"
                 ) : (
-                  "Submit Work"
-                )}
+                  // ← normal case
+                  "Submit Work"))}
               </Button>
             </div>
           </form>
