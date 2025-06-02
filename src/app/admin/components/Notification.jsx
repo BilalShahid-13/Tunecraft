@@ -24,8 +24,6 @@ export default function Notification() {
     }
   }, [allNotifications, sortOrder]);
 
-  
-
   return (
     <div className="space-y-3">
       {/* Sorting buttons */}
@@ -49,22 +47,21 @@ export default function Notification() {
       <div className="flex flex-col gap-4">
         {sorted.map((item, index) => (
           <NotificationCard
-            key={item._id || index}
+            key={index}
             time={item.createdAt}
             approvalStatus={item?.approvalStatus}
             status={item?.status}
             username={item.username}
             role={item.role}
-            crafterId={item.crafterId}
+            //  crafterId = orderId
+            crafterId={item.orderId || item.crafterId}
             onClick={() => {
               if (item.status === "Crafter Registration") {
                 setClicked(true);
                 clickedNotification(item._id);
-
                 setTabValue({ value: adminPanel[0].name, userStatus: item.approvalStatus });
               } if (item.status === "Task Submission") {
                 setClicked(true);
-                console.log('task submission id',item._id)
                 clickedNotification(item._id);
                 setTabValue({ value: adminPanel[1].name, userStatus: item.approvalStatus });
               }

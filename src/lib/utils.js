@@ -14,13 +14,6 @@ export const formatCentsToDollars = (cents) => {
   return `${Math.floor((cents / 100).toFixed(2))}`;
 };
 
-// export const formatTimeHMSS = (timestamp) => {
-//   const date = new Date(timestamp);
-//   const hours = String(date.getHours()).padStart(2, "0"); // local hours
-//   const minutes = String(date.getMinutes()).padStart(2, "0"); // local minutes
-//   const seconds = String(date.getSeconds()).padStart(2, "0"); // local seconds
-//   return `${hours}hr : ${minutes}min : ${seconds}sec`;
-// };
 export const formatTimeHMSS = (timestamp) => {
   const date = new Date(timestamp);
   const hours = String(date.getHours()).padStart(2, "0"); // local hours
@@ -60,14 +53,6 @@ export const prevRole = (role) => {
   }
 };
 
-// export const formatTimeHMSS = (timestamp) => {
-//   const date = new Date(timestamp);
-//   const hours = String(date.getUTCHours()).padStart(2, "0");
-//   const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-//   const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-//   return `${hours}hr : ${minutes}min : ${seconds}sec`;
-// };
-
 export function timeAgo(timestamp) {
   const now = new Date();
   const past = new Date(timestamp);
@@ -100,5 +85,15 @@ export function _userStatus(status) {
   }
   if (status === "rejected") {
     return { label: "Rejected", colorClass: "bg-red-400" }; // Red for rejected
+  }
+}
+
+
+export function _crafterStatus(status) {
+  if (status === "submitted") {
+    return { label: "pending", colorClass: "bg-blue-400" }; // Blue for pending
+  }
+  if (status === "approved") {
+    return { label: "Approved", colorClass: "bg-green-400" }; // Green for approved
   }
 }

@@ -49,7 +49,7 @@ export default function craftersManagment() {
       setLoading(true)
       const res = await axios.get('/api/fetch-signup-user')
       setAllUsers(res.data.data)
-      addAllUser(res.data.data)
+      addAllUser({ users: res.data.data, mode: "crafters", task: res.data.data });
       if (res) {
         setIsUpdate(false);
       }
@@ -59,6 +59,8 @@ export default function craftersManagment() {
       setLoading(false)
     }
   }
+
+  
 
   return (
     <>
@@ -87,8 +89,7 @@ export default function craftersManagment() {
         max-sm:w-full
         ${index >= 4 ? `col-span-4 max-md:col-span-2
         max-sm:col-span-1 max-xl:col-span-2 max-lg:col-span-1
-         ` : ''}
-      `}
+         ` : ''}`}
             >
               <CustomCard name={items.name} Icon={items.Icon} />
             </TabsTrigger>

@@ -18,18 +18,24 @@ import axios from "axios";
 import useNotificationStore from "@/store/notification";
 import { Badge } from "./ui/badge";
 import { GetServerLoading } from "@/utils/GetServerLoading";
+import useAllUsers from "@/store/allUsers";
 
 export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items }) {
   const [loading, setLoading] = useState(false)
   const { data: session } = useSession()
   const { setApprovalNotifications, setCraftersNotifications,
     totalNotifications, setIsUpdate, isFetched, addNotifications, allNotifications } = useNotificationStore()
+  const { addAllUser, setIsUpdate: setIsUpdateTask } = useAllUsers()
+
+
   useEffect(() => {
     if (session?.user.role === 'admin') {
       const notificationItem = items.find((item) => item.name === 'Notifications');
       if (notificationItem && !isFetched) {
         getNotificationCount()
         fetchReviewSubmissions()
+        fetchCraftersPlenty()
+        fetchAllCrafterTasks();
         setIsUpdate(true)
       }
     }
@@ -75,7 +81,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
             // approvalStatus: items.approvalStatus,
             approvalStatus: "pending",
             status: "Task Submission",
-            crafterId: items?.orderId,
+            orderId: items?.orderId,
             // _id: items?.orderId,
             _id: items.submittedCrafter.assignedCrafterId._id,
             username: items.name,
@@ -94,7 +100,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       const response = await axios.get('/api/crafter-penalties-detailed');
       if (response.status === 200) {
         const allPlentyCrafters = response.data.data;
-
+        console.log('allPlentyCrafters', allPlentyCrafters)
         /**
          addNotifications({
 
@@ -104,6 +110,21 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       }
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  const fetchAllCrafterTasks = async () => {
+    try {
+      const res = await axios.get('/api/admin/get-allApproved-Crafters')
+      console.log('all-users', res.data.data)
+      // setAllCrafter(res.data.data)
+      // setIsScroll(true);
+      addAllUser({ users: res.data.data, mode: "task", task: res.data.data });
+      if (res.status === 200) {
+        setIsUpdateTask(false);
+      }
+    } catch (error) {
+      console.error(error.response.data);
     }
   }
 

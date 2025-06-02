@@ -13,7 +13,7 @@ import X from "../../public/footer/x.png";
 import Dashboard from "@/app/(Dashboard)/components/Dashboard";
 import craftersManagment from "@/app/admin/components/craftersManagment";
 import Notification from "@/app/admin/components/Notification";
-import projectManagment from "@/app/admin/components/TaskManagment";
+import projectManagment from "@/app/admin/(TaskManagment)/components/CraftersTab/PendingCrafters";
 import UpdatePassword from "@/components/UpdatePassword";
 import {
   Bell,
@@ -35,6 +35,7 @@ import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
 import Tasks from "@/app/(Role)/(Task)/components/Tasks";
 import Payments from "@/app/(Role)/(Payments)/Payments";
+import RootLayout from "@/app/admin/(TaskManagment)/components/TaskManagmentLayout";
 
 export const Currency = "MX$";
 
@@ -399,7 +400,7 @@ export const adminPanel = [
   {
     name: "Task Managment",
     Icon: Clipboard,
-    route: projectManagment,
+    route: RootLayout,
   },
   {
     name: "Notifications",
@@ -436,6 +437,21 @@ export const craftersManagmentList = [
     Icon: Key,
     description:
       "Assign or edit user roles (Lyricist, Singer, Engineer, Admin, etc.).",
+  },
+];
+
+export const taskManagmentList = [
+  {
+    name: "All Crafters",
+    Icon: User,
+  },
+  {
+    name: "Pending Crafters",
+    Icon: Clock,
+  },
+  {
+    name: "Approved Crafters",
+    Icon: UserCheck,
   },
 ];
 

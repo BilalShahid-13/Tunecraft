@@ -67,6 +67,7 @@ export default function TaskLayoutRoot({ taskName = 'active'
                     key={index}
                     index={index}
                     badge={taskName}
+                    musicTemplate={item.musicTemplate}
                     inReview={inReview}
                     title={item?.songGenre}
                     session={session}

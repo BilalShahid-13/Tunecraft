@@ -85,6 +85,7 @@ const DialogDetails = memo(({ title, songGenre, userPlan, des, bgStory, badge, s
 export default function TaskCard({
   badge = 'available',
   title = 'Birthday Song',
+  musicTemplate,
   des = 'i want song like o repiya sung by rahet',
   plan, item, session, assignedAtTime, index, inReview,
   time = '3hr', bgStory, currentStage, songGenre, setGracePeriodError
@@ -205,9 +206,10 @@ export default function TaskCard({
         ${badge === 'active' && (activeCardHover === index) ?
             'border-red-400 cursor-pointer' : ''} transition-all ease-in duration-150`}>
         <CardHeader className={'flex flex-row justify-between items-center'}>
-          <div>
-            <CardTitle>{title}</CardTitle>
-          </div>
+          <CardTitle className={'flex flex-col gap-2 font-inter'}>
+            <h2>{musicTemplate}</h2>
+            <h6 className="text-zinc-400 text-sm font-normal italic ml-2">{title}</h6>
+          </CardTitle>
           <Badge className={`${inReview ? TaskStatus('active').bg : TaskStatus(badge).bg} text-white capitalize max-xs:text-xs`}>{inReview ? 'pending' : badge}</Badge>
         </CardHeader>
         <CardContent className="font-light text-zinc-600

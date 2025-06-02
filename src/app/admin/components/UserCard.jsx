@@ -37,18 +37,7 @@ import { toast } from "sonner";
 import UpdateUser from "./UpdateUser";
 import useNotificationStore from "@/store/notification";
 import { _userStatus } from "@/lib/utils";
-
-function Loader() {
-  return (
-    <div className="flex flex-col space-y-3">
-      <Skeleton className="h-[125px] w-full rounded-xl" />
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-      </div>
-    </div>
-  )
-}
+import { Loader } from "@/utils/Skeleton";
 
 export default function UserCard({ users, isLoading = false, userStatus = null, userRole = false }) {
   const [allUsers, setAllUsers] = useState([])
