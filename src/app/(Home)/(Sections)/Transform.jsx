@@ -1,9 +1,7 @@
-import React from 'react'
-import Star from '../../../../public/Star 9.png';
-import Image from 'next/image';
 import Carousel from '@/components/Carousel';
-import CustomButton from '@/components/CustomButton';
 import GradientText from '@/components/GradientText';
+import Image from 'next/image';
+import Star from '../../../../public/Star 9.png';
 
 const StarImage = ({ ref, cn }) => {
   return (
@@ -12,7 +10,8 @@ const StarImage = ({ ref, cn }) => {
         src={Star}
         alt="ellipse"
         fill
-        priority
+        loading="lazy"
+        quality={20}
         className="object-cover" // or object-cover, depending on your need
       />
     </div>

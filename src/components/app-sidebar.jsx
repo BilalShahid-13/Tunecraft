@@ -9,22 +9,21 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useAllUsers from "@/store/allUsers";
+import useNotificationStore from "@/store/notification";
 import { Loader2 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
-import axios from "axios";
-import useNotificationStore from "@/store/notification";
+import fetchAllCrafterTask from "./serverComponents/fetchAllCrafterTasks";
+import getNotificationCount from "./serverComponents/getNotificationCount";
 import { Badge } from "./ui/badge";
-import { GetServerLoading } from "@/utils/GetServerLoading";
-import useAllUsers from "@/store/allUsers";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items }) {
   const [loading, setLoading] = useState(false)
   const { data: session } = useSession()
-  const { setApprovalNotifications, setCraftersNotifications,
-    totalNotifications, setIsUpdate, isFetched, addNotifications, allNotifications } = useNotificationStore()
+  const { totalNotifications, setIsUpdate, isFetched, addNotifications } = useNotificationStore()
   const { addAllUser, setIsUpdate: setIsUpdateTask } = useAllUsers()
 
 
@@ -32,99 +31,32 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
     if (session?.user.role === 'admin') {
       const notificationItem = items.find((item) => item.name === 'Notifications');
       if (notificationItem && !isFetched) {
-        getNotificationCount()
-        fetchReviewSubmissions()
-        fetchCraftersPlenty()
-        fetchAllCrafterTasks();
+        getNotification();
+        getAllCrafterTasks();
         setIsUpdate(true)
       }
     }
   }, [session])
 
-  const getNotificationCount = async () => {
+  async function getNotification() {
     try {
-      const notifcations = await axios.get('/api/notification/getAllPending')
-      if (notifcations.statusText === 'OK') {
-        setApprovalNotifications(notifcations.data.data)
-        const data = notifcations.data.data;
-        const newNotifications = data.map((items) => (
-          {
-            orderName: items.musicTemplate,
-            submittedAtTime: items.submittedAtTime,
-            createdAt: items.updatedAt,
-            approvalStatus: items.approvalStatus,
-            status: "Crafter Registration",
-            crafterId: items?.crafterId,
-            _id: items._id,
-            username: items.username,
-            role: items.role,
-          }
-        ))
-        addNotifications(newNotifications)
-      }
+      const notificationCount = await getNotificationCount();
+      addNotifications(notificationCount)
     } catch (error) {
-      console.error('Error fetching notifications:', error);
-
+      console.error('error in getting notifications', error);
     }
   }
 
-  const fetchReviewSubmissions = async () => {
+  async function getAllCrafterTasks() {
     try {
-      const response = await axios.get('/api/admin/crafters-submission-review');
-      if (response.status === 200) {
-        const allCrafters = response.data.data;
-        const newNotifications = allCrafters.map((items) => (
-          {
-            orderName: items.musicTemplate,
-            createdAt: items.submittedCrafter.submittedAtTime,
-            updatedAt: items.updatedAt,
-            // approvalStatus: items.approvalStatus,
-            approvalStatus: "pending",
-            status: "Task Submission",
-            orderId: items?.orderId,
-            // _id: items?.orderId,
-            _id: items.submittedCrafter.assignedCrafterId._id,
-            username: items.name,
-            role: items.submittedCrafter.assignedCrafterId.role,
-          }
-        ))
-        addNotifications(newNotifications);
-      }
+      const { notification, allUser, isUpdateTask } = await fetchAllCrafterTask();
+      console.log('getAllCrafterTasks', notification, allUser, isUpdateTask)
+      addNotifications(notification);
+      addAllUser(allUser);
+      setIsUpdateTask(isUpdateTask);
     } catch (error) {
-      console.error(error);
-    }
-  };
+      console.error('error in getting all crafter tasks', error);
 
-  const fetchCraftersPlenty = async () => {
-    try {
-      const response = await axios.get('/api/crafter-penalties-detailed');
-      if (response.status === 200) {
-        const allPlentyCrafters = response.data.data;
-        console.log('allPlentyCrafters', allPlentyCrafters)
-        /**
-         addNotifications({
-
-         })
-         *
-         */
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  const fetchAllCrafterTasks = async () => {
-    try {
-      const res = await axios.get('/api/admin/get-allApproved-Crafters')
-      console.log('all-users', res.data.data)
-      // setAllCrafter(res.data.data)
-      // setIsScroll(true);
-      addAllUser({ users: res.data.data, mode: "task", task: res.data.data });
-      if (res.status === 200) {
-        setIsUpdateTask(false);
-      }
-    } catch (error) {
-      console.error(error.response.data);
     }
   }
 
@@ -189,8 +121,8 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
                     <div className="flex relative">
                       {items?.Icon && <items.Icon className="scale-125" />}
                       <div className="flex absolute -top-3 left-1">
-                        {items.name === 'Notifications'
-                          && <Badge
+                        {(items.name === 'Notifications')
+                          && totalNotifications > 0 && <Badge
                             className={'scale-75 bg-red-400 text-white'}>{totalNotifications}</Badge>}</div>
                     </div>
                   )}

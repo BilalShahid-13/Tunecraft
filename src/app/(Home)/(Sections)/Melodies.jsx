@@ -1,13 +1,17 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, lazy } from 'react';
 import GradientText from '@/components/GradientText';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from 'next/image';
-import SoundWaveAnimation from '@/components/SoundWaveAnimation';
 import { MelodiesItem } from '@/lib/Constant';
 import { Pause, Play } from 'lucide-react';
-import Eclipse from '../../../../public/heroSection/Ellipse 26.svg';
+import Eclipse from '../../../../public/heroSection/Ellipse 26.png';
 import Star from '../../../../public/Star 9.png';
+
+const SoundWaveAnimation = React.lazy(() =>
+  import("@/components/SoundWaveAnimation")
+);
+// const Eclipse = lazy(()=> import ('../../../../public/heroSection/Ellipse 26.png'))
 
 // MelodiesCard Component
 const MelodiesCard = ({ heading, genre, musicSrc, isPlaying, onPlayPause, audioRef }) => {
@@ -21,11 +25,13 @@ const MelodiesCard = ({ heading, genre, musicSrc, isPlaying, onPlayPause, audioR
       </CardHeader>
 
       <div className="absolute top-0 right-0 w-[150px] h-[150px] ">
-        <Image src={Eclipse} alt="ellipse" fill className="object-cover" priority />
+        <Image src={Eclipse} alt="ellipse" fill className="object-cover"
+          loading="lazy"
+          quality={20} />
       </div>
 
       <audio ref={audioRef}>
-        <source src={musicSrc} type="audio/mp3" />
+        <source src={musicSrc} type="audio/mp3" preload="metadata" />
         Your browser does not support the audio element.
       </audio>
 
@@ -98,12 +104,12 @@ export default function Melodies() {
         ))}
       </div>
 
-      <Image src={Star} priority alt="ellipse"
+      <Image src={Star} alt="ellipse" loading="lazy"
         className="w-[40px] h-[40px] max-sm:w-[18px] max-sm:h-[18px] absolute ml-[14.5%] max-sm:ml-[37%] max-md:top-[0.5vh] max-md:-ml-[18%] max-sm:mt-[2.5%] mt-[1%] rotate-[35deg]"
-        width={50} height={50} />
-      <Image src={Star} priority alt="ellipse"
+        width={50} height={50} quality={20} />
+      <Image src={Star} alt="ellipse" loading="lazy"
         className="w-[40px] h-[40px] max-sm:ml-[48%] absolute ml-[20.3%] max-sm:mt-[16%] max-sm:w-[18px] max-sm:h-[18px] max-md:top-[9.4vh] max-md:ml-[10%] mt-[9.6%] rotate-[35deg]"
-        width={50} height={50} />
+        width={50} height={50} quality={20} />
     </div>
   );
 }

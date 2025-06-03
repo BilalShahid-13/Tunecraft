@@ -3,10 +3,14 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import React, { useRef } from 'react'
 import { Button } from './ui/button';
+import { Loader2 } from 'lucide-react';
 
 
 gsap.registerPlugin(useGSAP)
-export default function CustomButton({ text = 'Create your own tune', onClick = () => { } }) {
+export default function CustomButton(
+  { text = 'Create your own tune',
+    onClick = () => { },
+    isLoading = false }) {
   const buttonRef = useRef()
   useGSAP(() => {
     const tl = gsap.timeline({
@@ -27,6 +31,7 @@ export default function CustomButton({ text = 'Create your own tune', onClick = 
   })
   return (
     <>
+    {isLoading}
       <Button ref={buttonRef} onClick={onClick}
         className={`
         bg-[#ff7e6e] text-white
@@ -35,11 +40,12 @@ export default function CustomButton({ text = 'Create your own tune', onClick = 
                 max-lg:text-3xl max-lg:py-9
                 mx-sm:text-sm max-sm:p-6
                  p-6 rounded-full hover:bg-red-400
-                 cursor-pointer`}>
+                 cursor-pointer
+                 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}>
+        {isLoading && <Loader2 className="animate-spin mr-2" />}
         {text}
       </Button >
+
     </>
   )
 }
-
-// export default CustomButton

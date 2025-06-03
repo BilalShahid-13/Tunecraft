@@ -1,8 +1,9 @@
 import { taskManagmentList } from '@/lib/Constant';
 import AdminTabRoot from '../../components/AdminTabRoot';
 import AllCrafters from './CraftersTab/AllCrafters';
-import PendingCrafters from './CraftersTab/PendingCrafters';
 import ApprovedCrafter from './CraftersTab/ApprovedCrafter';
+import PendingCrafters from './CraftersTab/PendingCrafters';
+
 
 const componentLists = [
   AllCrafters,

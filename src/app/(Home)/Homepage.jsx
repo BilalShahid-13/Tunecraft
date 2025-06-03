@@ -4,11 +4,12 @@ import SoundWaveAnimation from '@/components/SoundWaveAnimation';
 import { TunesItem } from '@/lib/Constant';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import Eclipse from '../../../public/heroSection/Ellipse 26.svg';
+import { useEffect, useState, useTransition } from 'react';
+import Eclipse from '../../../public/heroSection/Ellipse 26.png';
 // import
 const Homepage = () => {
   const navigate = useRouter()
+  const [isPending, startTransition] = useTransition();
   useEffect(() => {
     if (navigate?.query?.scrollTo) { // Check if scrollTo exists
       const element = document.getElementById(navigate.query.scrollTo);
@@ -22,25 +23,31 @@ const Homepage = () => {
     const result = price.match(/\d+/); // Match numbers
     return result ? result[0] : null; // Return the matched number
   };
-  let price = TunesItem.map((items) => items.price)
-  console.log(price)
-  let a = extractPrice(price[0])
-  console.log(a)
+
+  const handleNavigate = async () => {
+    startTransition(() => {
+      navigate.push("/Questions");
+    })
+  };
+
   return (
     <div>
       <div className='relative justify-center items-center flex flex-col gap-18 max-sm:gap-18 pt-12'>
         <h2 className='heading-1 w-[80%] mt-6'>
           Create Musical Magic For Every Occasion
         </h2>
-        <CustomButton onClick={() => navigate.push('/Questions')} />
-        <SoundWaveAnimation/>
+        <CustomButton
+          onClick={handleNavigate}
+          isLoading={isPending}
+        />
+        <SoundWaveAnimation />
         {/* eclipse img */}
         <div className="absolute right-0 top-0 -z-10 w-[400px] h-[300px] py-4 rounded-full">
           <Image
             src={Eclipse}
             alt="ellipse"
             fill
-            priority
+            quality={20}
             className="object-cover" // or object-cover, depending on your need
           />
         </div>

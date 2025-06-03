@@ -12,7 +12,8 @@ export async function GET() {
     return NextResponse.json({
       message: "Data fetch successfully",
       data: notifications,
-    });
+
+    },{ status: 200 });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

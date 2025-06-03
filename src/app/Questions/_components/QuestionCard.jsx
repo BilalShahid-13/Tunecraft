@@ -64,6 +64,8 @@ export default function QuestionCard({ onNext, onPrev }) {
                   src={items.img}
                   width={20}
                   height={20}
+                  quality={20}
+                  loading="lazy"
                   alt={items.question}
                   className='object-cover'
                 />

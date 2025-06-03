@@ -25,7 +25,6 @@ import {
 import { handleDownloadWithRef } from "@/lib/handleDownloadWithName";
 import { _crafterStatus, formatCentsToDollars, formatDateTime } from "@/lib/utils";
 import useAllUsers from "@/store/allUsers";
-import useNotificationStore from "@/store/notification";
 import axios from "axios";
 import { Files, Loader2, TriangleAlert } from "lucide-react";
 import { forwardRef, useRef, useState } from "react";
@@ -60,7 +59,6 @@ const AdminTaskCard = forwardRef(
     const [loadingStates, setLoadingStates] = useState({});
     const downloadRefs = useRef([]);
     const { setIsUpdate } = useAllUsers();
-    const { isClicked, setClicked, notificationId } = useNotificationStore();
 
     const onApprove = async (item) => {
       let nextRole = "";

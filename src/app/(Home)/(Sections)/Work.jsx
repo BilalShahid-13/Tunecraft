@@ -46,7 +46,8 @@ const MusicImage = ({ cn }) => {
         src={Music}
         alt="ellipse"
         fill
-        priority
+        loading="lazy"
+        quality={20}
         className="object-cover" // or object-cover, depending on your need
       />
     </div>
@@ -71,33 +72,6 @@ export default function Work() {
         ease: "power2.inOut",
       },
     });
-    // const tl2 = gsap.timeline({
-    //   repeat: -1,
-    //   defaults: {
-    //     duration: 2,
-    //     ease: "power2.inOut",
-    //   },
-    // });
-    // tl2.fromTo(bloomRef.current, {
-    //   scale: 0,
-    // }, {
-    //   scale: 1,
-    //   opacity: 0.8,
-    //   background: 'linear-gradient(0deg,#ff6467,#ff6467)',
-    //   duration: 0.4,
-    //   ease: "power2.inOut",
-    //   onComplete: () => {
-    //     gsap.fromTo(titleRef.current, {
-    //       opacity: 0
-    //     }, {
-    //       opacity: 1,
-    //       textContent: CardItems[0].title,
-    //       duration: 0.4,
-    //       ease: "power2.inOut",
-    //     });
-    //   }
-    // }).fromTo()
-
     tl.to(buttonRef.current, {
       borderLeftColor: "#fb2c36",
       borderTopColor: "transparent",
@@ -199,13 +173,14 @@ export default function Work() {
             {CardItems[current].description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative  h-28 w-28 rounded ">
+          <div className="relative h-28 w-28 rounded ">
             <Image
               ref={imgRef}
               src={CardItems[current].image}
               alt="ellipse"
+              loading="lazy"
               fill
-              priority
+              quality={20}
               className="object-cover"
             />
           </div>
@@ -215,7 +190,6 @@ export default function Work() {
       </Card>
       {/* bg bloom */}
       <div ref={bloomRef}
-        //   bg-linear-to-r from-red-300 to-red-300 bg-red-300
         className="w-[500px] h-[150px] blur-3xl max-sm:w-[250px] max-sm:h-[100px]
       rounded-full absolute -z-10"></div>
 
@@ -224,8 +198,6 @@ export default function Work() {
       <MusicImage cn={'top-0 -z-10 w-6 h-6 left-[13%] top-[20vh] max-md:left-[1%] max-sm:top-[12%]'} />
       <MusicImage cn={'top-0 -z-10 w-6 h-6 right-[20%] top-[40vh] max-md:right-[10%] max-md:top-[55vh]'} />
       <MusicImage cn={'top-0 -z-10 w-6 h-6 left-[20%] top-[40vh] max-md:top-[55vh] max-md:left-[10%]'} />
-
-      {/* <BorderButton /> */}
 
     </div>
   )

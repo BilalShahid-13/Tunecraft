@@ -1,153 +1,112 @@
 "use client";
+import fetchActiveTask from '@/components/serverComponents/fetchActiveTask';
+import fetchCompleteTask from '@/components/serverComponents/fetchCompleteTask';
+import fetchCrafterAvailableTask from '@/components/serverComponents/fetchCrafterAvailableTask';
+import fetchPendingTask from '@/components/serverComponents/fetchPendingTask';
 import useCrafterTask from '@/store/crafterTask';
+import useTasks from '@/store/tasks';
 import { GetServerLoading } from '@/utils/GetServerLoading';
-import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useCallback, useEffect, useState } from 'react';
 import TaskLayoutRoot from './TaskLayoutRoot';
-import useTasks from '@/store/tasks';
-import { prevRole } from '@/lib/utils';
 
 // Custom hook to fetch tasks based on type
-const useFetchTasks = (session, fetchedTasks, setFetchedTasks, setIsLoadingAvailableTask, setIsLoadingActiveTask, setIsCompletedTask) => {
-  const [activeTask, setActiveTask] = useState([]);
-  const [availableTask, setAvailableTask] = useState([]);
-  const [pendingTask, setPendingTask] = useState([]);
-  const [completedTask, setCompletedTask] = useState([]);
-  const setCrafterTask = useCrafterTask((state) => state.setCrafterTask);
-  const crafterTask = useCrafterTask((state) => state.crafterTask);
+const useFetchTasks =
+  (session, fetchedTasks,
+    setFetchedTasks,
+    setIsLoadingAvailableTask,
+    setIsLoadingActiveTask,
+    setIsCompletedTask) => {
+    const [activeTask, setActiveTask] = useState([]);
+    const [availableTask, setAvailableTask] = useState([]);
+    const [pendingTask, setPendingTask] = useState([]);
+    const [completedTask, setCompletedTask] = useState([]);
+    const setCrafterTask = useCrafterTask((state) => state.setCrafterTask);
+    const crafterTask = useCrafterTask((state) => state.crafterTask);
 
-  const fetchAvailableTask = useCallback(async () => {
-    if (!session) return;
-    setIsLoadingAvailableTask(true)
-    try {
-      const res = await axios.post('/api/availableTasks', {
-        role: session.user.role,
-        userId: session.user.id
-      });
-      if (res.status === 200) {
-        setAvailableTask(res.data.data);
-        console.log('availableTask', res.data)
+    const fetchAvailableTask = useCallback(async () => {
+      try {
+        setIsLoadingAvailableTask(true)
+        const availableData = await fetchCrafterAvailableTask(fetchedTasks)
+        setAvailableTask(availableData);
+      } catch (error) {
+        console.error('Error fetching available tasks:', error?.response?.data || error.message);
+      } finally {
+        setIsLoadingAvailableTask(false)
       }
-    } catch (error) {
-      console.error('Error fetching available tasks:', error?.response?.data || error.message);
-    } finally {
-      setIsLoadingAvailableTask(false)
-    }
-  }, [session]);
+    }, [session]);
 
-  const fetchActiveTask = useCallback(async () => {
-    if (!session) return;
-    setIsLoadingActiveTask(true)
-    try {
-      const res = await axios.post('/api/activeTask', {
-        role: session.user.role,
-        userId: session.user.id,
-      });
-      if (res.status === 200) {
-        const tasks = res.data.data;
-        if (Array.isArray(tasks) && tasks.length > 0) {
-          setActiveTask(tasks)
-          console.log('tasks', tasks)
-          const data = tasks[0]
-          const newTaskData = {
-            orderId: data?._id,
-            title: data.musicTemplate,
-            des: data.jokes,
-            requirements: data.backgroundStory,
-            clientName: data.name,
-            dueData: data.crafters[session.user.role]?.assignedAtTime || "",
-            submittedFileUrls: data.crafters[prevRole(session.user.role)]?.submittedFileUrl
-          }
-          setCrafterTask(newTaskData) // Pass the actual data object
-        }
+    const getActiveTask = useCallback(async () => {
+      setIsLoadingActiveTask(true)
+      try {
+        const { activeTask, crafterTask } = await fetchActiveTask(fetchedTasks)
+        setActiveTask(activeTask)
+        setCrafterTask(crafterTask)
+
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error('Error fetching active tasks:', error?.response?.data || error.message);
-    }
-    finally {
-      setIsLoadingActiveTask(false);
-    }
-  }, [session]);
-
-  const fetchPendingTask = useCallback(async () => {
-    if (!session) return;
-    try {
-      const res = await axios.post('/api/pending-tasks', {
-        userId: session.user.id,
-        role: session.user.role,
-      });
-      if (res.status === 200) {
-        const tasks = res.data.data;
-        console.log('tasks',tasks)
-        setPendingTask(res.data.data);
-        const data = tasks[0]
-        const newTaskData = {
-          orderId: data._id,
-          title: data.musicTemplate,
-          des: data.jokes,
-          requirements: data.backgroundStory,
-          clientName: data.name,
-          dueData: data.crafters[session.user.role]?.assignedAtTime || "",
-          submittedFileUrls: data.crafters[prevRole(session.user.role)]?.submittedFile
-        }
-        setCrafterTask(newTaskData,'pending')
+      finally {
+        setIsLoadingActiveTask(false);
       }
-    } catch (error) {
-      console.error('Error fetching pending tasks:', error);
-    }
-  }, [session]);
+    }, [session]);
 
-  const fetchCompletedTask = useCallback(async () => {
-    if (!session) return;
-    setIsCompletedTask(true)
-    try {
-      const res = await axios.post('/api/complete-task', {
-        userId: session.user.id,
-        role: session.user.role,
-      });
-      if (res.status === 200) {
-        setCompletedTask(res.data.data);
+    const getPendingTask = useCallback(async () => {
+      if (!session) return;
+      try {
+        const { pendingTask, crafterTask } = await fetchPendingTask(fetchedTasks);
+        setPendingTask(pendingTask);
+        setCrafterTask(crafterTask);
+      } catch (error) {
+        console.error('Error fetching pending tasks:', error);
       }
-    } catch (error) {
-      console.error('Error fetching completed tasks:', error);
-    } finally {
-      setIsCompletedTask(false)
-    }
-  }, [session]);
+    }, [session]);
 
-  useEffect(() => {
-    if (session) {
-      fetchAvailableTask();
-      fetchActiveTask();
-      fetchPendingTask();
-      fetchCompletedTask();
-    }
-  }, [session, fetchAvailableTask, fetchActiveTask, fetchPendingTask, fetchCompletedTask]);
+    const getCompletedTask = useCallback(async () => {
+      if (!session) return;
+      setIsCompletedTask(true)
+      try {
+        const { completeTask } = await fetchCompleteTask(fetchedTasks);
+        setCompletedTask(completeTask);
 
-  useEffect(() => {
-    if (fetchedTasks) {
-      fetchAvailableTask();
-      fetchActiveTask();
-      fetchPendingTask();
-      fetchCompletedTask();
-      setFetchedTasks(false);
-    }
-  }, [fetchedTasks, fetchAvailableTask, fetchActiveTask, fetchPendingTask, fetchCompletedTask]);
+      } catch (error) {
+        console.error('Error fetching completed tasks:', error);
+      } finally {
+        setIsCompletedTask(false)
+      }
+    }, [session]);
 
-  return {
-    activeTask,
-    availableTask,
-    pendingTask,
-    completedTask,
+    useEffect(() => {
+      if (session) {
+        fetchAvailableTask();
+        getActiveTask();
+        getPendingTask();
+        getCompletedTask();
+      }
+    }, [session, fetchAvailableTask, getActiveTask, getPendingTask, getCompletedTask]);
+
+    useEffect(() => {
+      if (fetchedTasks) {
+        fetchAvailableTask();
+        getActiveTask();
+        getPendingTask();
+        getCompletedTask();
+        setFetchedTasks(false);
+      }
+    }, [fetchedTasks, fetchAvailableTask, getActiveTask, getPendingTask, getCompletedTask]);
+
+    return {
+      activeTask,
+      availableTask,
+      pendingTask,
+      completedTask,
+    };
   };
-};
 
 
 export default function Dashboard() {
   const { data: sessionData, status } = useSession();
   const [session, setSession] = useState(null);
-  const [timeOutError, setTimeOutError] = useState(false);
   const [isLoadingAvailableTask, setIsLoadingAvailableTask] = useState();
   const [isLoadingActiveTask, setIsLoadingActiveTask] = useState();
   const [isLoadingCompletedTask, setIsCompletedTask] = useState();
@@ -162,11 +121,6 @@ export default function Dashboard() {
   // Use custom hook to fetch tasks
   const { activeTask, availableTask, pendingTask, completedTask } = useFetchTasks(session, fetchedTasks, setFetchedTasks, setIsLoadingAvailableTask, setIsLoadingActiveTask, setIsCompletedTask);
 
-  // Optional: handle grace period error
-  const setGracePeriodError = useCallback((error) => {
-    setTimeOutError(error);
-    console.log('Grace period error:', error);
-  }, []);
 
   if (status === 'loading') {
     return <GetServerLoading session={sessionData} />;

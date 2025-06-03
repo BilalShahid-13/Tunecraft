@@ -94,6 +94,6 @@ export function _crafterStatus(status) {
     return { label: "pending", colorClass: "bg-blue-400" }; // Blue for pending
   }
   if (status === "approved") {
-    return { label: "Approved", colorClass: "bg-green-400" }; // Green for approved
+    return { label: "approved", colorClass: "bg-green-400" }; // Green for approved
   }
 }

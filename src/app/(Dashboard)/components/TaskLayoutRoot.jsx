@@ -59,9 +59,9 @@ export default function TaskLayoutRoot({ taskName = 'active'
                 `grid-cols-2 max-lg:grid-cols-1
             max-md:grid-cols-1 max-xl:grid-cols-2`}`}
                    gap-4 max-sm:grid-cols-1 max-xs:grid-cols-1`}>
-            {isLoading ? <SkeletonCard /> : (!tasks || tasks.length === 0) ?
+            {isLoading ? <SkeletonCard /> : (!tasks || tasks?.length === 0) ?
               <NoAvailableTasks msg={taskName} /> :
-              tasks?.map((item, index) => (
+              tasks.map((item, index) => (
                 <React.Fragment key={index}>
                   <TaskCard
                     key={index}

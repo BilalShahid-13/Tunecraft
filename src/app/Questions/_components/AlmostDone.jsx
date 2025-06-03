@@ -17,7 +17,7 @@ import { Currency } from '@/lib/Constant';
 import useQuestionStore from '@/store/questionStore';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 
 export default function AlmostDone({ onNext, onPrev }) {
   const { formData } = useQuestionStore();
@@ -26,7 +26,7 @@ export default function AlmostDone({ onNext, onPrev }) {
   const navigate = useRouter()
   const [buttonOnClick, setButtonOnClick] = useState(false)
   const [price, SetPrice] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [isPending, startTransition] = useTransition();
   useEffect(() => {
     if (formData) {
       const numericPrice = Number(formData.step3.planPrice.replace('MX$', '')); // 2.299
@@ -39,10 +39,10 @@ export default function AlmostDone({ onNext, onPrev }) {
 
   // Function to trigger confetti on button click
   const handleProceedToPayment = async () => {
-    setLoading(true);
-    setButtonOnClick(!buttonOnClick)
-    navigate.push('/Payment')
-    setLoading(false)
+    startTransition(() => {
+      navigate.push("/Payment");
+      setButtonOnClick(!buttonOnClick)
+    });
   };
 
   useEffect(() => {
@@ -55,19 +55,10 @@ export default function AlmostDone({ onNext, onPrev }) {
       max-sm:justify-center max-sm:items-center font-inter'>
         <h2 className="text-3xl capitalize font-semibold">Almost Done!</h2>
         <p className="text-lg text-[#B0B0B0] max-sm:text-center">Review your package and proceed to payment</p>
-        {/* <Confetti
-          ref={confettiRef}
-          className="absolute left-0 top-0 z-0 size-full"
-        /> */}
         <Card className={'w-[450px] max-sm:w-[300px] px-2 border-neutral-400 mt-4'}>
           <CardHeader>
             <CardTitle className={'font-inter font-medium text-lg'}>Selected Package: {data?.placeName}</CardTitle>
             <CardDescription>
-              {/* <ol className='list-disc my-custom-list'>
-                {data?.points?.map((item, index) =>
-                  <li className='marker:text-[#d27461] text-sm text-neutral-400 leading-7' key={index}>{item}</li>
-                )}
-              </ol> */}
               <Accordion type="single" collapsible
                 className='w-full cursor-pointer'
               >
@@ -75,7 +66,6 @@ export default function AlmostDone({ onNext, onPrev }) {
                 >
                   <AccordionTrigger>Subscription Plan</AccordionTrigger>
                   <AccordionContent>
-                    {/* <h6 className='font-semibold text-xl font-inter my-1'>{formData?.step3?.placeName}</h6> */}
                     {data?.points?.map((item, index) =>
                       <li className='marker:text-[#d27461] text-sm text-neutral-400 leading-7' key={index}>{item}</li>
                     )}
@@ -102,10 +92,10 @@ export default function AlmostDone({ onNext, onPrev }) {
 
       </div >
       <Button
-        className={'my-3 bg-[#FF7E6E] hover:bg-red-400 text-white text-sm font-normal py-5 w-full z-20'}
+        className={'my-3 bg-[#FF7E6E] hover:bg-red-400 text-white text-sm font-normal py-5 w-full z-20 cursor-pointer'}
         onClick={handleProceedToPayment} // Trigger confetti when clicking button
       >
-        {loading ? <Loader2 className='animate-spin' /> : 'Proceed to Payment'}
+        {isPending ? <Loader2 className='animate-spin' /> : 'Proceed to Payment'}
         {/* Proceed to Payment */}
       </Button>
       <Button

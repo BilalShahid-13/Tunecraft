@@ -21,7 +21,8 @@ export default function About() {
             src={EclipsePng}
             alt="ellipse"
             fill
-            priority
+            loading="lazy"
+            quality={20}
             className="object-cover"
           />
         </div>

@@ -10,6 +10,7 @@ import { z } from "zod"
 import SignIn from "./components/Signin"
 import Signup from "./components/Signup"
 import axios from "axios"
+import LoginComponent, { loginAction } from "@/components/serverComponents/loginAction"
 // Define form schemas with Zod
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -71,26 +72,12 @@ export default function page() {
   })
 
   const onLoginSubmit = async (data) => {
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
     try {
-      const res = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
+      const res = await loginAction(data.email, data.password, loginForm);
 
-      if (res.ok) {
-        const session = await getSession(); // Fetch updated session
-
-        if (session?.user?.role) {
-          toast.success("Login successful!");
-          loginForm.reset();
-          navigate.push(`/${session.user.role.toLowerCase()}`);
-        } else {
-          toast.error("Role information missing in session.");
-        }
-      } else {
-        toast.error(res.error || "Invalid email or password");
-      }
     } catch (error) {
       console.error("Login exception:", error);
       toast.error("Something went wrong during login");

@@ -21,7 +21,7 @@ export default function AllCrafters() {
   const fetchAllUsers = async () => {
     try {
       setLoading(true)
-      const res = await axios.get('/api/admin/get-allApproved-Crafters')
+      const res = await axios.get('/api/admin/get-all-Crafters')
       // console.log('all-users', res.data.data)
       setAllCrafter(res.data.data)
       setIsScroll(true);

@@ -1,102 +1,126 @@
 "use client";
-import Stepper from '@/components/Stepper';
+
+import { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
+import axios from "axios";
+import Stepper from "@/components/Stepper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import AlmostDone from './_components/AlmostDone';
-import MusicTemplate from './_components/MusicTemplate';
-import Plan from './_components/Plan';
-import QuestionCard from './_components/QuestionCard';
-import Step2 from './_components/Step2';
+import { Loader2 } from "lucide-react";
 
+// Lazy‐load each of your step components.
+// This will split each step into its own chunk, only loaded when that tab is first rendered.
+const QuestionCard = SuspenseLazy(() => import("./_components/QuestionCard"));
+const Step2 = SuspenseLazy(() => import("./_components/Step2"));
+const Plan = SuspenseLazy(() => import("./_components/Plan"));
+const MusicTemplate = SuspenseLazy(() => import("./_components/MusicTemplate"));
+const AlmostDone = SuspenseLazy(() => import("./_components/AlmostDone"));
 
-const CustomTabComponent = ({ onNext, onPrev, Component }) => {
-  return (
-    <Component onNext={onNext} onPrev={onPrev} />
+// Utility to wrap React.lazy with a fallback Suspense wrapper
+function SuspenseLazy(loader) {
+  const Comp = lazy(loader);
+  return (props) => (
+    <Suspense
+      fallback={
+        <div className="w-full h-screen relative flex justify-center items-center">
+          <h3 className="text-[#ff7e6e] uppercase font-inter text-4xl flex items-center">
+            <Loader2 className="h-8 w-8 animate-spin mr-2" />
+            Tunecraft
+          </h3>
+        </div>
+      }>
+      <Comp {...props} />
+    </Suspense>
   );
-};
+}
+
+// These two arrays never change, so we can define them once outside the component.
+const TAB_KEYS = [1, 2, 3, 4, 5];
+const STEP_COMPONENTS = [
+  QuestionCard,
+  Step2,
+  Plan,
+  MusicTemplate,
+  AlmostDone,
+];
 
 export default function Page() {
-  const Items = [1, 2, 3, 4, 5];
-  const StepsComponents = [
-    QuestionCard,
-    Step2,
-    Plan,
-    MusicTemplate,
-    AlmostDone,
-  ]
+  // currentTab holds the “active” tab (1‐based index).
   const [currentTab, setCurrentTab] = useState(1);
+  // activeStep is 0‐based for Stepper
   const [activeStep, setActiveStep] = useState(0);
 
-  const handleNext = () => {
-    const currentIndex = Items.indexOf(currentTab);
-    const nextIndex = Math.min(currentIndex + 1, Items.length - 1);
-    setCurrentTab(Items[nextIndex]);
-  };
 
-  const handlePrev = () => {
-    const currentIndex = Items.indexOf(currentTab);
-    const prevIndex = Math.max(currentIndex - 1, 0);
-    setCurrentTab(Items[prevIndex]);
-    console.log('Prev clicked', prevIndex); // Add logging
-  };
-
+  // Keep the Stepper in sync with currentTab.
   useEffect(() => {
-    async function ConnectDB() {
-      try {
-        const response = await axios.get('/api/test')
-        if (response)
-          console.log(response)
-      } catch (error) {
-        console.error(error);
+    setActiveStep(currentTab - 1);
+  }, [currentTab]);
 
-      }
-    }
-    ConnectDB()
-  }, [])
+  // move to next tab if not already at last
+  const handleNext = useCallback(() => {
+    setCurrentTab((prev) => {
+      const idx = TAB_KEYS.indexOf(prev);
+      if (idx === -1 || idx === TAB_KEYS.length - 1) return prev;
+      return TAB_KEYS[idx + 1];
+    });
+  }, []);
 
+  // move to previous tab if not already at first
+  const handlePrev = useCallback(() => {
+    setCurrentTab((prev) => {
+      const idx = TAB_KEYS.indexOf(prev);
+      if (idx <= 0) return prev;
+      return TAB_KEYS[idx - 1];
+    });
+  }, []);
 
-  useEffect(() => {
-    if (currentTab)
-      setActiveStep(currentTab - 1)
-  }, [currentTab])
+  // Memoize the list of <TabsTrigger> so they don’t re‐render on every tab change.
+  const tabTriggers = useMemo(
+    () =>
+      TAB_KEYS.map((tabKey) => (
+        <TabsTrigger key={tabKey} value={String(tabKey)} />
+      )),
+    []
+  );
 
-
+  // Memoize the <TabsContent> array, pairing each component in STEP_COMPONENTS
+  // with its corresponding tab key. We pass down onNext/onPrev into each.
+  const tabContents = useMemo(
+    () =>
+      STEP_COMPONENTS.map((StepComp, idx) => {
+        const tabValue = String(TAB_KEYS[idx]);
+        return (
+          <TabsContent key={tabValue} value={tabValue}>
+            <StepComp onNext={handleNext} onPrev={handlePrev} />
+          </TabsContent>
+        );
+      }),
+    [handleNext, handlePrev]
+  );
 
   return (
-    <div className="flex flex-col items-center
-    max-sm:justify-start max-sm:items-start max-sm:h-screen
-    max-lg:gap-y-14
-    max-sm:overflow-auto max-sm:gap-y-14 max-sm:mt-12 max-lg:mt-12
-    justify-center gap-6 w-full px-4 overflow-x-hidden">
-
+    <div
+      className="
+        flex flex-col items-center
+        max-sm:justify-start max-sm:items-start max-sm:h-screen
+        max-lg:gap-y-14
+        max-sm:overflow-auto max-sm:gap-y-14 max-sm:mt-12 max-lg:mt-12
+        justify-center gap-6 w-full px-4 overflow-x-hidden
+      "
+    >
       {/* Stepper */}
-      <div className="w-full flex justify-center
-      items-center ">
+      <div className="w-full flex justify-center items-center">
         <Stepper currentStep={activeStep} />
       </div>
 
-      <Tabs value={currentTab.toString()}
+      <Tabs
+        value={String(currentTab)}
         onValueChange={(val) => setCurrentTab(Number(val))}
-        className="w-fit justify-center items-center px-6
-         flex flex-col gap-6 bg-[#111111] shadow-2xl
-          shadow-zinc-700  py-5 rounded-lg">
-        {/*  max-w-xl */}
-        {/* Hide triggers if not needed */}
-        <TabsList
-          // className="hidden"
-        >
-          {Items.map((items, index) =>
-            <TabsTrigger key={index}
-              value={String(items)} />)}
-        </TabsList>
-
-        {StepsComponents.map((items, index) =>
-          <TabsContent key={index} value={String(index + 1)}>
-            <CustomTabComponent key={index}
-              Component={items}
-              onNext={handleNext} onPrev={handlePrev} />
-          </TabsContent>)}
+        className="
+          w-fit justify-center items-center px-6 flex flex-col gap-6
+          bg-[#111111] shadow-2xl shadow-zinc-700 py-5 rounded-lg
+        "
+      >
+        <TabsList>{tabTriggers}</TabsList>
+        {tabContents}
       </Tabs>
     </div>
   );
