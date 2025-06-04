@@ -15,7 +15,7 @@ export default function ApprovedCrafter() {
     <ScrollArea className="w-full h-full">
       <div className="flex flex-col gap-4 mt-2 px-4">
         {activeUser?.length === 0 ? (
-          <p className="text-sm text-gray-500">No Active Tasks.</p>
+          <p className="text-sm text-gray-500">No Approved Crafters.</p>
         ) : (
           activeUser.map((item, index) => (
             <AdminTaskCard

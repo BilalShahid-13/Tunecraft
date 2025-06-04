@@ -2,17 +2,20 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { craftersManagmentList } from '@/lib/Constant';
 import useAllUsers from "@/store/allUsers";
-import useSidebarWidth from '@/store/sidebarWidth';
-import axios from "axios";
-import { useEffect, useState } from "react";
-import ApproveUsers from "./ApproveUsers";
-import CustomCard from './CustomCard';
-import PendingApproval from "./PendingApproval";
-import RejectedUsers from "./RejectedUsers";
-import UserCard from './UserCard';
-import UserRole from "./UserRole";
 import useNotificationStore from "@/store/notification";
+import useSidebarWidth from '@/store/sidebarWidth';
 import useTabValue from "@/store/tabValue";
+import { Loader } from "@/utils/Skeleton";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+import { lazy, Suspense, useEffect, useState } from "react";
+
+const UserCard = lazy(() => import("./UserCard"));
+const CustomCard = lazy(() => import("./CustomCard"));
+const PendingApproval = lazy(() => import("./PendingApproval"));
+const ApproveUsers = lazy(() => import("./ApproveUsers"));
+const RejectedUsers = lazy(() => import("./RejectedUsers"));
+const UserRole = lazy(() => import("./UserRole"));
 
 const components = [
   UserCard,
@@ -60,7 +63,7 @@ export default function craftersManagment() {
     }
   }
 
-  
+
 
   return (
     <>
@@ -99,11 +102,15 @@ export default function craftersManagment() {
 
         {components.map((Items, index) => (
           <TabsContent key={index} value={`${index}`} className="mt-6">
-            <CustomComponent
-              Component={Items}
-              users={allUsers}
-              isLoading={loading}
-              index={index} />
+            <Suspense fallback={
+              <Loader />
+            }>
+              <CustomComponent
+                Component={Items}
+                users={allUsers}
+                isLoading={loading}
+                index={index} />
+            </Suspense>
           </TabsContent>
         ))}
       </Tabs>

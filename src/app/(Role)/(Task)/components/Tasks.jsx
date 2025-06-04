@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
 import { ArrowUpLeft, LoaderCircle } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -35,15 +35,16 @@ export default function Tasks() {
 
   const { data: session, status } = useSession();
   const { crafterTask, userStatus } = useCrafterTask();
+
   const { setTabValue } = useTabValue();
   const [onFileReset, setOnFileReset] = useState(false);
-
+  const [timeUp, setTimeUp] = useState(false)
   const isTaskEmpty =
     !crafterTask.title &&
     !crafterTask.des &&
     !crafterTask.requirements &&
     !crafterTask.clientName &&
-    !crafterTask.dueData
+    !crafterTask.dueDate
 
   const tabHandler = () => {
     setTabValue({ value: "Dashboard" })
@@ -82,7 +83,27 @@ export default function Tasks() {
     return <GetServerLoading session={session} />
   }
 
-  console.log('crafterTask', crafterTask)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const dueDate = new Date(crafterTask.dueDate);
+      const timeLeft = dueDate - Date.now();
+
+      if (timeLeft <= 0) {
+        setTimeUp(true);
+        setTimeRemaining('00:00:00'); // Time is up, show 00:00:00
+        clearInterval(interval); // Stop the timer
+      } else {
+        setTimeUp(false);
+        setTimeRemaining(formatTime(timeLeft)); // Update time remaining
+      }
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [crafterTask.dueDate]);
+
+
+
+  console.log('time', crafterTask.dueDate, timeUp)
 
   return (
     <>
@@ -95,9 +116,9 @@ export default function Tasks() {
       ) : (
         <div className={`flex flex-col gap-12`}>
           <TaskCard
-            title={crafterTask.title}
+            title={crafterTask?.title}
             des={crafterTask.des}
-            dueDate={crafterTask.dueData}
+            dueDate={crafterTask.dueDate}
             timeAgo={"03 hr"}
             requirements={crafterTask.requirements}
             client={crafterTask.clientName}
@@ -150,7 +171,7 @@ export default function Tasks() {
               </div>
               <Button
                 type={"submit"}
-                disabled={taskForm.formState.isSubmitting || userStatus === "pending"}
+                disabled={taskForm.formState.isSubmitting || userStatus === "pending" || timeUp}
                 className={"bg-primary text-white w-fit cursor-pointer max-xs:w-full"}
               >
                 {taskForm.formState.isSubmitting ? (

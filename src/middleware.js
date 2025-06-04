@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { roles } from "./lib/Constant";
 import { getToken } from "next-auth/jwt";
+import { roles } from "./lib/Constant";
 
 const protectedRoutes = ["/admin", "/singer", "/engineer", "/lyricist"];
 export default async function middleware(req) {
@@ -40,7 +40,7 @@ export default async function middleware(req) {
 
 export const config = {
   matcher: [
-    "/Register",
+    "/Register/:path*",
     "/lyricist/:path*",
     "/engineer/:path*",
     "/singer/:path*",

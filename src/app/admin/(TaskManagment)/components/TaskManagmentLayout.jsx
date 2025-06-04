@@ -1,9 +1,10 @@
 import { taskManagmentList } from '@/lib/Constant';
 import AdminTabRoot from '../../components/AdminTabRoot';
-import AllCrafters from './CraftersTab/AllCrafters';
-import ApprovedCrafter from './CraftersTab/ApprovedCrafter';
-import PendingCrafters from './CraftersTab/PendingCrafters';
+import { lazy } from 'react';
 
+const AllCrafters = lazy(() => import('./CraftersTab/AllCrafters'));
+const PendingCrafters = lazy(() => import('./CraftersTab/PendingCrafters'));
+const ApprovedCrafter = lazy(() => import('./CraftersTab/ApprovedCrafter'));
 
 const componentLists = [
   AllCrafters,

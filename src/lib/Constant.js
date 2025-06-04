@@ -503,3 +503,5 @@ export const submissionStatusEnum = [
   "approved",
   "rejected",
 ];
+
+export const defaultTime = 0;

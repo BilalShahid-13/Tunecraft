@@ -6,35 +6,42 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { signOut, useSession } from 'next-auth/react'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { Button } from "./ui/button"
-import { Loader2, LogOut, User } from "lucide-react"
-import { useEffect, useState } from "react";
+} from "@/components/ui/dropdown-menu";
+import { Loader2, LogOut, User } from "lucide-react";
+import { signOut } from 'next-auth/react';
+import { useEffect, useState, useTransition } from "react";
+import UserProfileAction from "./serverComponents/UserProfile";
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Button } from "./ui/button";
 
 export default function UserProfile() {
-  const { data: session } = useSession()
-  // const initials = session?.user?.username.split(' ').map(word => word.charAt(0).toUpperCase()).join('');
-  const [loading, setLoading] = useState(false)
+  const [session, setSession] = useState({ email: "", username: "", role: "" });
+  useEffect(() => {
+    async function fetchSession() {
+      const res = await UserProfileAction();
+      setSession({
+        email: res.email,
+        username: res.username,
+        role: res.role
+      });
+    }
+    fetchSession();
+  }, [])
+
+
+
+  const [isPending, startTransition] = useTransition()
   const [initials, setInitials] = useState(null)
   useEffect(() => {
-    let name = session?.user?.username.split(' ').map(word => word.charAt(0).toUpperCase()).join('')
+    let name = session?.username.split(' ').map(word => word.charAt(0).toUpperCase()).join('')
     setInitials(name)
   }, [session])
 
 
   const handleLogout = async () => {
-    setLoading(true)
-    try {
-      await signOut({ callbackUrl: '/' });
-    } catch (error) {
-      console.error('logout error', error);
-
-    }
-    finally {
-      setLoading(false)
-    }
+    startTransition(() => {
+      signOut({ callbackUrl: '/' });
+    })
   }
 
   return (
@@ -51,12 +58,12 @@ export default function UserProfile() {
             className={'flex flex-row justify-start w-full items-start gap-2 text-left'}>
             <User size={16} />My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className={'text-left w-full'}>{session?.user?.username}</DropdownMenuItem>
-          <DropdownMenuItem>{session?.user?.email}</DropdownMenuItem>
+          <DropdownMenuItem className={'text-left w-full'}>{session?.username}</DropdownMenuItem>
+          <DropdownMenuItem>{session?.email}</DropdownMenuItem>
           <Button onClick={handleLogout}
-            disabled={loading}
+            disabled={isPending}
             className={'w-full primary-btn'}>
-            {loading ? <Loader2 className="animate-spin" />
+            {isPending ? <Loader2 className="animate-spin" />
               : <LogOut />}
             Logout</Button>
         </DropdownMenuContent>

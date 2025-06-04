@@ -47,6 +47,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
     }
   }
 
+
   async function getAllCrafterTasks() {
     try {
       const { notification, allUser, isUpdateTask } = await fetchAllCrafterTask();

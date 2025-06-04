@@ -21,14 +21,16 @@ const useFetchTasks =
     const [availableTask, setAvailableTask] = useState([]);
     const [pendingTask, setPendingTask] = useState([]);
     const [completedTask, setCompletedTask] = useState([]);
+    const [isActiveTask, setIsActiveTask] = useState(false);
     const setCrafterTask = useCrafterTask((state) => state.setCrafterTask);
     const crafterTask = useCrafterTask((state) => state.crafterTask);
-
+    console.log('crafterTask', crafterTask)
     const fetchAvailableTask = useCallback(async () => {
       try {
         setIsLoadingAvailableTask(true)
         const availableData = await fetchCrafterAvailableTask(fetchedTasks)
         setAvailableTask(availableData);
+        console.log('availableData', availableData)
       } catch (error) {
         console.error('Error fetching available tasks:', error?.response?.data || error.message);
       } finally {
@@ -37,30 +39,45 @@ const useFetchTasks =
     }, [session]);
 
     const getActiveTask = useCallback(async () => {
-      setIsLoadingActiveTask(true)
+      setIsLoadingActiveTask(true);
       try {
-        const { activeTask, crafterTask } = await fetchActiveTask(fetchedTasks)
-        setActiveTask(activeTask)
-        setCrafterTask(crafterTask)
-
+        const { activeTask, crafterTask } = await fetchActiveTask(fetchedTasks);
+        console.log('active Task', activeTask, crafterTask)
+        setActiveTask(activeTask);    // activeTask is always an array
+        setCrafterTask(crafterTask);  // crafterTask is object or null
       } catch (error) {
         console.error(error);
-      }
-      finally {
+      } finally {
         setIsLoadingActiveTask(false);
       }
     }, [session]);
 
-    const getPendingTask = useCallback(async () => {
-      if (!session) return;
-      try {
-        const { pendingTask, crafterTask } = await fetchPendingTask(fetchedTasks);
-        setPendingTask(pendingTask);
-        setCrafterTask(crafterTask);
-      } catch (error) {
-        console.error('Error fetching pending tasks:', error);
-      }
-    }, [session]);
+
+    const getPendingTask = useCallback(
+      async (fetchedTasks = false) => {
+        if (!session) return; // wait until session is defined
+
+        try {
+          const { pendingTask: tasksArray, crafterTask: taskData } =
+            await fetchPendingTask(fetchedTasks);
+
+          if (Array.isArray(tasksArray) && tasksArray.length > 0) {
+            setPendingTask(tasksArray);
+          } else {
+            setPendingTask([]); // clear if none
+          }
+          // Only set crafterTask if it's not null
+          if (taskData) {
+            setCrafterTask(taskData);
+          } else {
+            // setCrafterTask(null);
+          }
+        } catch (error) {
+          console.error("Error fetching pending tasks:", error);
+        }
+      },
+      [session]
+    );
 
     const getCompletedTask = useCallback(async () => {
       if (!session) return;
@@ -121,6 +138,8 @@ export default function Dashboard() {
   // Use custom hook to fetch tasks
   const { activeTask, availableTask, pendingTask, completedTask } = useFetchTasks(session, fetchedTasks, setFetchedTasks, setIsLoadingAvailableTask, setIsLoadingActiveTask, setIsCompletedTask);
 
+  console.log('pendingTask', pendingTask)
+  console.log('availableTask', activeTask)
 
   if (status === 'loading') {
     return <GetServerLoading session={sessionData} />;
@@ -141,8 +160,9 @@ export default function Dashboard() {
       <div className="flex flex-col gap-12">
         <TaskLayoutRoot
           taskName="active"
-          inReview={activeTask.length === 0}
-          tasks={activeTask.length > 0 ? activeTask : pendingTask}
+          inReview={pendingTask.length > 0 ? true : false}
+          tasks={pendingTask.length > 0 ? pendingTask : activeTask}
+          // tasks={activeTask.length > 0 ? activeTask : pendingTask}
           session={session}
           isLoading={isLoadingActiveTask}
         />

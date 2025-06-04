@@ -3,9 +3,10 @@ import { Clock } from 'lucide-react';
 import { useCountdown } from '@/hooks/useCountdown';
 import { Badge } from '@/components/ui/badge';
 import useCrafterTask from '@/store/crafterTask';
+import { defaultTime } from '@/lib/Constant';
 export default function TaskCard({ title = 'Birthday Song',
-  des, dueDate = '12/12/2023', requirements, client = 'atif', timeAgo }) {
-  const countdown = useCountdown(dueDate, 3);
+  des, dueDate, requirements, client = 'atif', timeAgo }) {
+  const countdown = useCountdown(dueDate, defaultTime);
   const { userStatus } = useCrafterTask()
   return (
     <>

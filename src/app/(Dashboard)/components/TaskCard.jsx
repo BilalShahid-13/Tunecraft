@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCountdown } from "@/hooks/useCountdown";
-import { musicPlans } from "@/lib/Constant";
+import { defaultTime, musicPlans } from "@/lib/Constant";
 import { formatDateTime, formatTimeHMSS } from "@/lib/utils";
 import useCrafterTask from "@/store/crafterTask";
 import useSidebarWidth from "@/store/sidebarWidth";
@@ -90,7 +90,6 @@ export default function TaskCard({
   plan, item, session, assignedAtTime, index, inReview,
   time = '3hr', bgStory, currentStage, songGenre, setGracePeriodError
 }) {
-  let defaultTime = 0;
   const [userPlan, setUserPlan] = useState({ title: '', price: 0 })
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

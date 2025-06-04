@@ -1,16 +1,17 @@
 "use client"
+import { signupAction } from "@/components/serverComponents/signupAction"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { getSession, signIn, useSession } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { lazy, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
-import SignIn from "./components/Signin"
-import Signup from "./components/Signup"
-import axios from "axios"
-import LoginComponent, { loginAction } from "@/components/serverComponents/loginAction"
+
+const SignIn = lazy(() => import('./components/Signin'))
+const Signup = lazy(() => import('./components/Signup'))
+
 // Define form schemas with Zod
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -44,6 +45,8 @@ export default function page() {
   const [selectedRole, setSelectedRole] = useState(null);
   const [onFileReset, setOnFileReset] = useState(false);
   const { data: session } = useSession();
+  const [loginLoading, setLoginLoading] = useState();
+  const [getSession, setSession] = useState(null);
   const navigate = useRouter();
 
   // Login form
@@ -72,49 +75,69 @@ export default function page() {
   })
 
   const onLoginSubmit = async (data) => {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
+    setLoginLoading(true)
     try {
-      const res = await loginAction(data.email, data.password, loginForm);
-
+      const res = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+      if (!res) {
+        toast.error("Unexpected error during sign-in");
+        setLoginLoading(false);
+        return;
+      }
+      if (!res.ok) {
+        setLoginLoading(false);
+        // res.error might be undefined or a string; fall back to a default.
+        const message = res.error || "Login failed. Please try again.";
+        toast.error(message);
+        return;
+      }
+      if (res.ok) {
+        console.log('session', getSession)
+        // if (getSession) {
+        navigate.push(`/${session.user.role}`)
+        setLoginLoading(true);
+      }
+      setLoginLoading(false);
     } catch (error) {
       console.error("Login exception:", error);
       toast.error("Something went wrong during login");
+      setLoginLoading(false);
+    } finally {
     }
   };
 
-  // const formData = new FormData();
-  const onhandleSignup = async (data) => {
+  async function onhandleSignup(data) {
+    // setIsLoading(true);
+
+    // Build a JS FormData 👉 exactly as you did:
     const formData = new FormData();
-    console.log('file', data.file)
     formData.append("username", data.fullName);
     formData.append("email", data.email);
     formData.append("role", data.role);
-    formData.append("phone", `(+${data.phoneCode})` + data.phone);
+    formData.append("phone", `(+${data.phoneCode})${data.phone}`);
     formData.append("details", data.textField);
     formData.append("musicTemplate", data.select || "");
     if (data.file) {
       formData.append("cv", data.file[0]);
     }
+
     try {
-      const res = await axios.post('/api/create-user', formData);
-      if (res.data.success) {
-        setOnFileReset(true)
-        signupForm.reset();
-        console.log('signupForm File', signupForm.getValues('file'))
-        toast.success(res.data.msg)
+      // Instead of calling a server action directly, call your Next.js API route:
+      const res = await signupAction(formData)
+      if (res.success) {
         navigate.push('/')
+        toast.success('You will be notify via email');
       } else {
-        toast.error(res.data.msg || "Signup failed");
+        toast.success(res.message);
       }
-    } catch (error) {
-      toast.error(error.response?.data.msg || error.message);
-      console.error(error.response?.data.msg || error.message);
+    } catch (err) {
+      console.error("Network error:", err);
     }
+  }
 
-
-  };
   const watchRole = signupForm.watch("role")
   const handleTabChange = (value) => {
     setActiveTab(value)
@@ -154,7 +177,7 @@ export default function page() {
         <TabsContent value="login" className="bg-[#111111] p-6 rounded-lg">
           <SignIn onSubmit={loginForm.handleSubmit(onLoginSubmit)}
             loginForm={loginForm}
-            navigate={navigate} />
+            isLoading={loginLoading} />
         </TabsContent>
 
         {/* Signup Form */}

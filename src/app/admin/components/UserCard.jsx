@@ -94,7 +94,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
       if (res) {
         console.log('userCard', res)
       }
-      toast.success(`${user.crafterId} ${res.data.message}`);
+      toast.success(`${res.data.message}`);
       setIsUpdate(true);
     } catch (error) {
       const msg = error.response?.data?.error || 'Failed to send reset link';
@@ -188,7 +188,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
                   }
                 </CardTitle>
                 <CardDescription className={'flex flex-col gap-2'}>
-                  <p className="capitalize font-inter flex flex-row gap-2 justify-start items-center"> # <span className="italic"> {items?.crafterId}</span></p>
+                  {items?.crafterId && <p className="capitalize font-inter flex flex-row gap-2 justify-start items-center"> # <span className="italic"> {items?.crafterId}</span></p>}
                   <p className="capitalize font-inter flex flex-row gap-2 justify-start items-center"> <User size={13} /> {items?.username}</p>
                   <a href={`tel:${items.phone}`} className='flex flex-row justify-start items-center gap-1 hover:underline'>
                     <Phone size={13} />

@@ -15,11 +15,19 @@ export default async function fetchAllCrafterTask() {
           approvalStatus: _crafterStatus(items?.matchedCrafters[0].submissionStatus).label,
           status: "Task Submission",
           orderId: items?.orderId,
-          _id: items?.matchedCrafters[0].assignedCrafterId._id,
+          _id: items?.matchedCrafters[0]?.assignedCrafterId?._id,
           username: items?.name,
-          role: items?.matchedCrafters[0].assignedCrafterId.role,
+          role: items?.matchedCrafters[0].assignedCrafterId?.role,
         }
       ))
+      console.log(newNotifications, res.data.data)
+      if(newNotifications === undefined || null){
+        return {
+          notification: [],
+          allUser: { users: res.data.data, mode: "task", task: res.data.data },
+          isUpdateTask: false
+        }
+      }
       return {
         notification: newNotifications,
         allUser: { users: res.data.data, mode: "task", task: res.data.data },

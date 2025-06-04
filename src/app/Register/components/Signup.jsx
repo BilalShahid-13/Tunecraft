@@ -140,7 +140,7 @@ export default function Signup({
         <div className="space-y-2">
           <Label htmlFor="details" className="text-white"> Additional information or preferences</Label>
           <Textarea placeholder="Write anything you'd like us to know..."
-            id='details'
+            id='details' className={'h-24'}
             {...signupForm.register("textField")} />
 
         </div>

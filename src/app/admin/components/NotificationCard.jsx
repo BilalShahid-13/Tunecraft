@@ -7,7 +7,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { _userStatus, formatTimeHMSS, timeAgo } from '@/lib/utils'
-import { CircleAlert, XCircle } from 'lucide-react'
 
 export default function NotificationCard(
   { status = 'Crafter Registration', approvalStatus,
@@ -33,9 +32,9 @@ export default function NotificationCard(
             <div className="flex justify-between items-center">
               <p className="text-sm font-semibold capitalize flex gap-3">
                 {role}
-                <span className="text-zinc-500 font-light">
+                {crafterId && <span className="text-zinc-500 font-light">
                   # <span className="italic">{crafterId}</span>
-                </span>
+                </span>}
               </p>
             </div>
             <div className="flex flex-col gap-2">

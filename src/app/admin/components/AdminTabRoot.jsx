@@ -3,9 +3,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useNotificationStore from '@/store/notification';
 import useSidebarWidth from '@/store/sidebarWidth';
 import useTabValue from '@/store/tabValue';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import CustomCard from './CustomCard';
 import { cn } from "@/lib/utils";
+import { Loader } from "@/utils/Skeleton";
 
 function CustomComponent({ Component }) {
   return <Component />
@@ -62,9 +63,11 @@ export default function AdminTabRoot({ list = craftersManagmentList, componentLi
 
         {componentLists.map((Items, index) => (
           <TabsContent key={index} value={`${index}`} className="mt-3">
-            <CustomComponent
-              Component={Items}
-              index={index} />
+            <Suspense fallback={<Loader />}>
+              <CustomComponent
+                Component={Items}
+                index={index} />
+            </Suspense>
           </TabsContent>
         ))}
       </Tabs>

@@ -67,7 +67,7 @@ export default function TaskLayoutRoot({ taskName = 'active'
                     key={index}
                     index={index}
                     badge={taskName}
-                    musicTemplate={item.musicTemplate}
+                    musicTemplate={item?.musicTemplate}
                     inReview={inReview}
                     title={item?.songGenre}
                     session={session}
@@ -76,8 +76,8 @@ export default function TaskLayoutRoot({ taskName = 'active'
                     songGenre={item?.songGenre}
                     item={item}
                     assignedAtTime={(taskName === 'completed' || inReview && taskName === 'active') ?
-                      item?.crafters[session.user.role].submittedAtTime
-                      : item?.crafters[session.user.role].assignedAtTime}
+                      item?.crafters[session.user.role]?.submittedAtTime
+                      : item?.crafters[session.user.role]?.assignedAtTime}
                     bgStory={item?.backgroundStory}
                     currentStage={item?.currentStage} />
                 </React.Fragment>

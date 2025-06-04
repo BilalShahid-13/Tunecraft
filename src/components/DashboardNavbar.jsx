@@ -1,6 +1,5 @@
-import React from 'react'
-import UserProfile from './UserProfile'
 import useSidebarWidth from '@/store/sidebarWidth'
+import UserProfile from './UserProfile'
 
 export default function DashboardNavbar({ link }) {
   let heading = link.replace('/', '')
@@ -14,6 +13,7 @@ export default function DashboardNavbar({ link }) {
           width: width ? 'calc(100% - var(--sidebar-width))' : '100%'
         }}>
         <h3 className='capitalize font-inter font-semibold'>{heading} Dashboard</h3>
+        {/* <UserProfile /> */}
         <UserProfile />
       </div>
     </>

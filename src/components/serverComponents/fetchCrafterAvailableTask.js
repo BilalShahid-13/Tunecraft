@@ -1,7 +1,6 @@
 "use server";
 
 import { authOptions } from "@/lib/auth";
-import axios from "axios";
 import { getServerSession } from "next-auth";
 
 export default async function fetchCrafterAvailableTask(fetchedTasks) {
@@ -18,7 +17,7 @@ export default async function fetchCrafterAvailableTask(fetchedTasks) {
           role: session.user.role,
           userId: session.user.id,
         }),
-      next: { revalidate: fetchedTasks ? 0 : 60 },
+        next: { revalidate: fetchedTasks ? 0 : 60 },
       });
 
       if (!res.ok) {

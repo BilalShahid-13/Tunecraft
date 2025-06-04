@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Lock, Mail } from "lucide-react"
+import { Loader2, Lock, Mail } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-export default function SignIn({ onSubmit, loginForm, navigate }) {
+export default function SignIn({ onSubmit, loginForm, isLoading }) {
+  const navigate = useRouter();
   return (
     <>
       <form
@@ -36,7 +38,7 @@ export default function SignIn({ onSubmit, loginForm, navigate }) {
             Password
           </Label>
           <div className="relative inputfield-box">
-            <Lock  />
+            <Lock />
             <Input
               id="password"
               type="password"
@@ -70,9 +72,12 @@ export default function SignIn({ onSubmit, loginForm, navigate }) {
         <Button
           type="submit"
           className="primary-btn"
-          disabled={loginForm.formState.isSubmitting}
+          disabled={isLoading}
         >
-          {loginForm.formState.isSubmitting ? "Logging in..." : "Log In"}
+          {isLoading ? <>
+            <Loader2 className="animate-spin" />
+            Logging in
+          </> : "Log In"}
         </Button>
       </form>
     </>
