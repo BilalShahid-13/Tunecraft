@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { roles } from "./lib/Constant";
+import { getToken } from "next-auth/jwt";
 
 const protectedRoutes = ["/admin", "/singer", "/engineer", "/lyricist"];
 export default async function middleware(req) {

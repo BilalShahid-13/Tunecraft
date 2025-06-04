@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
-import axios from "axios";
 import Stepper from "@/components/Stepper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 
 // Lazy‐load each of your step components.
 // This will split each step into its own chunk, only loaded when that tab is first rendered.
@@ -20,12 +19,7 @@ function SuspenseLazy(loader) {
   return (props) => (
     <Suspense
       fallback={
-        <div className="w-full h-screen relative flex justify-center items-center">
-          <h3 className="text-[#ff7e6e] uppercase font-inter text-4xl flex items-center">
-            <Loader2 className="h-8 w-8 animate-spin mr-2" />
-            Tunecraft
-          </h3>
-        </div>
+        <Loader2 className="h-8 w-8 animate-spin mr-2" />
       }>
       <Comp {...props} />
     </Suspense>
