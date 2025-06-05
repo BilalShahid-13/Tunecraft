@@ -504,4 +504,4 @@ export const submissionStatusEnum = [
   "rejected",
 ];
 
-export const defaultTime = 0;
+export const defaultTime = 3;

@@ -21,7 +21,7 @@ const baseCrafterSchema = {
     enum: submissionStatusEnum,
     default: "pending",
   },
-  assignedAtTime: {
+  taskDeadline: {
     type: Date,
     default: null,
   },

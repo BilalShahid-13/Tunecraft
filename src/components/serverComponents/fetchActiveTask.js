@@ -25,7 +25,7 @@ export default async function fetchActiveTask(fetchedTasks = false) {
         role: session.user.role,
         userId: session.user.id,
       }),
-      next: { revalidate: fetchedTasks ? 0 : 60 },
+      // next: { revalidate: fetchedTasks ? 0 : 60 },
     });
 
     if (!res.ok) {
@@ -54,21 +54,42 @@ export default async function fetchActiveTask(fetchedTasks = false) {
 
     // 4) Build crafterTask from the first active task
     const firstTask = tasks[0];
-    const newTaskData = {
-      orderId: firstTask._id,
-      title: firstTask.musicTemplate,
-      des: firstTask.jokes,
-      requirements: firstTask.backgroundStory,
-      clientName: firstTask.name,
-      dueDate: firstTask.crafters?.[session.user.role]?.assignedAtTime,
-      submittedFileUrls:
-        firstTask.crafters?.[prevRole(session.user.role)]?.submittedFileUrl ||
-        [],
-    };
+    let newTaskData = {};
+    if (firstTask.crafters[session.user.role].extension.granted === true) {
+      newTaskData = {
+        orderId: firstTask._id,
+        title: firstTask.musicTemplate,
+        songGenre: firstTask.songGenre,
+        des: firstTask.jokes,
+        requirements: firstTask.backgroundStory,
+        clientName: firstTask.name,
+        plan: firstTask.plan,
+        currentStage: firstTask.currentStage,
+        dueDate: firstTask.crafters?.[session.user.role]?.extension.until,
+        submittedFileUrls:
+          firstTask.crafters?.[prevRole(session.user.role)]?.submittedFileUrl ||
+          [],
+      };
+    } else {
+      newTaskData = {
+        orderId: firstTask._id,
+        title: firstTask.musicTemplate,
+        songGenre: firstTask.songGenre,
+        des: firstTask.jokes,
+        plan: firstTask.plan,
+        requirements: firstTask.backgroundStory,
+        currentStage: firstTask.currentStage,
+        clientName: firstTask.name,
+        dueDate: firstTask.crafters?.[session.user.role]?.taskDeadline,
+        submittedFileUrls:
+          firstTask.crafters?.[prevRole(session.user.role)]?.submittedFileUrl ||
+          [],
+      };
+    }
 
     return {
       activeTask: tasks,
-      crafterTask: newTaskData,
+      crafterTask: [newTaskData],
     };
   } catch (error) {
     console.error(

@@ -1,12 +1,11 @@
 "use client";
-import { Clock } from 'lucide-react';
-import { useCountdown } from '@/hooks/useCountdown';
 import { Badge } from '@/components/ui/badge';
+import useCountdown from '@/hooks/useCountdown';
 import useCrafterTask from '@/store/crafterTask';
-import { defaultTime } from '@/lib/Constant';
+import { Clock } from 'lucide-react';
 export default function TaskCard({ title = 'Birthday Song',
   des, dueDate, requirements, client = 'atif', timeAgo }) {
-  const countdown = useCountdown(dueDate, defaultTime);
+  const countdown = useCountdown(dueDate);
   const { userStatus } = useCrafterTask()
   return (
     <>

@@ -36,14 +36,17 @@ export async function PATCH(req) {
     order.orderStatus = "in-progress";
     order.crafters[role].submissionStatus = "assigned";
     order.crafters[role].assignedCrafterId = userId;
-    order.crafters[role].assignedAtTime = new Date();
+    // order.crafters[role].taskDeadline = new Date();
 
     if (!order) {
       return NextResponse.json({
         message: "Order not found or already started",
       });
     }
-    order.crafters[role].assignedAtTime = new Date();
+    // order.crafters[role].taskDeadline = new Date();
+    order.crafters[role].taskDeadline = new Date(
+      new Date().getTime() + 3 * 60 * 60 * 1000
+    );
 
     await order.save();
 

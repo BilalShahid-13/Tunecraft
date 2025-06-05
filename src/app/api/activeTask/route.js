@@ -13,10 +13,15 @@ export async function POST(req) {
   }
   try {
     await dbConnect();
+
     const assignedCrafterIdField = `crafters.${role}.assignedCrafterId`;
+    const submissionStatusField = `crafters.${role}.submissionStatus`;
+    const rejectedCraftersField = `crafters.${role}.rejectedCrafters`;
+
     const tasks = await Order.find({
       [assignedCrafterIdField]: userId,
-      [`crafters.${role}.submissionStatus`]: "assigned",
+      [submissionStatusField]: "assigned",
+      [rejectedCraftersField]: { $nin: [userId] }, // UserId NOT in rejectedCrafters
       currentStage: role,
     }).populate("plan");
 

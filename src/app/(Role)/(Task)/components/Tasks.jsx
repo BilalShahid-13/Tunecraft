@@ -1,8 +1,10 @@
 "use client"
+import AllSubmittedFiles from "@/app/(Role)/(Task)/components/AllSubmittedFiles"
 import CustomFileInput from "@/components/CustomFileInput"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { defaultTime } from "@/lib/Constant"
 import useCrafterTask from "@/store/crafterTask"
 import useTabValue from "@/store/tabValue"
 import { GetServerLoading } from "@/utils/GetServerLoading"
@@ -10,12 +12,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
 import { ArrowUpLeft, LoaderCircle } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { useEffect, useState } from "react"
+import { Fragment, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import TaskCard from "./TaskCard"
-import AllSubmittedFiles from "@/app/(Role)/(Task)/components/AllSubmittedFiles"
 
 const acceptedTypes = ["application/pdf", "audio/mpeg", "audio/wav", "application/msword"]
 
@@ -40,11 +41,11 @@ export default function Tasks() {
   const [onFileReset, setOnFileReset] = useState(false);
   const [timeUp, setTimeUp] = useState(false)
   const isTaskEmpty =
-    !crafterTask.title &&
-    !crafterTask.des &&
-    !crafterTask.requirements &&
-    !crafterTask.clientName &&
-    !crafterTask.dueDate
+    !crafterTask[0].title &&
+    !crafterTask[0].des &&
+    !crafterTask[0].requirements &&
+    !crafterTask[0].clientName &&
+    !crafterTask[0].dueDate
 
   const tabHandler = () => {
     setTabValue({ value: "Dashboard" })
@@ -63,8 +64,9 @@ export default function Tasks() {
     console.log('data.comments', data.comments)
     formData.append("comment", data.comments)
     formData.append("role", session.user.role)
-    formData.append("orderId", crafterTask.orderId)
+    formData.append("orderId", crafterTask[0].orderId)
     formData.append("crafterId", session.user.id)
+
     try {
       const res = await axios.post("/api/taskSubmission", formData)
       if (res.status === 200) {
@@ -83,27 +85,7 @@ export default function Tasks() {
     return <GetServerLoading session={session} />
   }
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const dueDate = new Date(crafterTask.dueDate);
-      const timeLeft = dueDate - Date.now();
-
-      if (timeLeft <= 0) {
-        setTimeUp(true);
-        setTimeRemaining('00:00:00'); // Time is up, show 00:00:00
-        clearInterval(interval); // Stop the timer
-      } else {
-        setTimeUp(false);
-        setTimeRemaining(formatTime(timeLeft)); // Update time remaining
-      }
-    }, 1000); // Update every second
-
-    return () => clearInterval(interval); // Cleanup on component unmount
-  }, [crafterTask.dueDate]);
-
-
-
-  console.log('time', crafterTask.dueDate, timeUp)
+  console.log('crafterTask[0]', crafterTask[0])
 
   return (
     <>
@@ -113,82 +95,88 @@ export default function Tasks() {
             <ArrowUpLeft /> Go to Dashboard to pick one of them
           </Button>
         </div>
-      ) : (
-        <div className={`flex flex-col gap-12`}>
-          <TaskCard
-            title={crafterTask?.title}
-            des={crafterTask.des}
-            dueDate={crafterTask.dueDate}
-            timeAgo={"03 hr"}
-            requirements={crafterTask.requirements}
-            client={crafterTask.clientName}
-          />
-          <div className="flex w-full max-xs:max-w-md">
-            {crafterTask.submittedFileUrls && <AllSubmittedFiles files={crafterTask.submittedFileUrls} />}
-          </div>
-          <form onSubmit={taskForm.handleSubmit(handleSubmit)}>
-            <div className="bg-[#111111] flex flex-col gap-8 p-4
+      ) :
+        (
+          <div div className={`flex flex-col gap-12`} >
+            {crafterTask.map((item, index) => (
+              <Fragment key={index}>
+                <TaskCard key={index}
+                  title={item?.title}
+                  des={item.des}
+                  dueDate={item.dueDate}
+                  timeAgo={`${defaultTime} hr`}
+                  requirements={item.requirements}
+                  client={item.clientName}
+                />
+                <div
+                  className="flex w-full max-xs:max-w-md">
+                  {item.submittedFileUrls.length > 0 && <AllSubmittedFiles files={item.submittedFileUrls} />}
+                </div>
+              </Fragment>))}
+            <form onSubmit={taskForm.handleSubmit(handleSubmit)}>
+              <div className="bg-[#111111] flex flex-col gap-8 p-4
             rounded-lg max-xs:max-w-full max-sm:max-w-full w-full
               max-md:gap-5">
-              <h1 className="text-2xl font-bold font-inter max-sm:text-xl">Your Submission</h1>
-              <div className="
+                <h1 className="text-2xl font-bold font-inter max-sm:text-xl">Your Submission</h1>
+                <div className="
             justify-center items-center flex flex-col
               ">
-                <div className="space-y-3 max-xs:max-w-xs max-xl:w-full w-full">
-                  <p className="text-zinc-400">Upload your work</p>
-                  <CustomFileInput
-                    signupForm={taskForm}
-                    acceptedTypes={acceptedTypes}
-                    multiple={true}
-                    onReset={onFileReset}
-                    fieldName="file"
-                    maxFiles={6}
-                    disabled={userStatus === "pending"}
-                    className={`h-[300px] border-2 border-dashed bg-zinc-900
+                  <div className="space-y-3 max-xs:max-w-xs max-xl:w-full w-full">
+                    <p className="text-zinc-400">Upload your work</p>
+                    <CustomFileInput
+                      signupForm={taskForm}
+                      acceptedTypes={acceptedTypes}
+                      multiple={true}
+                      onReset={onFileReset}
+                      fieldName="file"
+                      maxFiles={6}
+                      disabled={userStatus === "pending"}
+                      className={`h-[300px] border-2 border-dashed bg-zinc-900
                      border-neutral-600 text-center rounded-lg
                     ${userStatus === "pending" ? 'hover:cursor-not-allowed' : 'hover:cursor-pointer'}`}
+                    />
+                    {taskForm.formState.errors.file && (
+                      <p className="input-error">{taskForm.formState.errors.file.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5 space-y-1 w-full max-md:mt-4">
+                  <Label htmlFor="comment"
+                    className={"text-zinc-300 font-inter "}>
+                    Comments (Optional)
+                  </Label>
+                  <Textarea
+                    {...taskForm.register("comments")}
+                    className={"max-h-[20vh] min-h-[15vh] max-sm:h-[10vh] placeholder:max-xs:text-xs placeholder:max-md:text-sm"}
+                    placeholder="Add any notes or comments about your submission..."
+                    id="comment"
                   />
-                  {taskForm.formState.errors.file && (
-                    <p className="input-error">{taskForm.formState.errors.file.message}</p>
+                  {taskForm.formState.errors.comments && (
+                    <p className="input-error">{taskForm.formState.errors.comments.message}</p>
                   )}
                 </div>
+                <Button
+                  type={"submit"}
+                  disabled={taskForm.formState.isSubmitting || userStatus === "pending" || timeUp}
+                  className={"bg-primary text-white w-fit cursor-pointer max-xs:w-full"}
+                >
+                  {taskForm.formState.isSubmitting ? (
+                    <>
+                      <p>Submitting Work</p> <LoaderCircle className="animate-spin" />
+                    </>
+                  ) : (userStatus === "pending" ? (
+                    // ← when they’re already in “pending” state
+                    "Submission Pending Review"
+                  ) : (
+                    // ← normal case
+                    "Submit Work"))}
+                </Button>
               </div>
-
-              <div className="flex flex-col gap-1.5 space-y-1 w-full max-md:mt-4">
-                <Label htmlFor="comment"
-                  className={"text-zinc-300 font-inter "}>
-                  Comments (Optional)
-                </Label>
-                <Textarea
-                  {...taskForm.register("comments")}
-                  className={"max-h-[20vh] min-h-[15vh] max-sm:h-[10vh] placeholder:max-xs:text-xs placeholder:max-md:text-sm"}
-                  placeholder="Add any notes or comments about your submission..."
-                  id="comment"
-                />
-                {taskForm.formState.errors.comments && (
-                  <p className="input-error">{taskForm.formState.errors.comments.message}</p>
-                )}
-              </div>
-              <Button
-                type={"submit"}
-                disabled={taskForm.formState.isSubmitting || userStatus === "pending" || timeUp}
-                className={"bg-primary text-white w-fit cursor-pointer max-xs:w-full"}
-              >
-                {taskForm.formState.isSubmitting ? (
-                  <>
-                    <p>Submitting Work</p> <LoaderCircle className="animate-spin" />
-                  </>
-                ) : (userStatus === "pending" ? (
-                  // ← when they’re already in “pending” state
-                  "Submission Pending Review"
-                ) : (
-                  // ← normal case
-                  "Submit Work"))}
-              </Button>
-            </div>
-          </form>
-        </div>
-      )}
+            </form>
+          </div>
+        )
+      }
     </>
   )
 }

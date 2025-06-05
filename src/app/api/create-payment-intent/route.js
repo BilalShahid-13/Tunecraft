@@ -61,12 +61,11 @@ export async function POST(request) {
       jokes: metadata.jokes,
       backgroundStory: metadata.backgroundStory,
       currentStage: "lyricist",
-      // crafters: {
-      //   lyricist: {
-      //     id: lyricistObj._id,
-      //     submissionStatus: "available",
-      //   },
-      // },
+      crafters: {
+        lyricist: {
+          submissionStatus: "available",
+        },
+      },
     });
 
     // Save the order in the session

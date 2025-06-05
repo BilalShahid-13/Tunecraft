@@ -17,10 +17,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCountdown } from "@/hooks/useCountdown";
+import useCountdown from "@/hooks/useCountdown";
 import { defaultTime, musicPlans } from "@/lib/Constant";
 import { formatDateTime, formatTimeHMSS } from "@/lib/utils";
-import useCrafterTask from "@/store/crafterTask";
 import useSidebarWidth from "@/store/sidebarWidth";
 import useTabValue from "@/store/tabValue";
 import useTasks from "@/store/tasks";
@@ -29,6 +28,7 @@ import { Clock, Loader2, MoveRight } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { toast } from "sonner";
 import ExtendTimeline from "./ExtendTimeline";
+import useTimer from "@/hooks/useTimer";
 
 const DialogDetails = memo(({ title, songGenre, userPlan, des, bgStory, badge, startWorking, isLoading, item }) => (
   <>
@@ -100,7 +100,7 @@ export default function TaskCard({
   const { width } = useSidebarWidth();
   const { setFetchedTasks } = useTasks()
   const { setTabValue } = useTabValue()
-  const countdown = useCountdown(assignedAtTime, defaultTime)
+  const countdown = useCountdown(assignedAtTime)
 
   useEffect(() => {
     if (plan) {
@@ -163,7 +163,6 @@ export default function TaskCard({
     }
   }
 
-  console.log('extend time', timeUp)
   const cardClick = () => {
     setAlertDialogOpen(true)
     if (timeUp && !inReview) {
@@ -177,7 +176,8 @@ export default function TaskCard({
 
   return (
     <>
-      {(badge === 'active' && timeUp && !inReview) && <ExtendTimeline orderId={item?._id}
+      {(badge === 'active' && timeUp && !inReview) &&
+      <ExtendTimeline orderId={item?.orderId}
         setTimeUpHandled={setTimeUpHandled}
         timeUp={timeUp}
         role={session.user.role} userId={session.user.id}
