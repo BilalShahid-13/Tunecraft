@@ -40,6 +40,7 @@ const useFetchTasks =
       setIsLoadingActiveTask(true);
       try {
         const { activeTask, crafterTask } = await fetchActiveTask(fetchedTasks);
+        setActiveTask(crafterTask);    // new update
         setActiveTask(activeTask);    // activeTask is always an array
         setCrafterTask(crafterTask);  // crafterTask is object or null
       } catch (error) {

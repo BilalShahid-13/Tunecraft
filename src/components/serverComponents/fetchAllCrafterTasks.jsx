@@ -14,14 +14,16 @@ export default async function fetchAllCrafterTask() {
           updatedAt: items?.updatedAt,
           approvalStatus: _crafterStatus(items?.matchedCrafters[0].submissionStatus).label,
           status: "Task Submission",
+          payment: items?.payment,
           orderId: items?.orderId,
           _id: items?.matchedCrafters[0]?.assignedCrafterId?._id,
           username: items?.name,
+          crafterFeedback: items.matchedCrafters[0]?.crafterFeedback,
           role: items?.matchedCrafters[0].assignedCrafterId?.role,
         }
       ))
       console.log(newNotifications, res.data.data)
-      if(newNotifications === undefined || null){
+      if (newNotifications === undefined || null) {
         return {
           notification: [],
           allUser: { users: res.data.data, mode: "task", task: res.data.data },

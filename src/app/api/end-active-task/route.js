@@ -16,6 +16,7 @@ export async function PATCH(req) {
       _id: orderId,
       [`crafters.${role}.assignedCrafterId`]: crafterId,
     });
+    const user = await User.findOne({ _id: crafterId });
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
@@ -26,7 +27,7 @@ export async function PATCH(req) {
         { status: 400 }
       );
     }
-    if (crafter.penaltyCount >= 4) {
+    if (user.penaltyCount >= 4) {
       return NextResponse.json(
         { error: `You have exceeded the maximum penalty count` },
         { status: 400 }
@@ -39,13 +40,13 @@ export async function PATCH(req) {
       // Time has expired - apply penalty
       crafter.rejectedCrafters = [...crafter.rejectedCrafters, crafterId];
       crafter.assignedAtTime = null;
-      crafter.assignedCrafterId = null;
       crafter.submissionStatus = "available";
       crafter.extension.granted = false;
       crafter.extension.until = null;
-      crafter.penaltyCount = crafter.penaltyCount + 1;
+      user.penaltyCount = user.penaltyCount + 1;
 
       await order.save();
+      await user.save();
       return NextResponse.json(
         { message: "Extension expired, penalty applied" },
         { status: 200 }

@@ -25,6 +25,7 @@ export default function ActiveTaskCard({ taskName = 'active'
         return 'border-l-green-400'
     }
   }
+
   return (
     <>
       <div
@@ -49,30 +50,23 @@ export default function ActiveTaskCard({ taskName = 'active'
                    gap-4 max-sm:grid-cols-1 max-xs:grid-cols-1`}>
             {isLoading ? (
               <SkeletonCard />
-            ) : !tasks || tasks.length === 0 ? (
+            ) : !tasks || tasks === null || tasks.length === 0 ? (
               <NoAvailableTasks msg={taskName} />
             ) : (
-              tasks.map((item, index) => (
-                <React.Fragment key={index}>
-                  <TaskCard
-                    key={index}
-                    index={index}
-                    badge={taskName}
-                    musicTemplate={item?.title}
-                    inReview={inReview}
-                    title={item?.songGenre}
-                    session={session}
-                    des={item?.jokes}
-                    plan={item?.plan}
-                    songGenre={item?.songGenre}
-                    item={item}
-                    assignedAtTime={item?.dueDate}
-                    currentStage={item?.currentStage}
-                  />
-                </React.Fragment>
-              ))
+              <TaskCard
+                badge={taskName}
+                musicTemplate={!inReview ? tasks?.title : tasks[0]?.musicTemplate}
+                inReview={inReview}
+                title={!inReview ? tasks?.songGenre : tasks[0]?.title}
+                session={session}
+                des={!inReview ? tasks?.jokes : tasks[0]?.jokes}
+                plan={!inReview ? tasks?.plan : tasks[0].plan}
+                songGenre={!inReview ? tasks?.songGenre : tasks[0]?.songGenre}
+                item={tasks}
+                assignedAtTime={!inReview ? tasks?.dueDate : tasks[0]?.crafters[session?.user?.role]?.taskDeadline}
+                currentStage={!inReview ? tasks.currentStage : `${tasks[0]?.currentStage}`}
+              />
             )}
-
           </div>
         </Suspense>
       </div>

@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import useCountdown from "@/hooks/useCountdown";
-import { defaultTime, musicPlans } from "@/lib/Constant";
+import { musicPlans } from "@/lib/Constant";
 import { formatDateTime, formatTimeHMSS } from "@/lib/utils";
 import useSidebarWidth from "@/store/sidebarWidth";
 import useTabValue from "@/store/tabValue";
@@ -28,7 +28,6 @@ import { Clock, Loader2, MoveRight } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { toast } from "sonner";
 import ExtendTimeline from "./ExtendTimeline";
-import useTimer from "@/hooks/useTimer";
 
 const DialogDetails = memo(({ title, songGenre, userPlan, des, bgStory, badge, startWorking, isLoading, item }) => (
   <>
@@ -88,7 +87,7 @@ export default function TaskCard({
   musicTemplate,
   des = 'i want song like o repiya sung by rahet',
   plan, item, session, assignedAtTime, index, inReview,
-  time = '3hr', bgStory, currentStage, songGenre, setGracePeriodError
+  time = '3hr', bgStory, currentStage, songGenre
 }) {
   const [userPlan, setUserPlan] = useState({ title: '', price: 0 })
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -104,21 +103,25 @@ export default function TaskCard({
 
   useEffect(() => {
     if (plan) {
+
       let stageKey = currentStage;
-      const musicPlan = musicPlans.find(item => item.plan === plan.name)
-      if (currentStage.includes('review_lyricist') || currentStage.includes('review_singer') || currentStage.includes('review_engineer')) {
+
+      // Check if currentStage is defined before calling .includes
+      if (currentStage && (currentStage.includes('review_lyricist') || currentStage.includes('review_singer') || currentStage.includes('review_engineer'))) {
         stageKey = currentStage.split('_')[1];
       }
+
+      const musicPlan = musicPlans.find(item => item.plan === plan.name);
       if (musicPlan) {
-        setUserPlan({ price: musicPlan[stageKey], title: musicPlan.plan })
+        setUserPlan({ price: musicPlan[stageKey], title: musicPlan.plan });
       }
     }
-  }, [plan])
+  }, [plan, currentStage]);  // Make sure to also include currentStage as a dependency
+
 
   useEffect(() => {
     if (countdown === '0:00:00' && !timeUpHandled) {
       setTimeUp(true)
-      console.warn('timeup')
     }
   }, [countdown, timeUpHandled])
 
@@ -133,6 +136,11 @@ export default function TaskCard({
         return {
           text: 'text-red-400',
           bg: 'bg-red-400'
+        };
+      case 'review':
+        return {
+          text: 'text-yellow-400',
+          bg: 'bg-yellow-400'
         };
       case 'completed':
         return {
@@ -168,7 +176,7 @@ export default function TaskCard({
     if (timeUp && !inReview) {
       return <ExtendTimeline />
     } else {
-      if (inReview || (badge === 'active')) {
+      if (inReview || (badge === 'active' || badge === "review")) {
         setTabValue({ value: 'Tasks' })
       }
     }
@@ -176,21 +184,21 @@ export default function TaskCard({
 
   return (
     <>
-      {(badge === 'active' && timeUp && !inReview) &&
-      <ExtendTimeline orderId={item?.orderId}
-        setTimeUpHandled={setTimeUpHandled}
-        timeUp={timeUp}
-        role={session.user.role} userId={session.user.id}
-        isOpen={alertDialogOpen} onOpenChange={setAlertDialogOpen} />}
+      {((badge === 'active' || badge === "review") && timeUp && !inReview) &&
+        <ExtendTimeline orderId={item?.orderId}
+          setTimeUpHandled={setTimeUpHandled}
+          timeUp={timeUp}
+          role={session.user.role} userId={session.user.id}
+          isOpen={alertDialogOpen} onOpenChange={setAlertDialogOpen} />}
       <Card
         onClick={cardClick}
         onMouseEnter={() => {
-          if (inReview || (badge === 'active')) {
+          if (inReview || (badge === 'active' || badge === "review")) {
             setActiveCardHover(index)
           }
         }}
         onMouseLeave={() => {
-          if ((inReview || badge === 'active')) {
+          if ((inReview || badge === 'active' || badge === "review")) {
             setActiveCardHover(false)
           }
         }}
@@ -202,7 +210,7 @@ export default function TaskCard({
           ${badge === 'available' ? 'w-[320px] max-lg:w-[380px]' :
             `w-[420px] max-lg:w-[380px] max-xl:w-[430px]`} font-inter`}
            max-xs:w-full max-sm:w-full
-        ${badge === 'active' && (activeCardHover === index) ?
+        ${(badge === 'active' || badge === "review") && (activeCardHover === index) ?
             'border-red-400 cursor-pointer' : ''} transition-all ease-in duration-150`}>
         <CardHeader className={'flex flex-row justify-between items-center'}>
           <CardTitle className={'flex flex-col gap-2 font-inter'}>
@@ -233,8 +241,8 @@ export default function TaskCard({
               <p className='font-inter font-light text-xs'>{formatDateTime(assignedAtTime).time}</p>
             </div>}
             {inReview ? <p className='font-inter'>
-              {(inReview && badge === 'active') && formatTimeHMSS(assignedAtTime)}</p> :
-              <p className='font-inter'>{badge === 'active' && countdown}</p>}
+              {(inReview && (badge === 'active' || badge === "review")) && formatTimeHMSS(assignedAtTime)}</p> :
+              <p className='font-inter'>{(badge === 'active' || badge === "review") && countdown}</p>}
           </div>
           <div className='text-zinc-400 text-sm flex items-center gap-2 max-xs:text-xs'>
             <h2 className='font-semibold font-inter'>MX$</h2>

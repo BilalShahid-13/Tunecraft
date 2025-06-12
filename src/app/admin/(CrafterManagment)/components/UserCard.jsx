@@ -27,17 +27,17 @@ import {
 } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { _userStatus } from "@/lib/utils";
 import useAllUsers from "@/store/allUsers";
+import useNotificationStore from "@/store/notification";
 import { generateStrongPassword } from "@/utils/generateStrongPassword";
+import { Loader } from "@/utils/Skeleton";
 import axios from "axios";
-import { Check, Frown, Loader2, Mail, Phone, Sliders, User, X } from 'lucide-react';
+import { Check, Loader2, Mail, Phone, Sliders, User, X } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import UpdateUser from "./UpdateUser";
-import useNotificationStore from "@/store/notification";
-import { _userStatus } from "@/lib/utils";
-import { Loader } from "@/utils/Skeleton";
+import { handleDownloadWithRef } from "@/lib/handleDownloadWithName";
 
 export default function UserCard({ users, isLoading = false, userStatus = null, userRole = false }) {
   const [allUsers, setAllUsers] = useState([])
@@ -50,6 +50,9 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
   const { setIsUpdate } = useAllUsers()
   const { isClicked, setClicked, notificationId } = useNotificationStore()
   const cardRefs = useRef({});
+  const downloadRefs = useRef([]);
+  const [loadingStates, setLoadingStates] = useState({});
+
   useEffect(() => {
     if (users) {
       setAllUsers(users)
@@ -92,7 +95,6 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
         password: password,
       });
       if (res) {
-        console.log('userCard', res)
       }
       toast.success(`${res.data.message}`);
       setIsUpdate(true);
@@ -113,7 +115,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
       });
       if (res.statusText === 'OK') {
         toast.success(user.crafterId + 'Application Discarded');
-        setTimeout(() => setIsUpdate(), 500);
+        setTimeout(() => setIsUpdate(true), 500);
 
       }
     } catch (error) {
@@ -130,7 +132,7 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
         data: { id: user._id }
       });
       if (res.statusText === 'OK') {
-        setIsUpdate();
+        setIsUpdate(true);
       }
     } catch (error) {
       console.error(error);
@@ -138,6 +140,17 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
       setDiscardLoading(false)
     }
   }
+
+  const handleDownload = async (fileUrl, fileName, index) => {
+    setLoadingStates((prev) => ({ ...prev, [index]: true }));
+
+    try {
+      const linkRef = { current: downloadRefs.current[index] };
+      await handleDownloadWithRef(fileUrl, fileName, linkRef);
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, [index]: false }));
+    }
+  };
 
   const handleIframeLoad = () => {
     setFrameLoading(false);
@@ -203,11 +216,11 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
 
               <CardContent>
                 <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1">
+                  <AccordionItem value="item-1" >
                     <AccordionTrigger className={'cursor-pointer'}>
                       View CV
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className={'flex flex-col gap-6'}>
                       {/* CV Preview (using Google Docs Viewer) */}
                       {frameLoading &&
                         <div className="flex justify-center items-center h-6">
@@ -225,13 +238,37 @@ export default function UserCard({ users, isLoading = false, userStatus = null, 
                         style={frameLoading ? { display: 'none' } : { display: 'block' }} // Hide iframe while loading
                       ></iframe>
                       {/* Download Button */}
+                      <Button
+                        // variant="link"
+                        className="cursor-pointer"
+                        disabled={loadingStates[index]}
+                        onClick={() =>
+                          handleDownload(items.cv, `${items.username}CV-Resume.pdf`, index)
+                        }
+                      >
+                        {loadingStates[index] ? (
+                          <>
+                            <Loader2 className="animate-spin w-full" />
+                            Downloading
+                          </>
+                        ) : (
+                          "Download File"
+                        )}
+                      </Button>
+                      {/* Hidden anchor element for each file */}
                       <a
+                        ref={(el) => (downloadRefs.current[index] = el)}
+                        style={{ display: "none" }}
+                        aria-hidden="true"
+                      />
+                      {/* <a
                         href={items.cv}
-                        download={`${items.username}CV-Resume.pdf`}
+                        // download={`${items.username}CV-Resume.pdf`}
+
                         className="mt-4 inline-block bg-[#ff7e6e] hover:bg-red-400 transition duration-150 ease text-zinc-900 py-2 px-4 rounded"
                       >
                         Download CV
-                      </a>
+                      </a> */}
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

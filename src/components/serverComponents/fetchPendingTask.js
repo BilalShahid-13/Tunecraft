@@ -64,7 +64,10 @@ export default async function fetchPendingTask(fetchedTasks = false) {
       title: firstTask.musicTemplate,
       des: firstTask.jokes,
       requirements: firstTask.backgroundStory,
+      adminFeedback: firstTask.crafters?.[session.user.role]?.adminFeedback,
+      crafterFeedback: firstTask.crafters?.[session.user.role]?.crafterFeedback,
       clientName: firstTask.name,
+      userStatus: "pending",
       dueDate: firstTask.crafters?.[session.user.role]?.assignedAtTime || "",
       submittedFileUrls:
         firstTask.crafters?.[prevRole(session.user.role)]?.submittedFile || [],

@@ -7,14 +7,13 @@ import useSidebarWidth from '@/store/sidebarWidth';
 import useTabValue from "@/store/tabValue";
 import { Loader } from "@/utils/Skeleton";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 
 const UserCard = lazy(() => import("./UserCard"));
 const CustomCard = lazy(() => import("./CustomCard"));
-const PendingApproval = lazy(() => import("./PendingApproval"));
-const ApproveUsers = lazy(() => import("./ApproveUsers"));
-const RejectedUsers = lazy(() => import("./RejectedUsers"));
+const PendingApproval = lazy(() => import("./approvals/PendingApproval"));
+const ApproveUsers = lazy(() => import("./approvals/ApproveUsers"));
+const RejectedUsers = lazy(() => import("./approvals/RejectedUsers"));
 const UserRole = lazy(() => import("./UserRole"));
 
 const components = [
@@ -62,8 +61,6 @@ export default function craftersManagment() {
       setLoading(false)
     }
   }
-
-
 
   return (
     <>

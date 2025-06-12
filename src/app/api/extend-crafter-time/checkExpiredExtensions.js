@@ -1,7 +1,6 @@
 "use server";
 import { dbConnect } from "@/lib/dbConnect";
 import Order from "@/Schema/Order";
-import cron from "node-cron";
 
 export const checkExpiredExtensions = async () => {
   try {
@@ -28,7 +27,7 @@ export const checkExpiredExtensions = async () => {
             crafter.assignedCrafterId,
           ];
           crafter.assignedAtTime = null;
-          crafter.assignedCrafterId = null;
+          // crafter.assignedCrafterId = null;
           crafter.submissionStatus = "available";
           crafter.penaltyCount = (crafter.penaltyCount || 0) + 1;
 
@@ -46,6 +45,3 @@ export const checkExpiredExtensions = async () => {
     console.error("Error in checking expired extensions:", err);
   }
 };
-
-// Schedule the cron job to run every minute
-cron.schedule("* * * * *", checkExpiredExtensions); // Every minute

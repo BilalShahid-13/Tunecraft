@@ -27,7 +27,6 @@ export default async function plentyAction() {
     // Check if the response is successful
     if (response.ok) {
       const data = await response.json(); // Parse the response as JSON
-      console.log("Plenty count data:", data);
       return {
         plenty: data.data, // Assuming 'data' contains the plenty count
       };

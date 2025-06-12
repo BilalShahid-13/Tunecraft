@@ -12,8 +12,8 @@ export default function Plenties() {
   const fetchPlenties = async () => {
     try {
       const res = await plentyAction(); // Call the action function
-      console.log("Plenty:", res); // Log the fetched plenty count
       setPlenty(res.plenty); // Update the state with plenty count
+      console.log('plenties',res)
     } catch (error) {
       console.error("Error fetching plenties:", error);
     }

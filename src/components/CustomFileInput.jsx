@@ -28,16 +28,7 @@ const CustomFileInput = ({
   const clearFiles = () => {
     setFiles([])
     setUploadSuccess(false)
-    // if (signupForm?.setValue) {
-    //   signupForm.setValue(formFieldName, [])
-    //   if (signupForm.trigger) {
-    //     signupForm.trigger(formFieldName)
-    //   }
-    // }
   }
-
-  // console.log('signupForm', signupForm)
-
   useEffect(() => {
     if (onReset) {
       clearFiles()

@@ -2,7 +2,7 @@
 import { signupAction } from "@/components/serverComponents/signupAction"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn, useSession } from "next-auth/react"
+import { getSession, signIn, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { lazy, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -46,7 +46,7 @@ export default function page() {
   const [onFileReset, setOnFileReset] = useState(false);
   const { data: session } = useSession();
   const [loginLoading, setLoginLoading] = useState();
-  const [getSession, setSession] = useState(null);
+  // const [getSession, setSession] = useState(null);
   const navigate = useRouter();
 
   // Login form
@@ -75,39 +75,49 @@ export default function page() {
   })
 
   const onLoginSubmit = async (data) => {
-    setLoginLoading(true)
+    setLoginLoading(true); // Start loading when submit is initiated
+
     try {
+      // Call signIn with credentials
       const res = await signIn("credentials", {
+        redirect: false,
         email: data.email,
         password: data.password,
-        redirect: false,
       });
-      if (!res) {
-        toast.error("Unexpected error during sign-in");
-        setLoginLoading(false);
-        return;
-      }
-      if (!res.ok) {
-        setLoginLoading(false);
-        // res.error might be undefined or a string; fall back to a default.
+
+      if (res.error) {
+        // If there's an error during login, show the error message
         const message = res.error || "Login failed. Please try again.";
         toast.error(message);
+        setLoginLoading(false); // Stop loading
         return;
+      } else {
+        // Now fetch the session data using getSession
+        const session = await getSession(); // This ensures we have the latest session
+
+        if (session && session.user && session.user.role) {
+          try {
+            // Now navigate based on the session role
+            toast.success("Login successful");
+            await navigate.push(`/${session.user.role}`);
+          } catch (error) {
+            console.error("Navigation error:", error);
+            toast.error("Something went wrong during navigation");
+          } finally {
+            setLoginLoading(false); // Stop loading
+          }
+        } else {
+          toast.error("Session not available, please try again.");
+          setLoginLoading(false); // Stop loading
+        }
       }
-      if (res.ok) {
-        console.log('session', getSession)
-        // if (getSession) {
-        navigate.push(`/${session.user.role}`)
-        setLoginLoading(true);
-      }
-      setLoginLoading(false);
     } catch (error) {
       console.error("Login exception:", error);
       toast.error("Something went wrong during login");
-      setLoginLoading(false);
-    } finally {
+      setLoginLoading(false); // Stop loading
     }
   };
+
 
   async function onhandleSignup(data) {
     // setIsLoading(true);

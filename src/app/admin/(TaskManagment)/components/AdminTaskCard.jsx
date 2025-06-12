@@ -1,5 +1,7 @@
 "use client";
 
+import crafterApproveAction from "@/components/serverComponents/crafterApproveAction";
+import crafterRevision from "@/components/serverComponents/crafterRevision";
 import {
   Accordion,
   AccordionContent,
@@ -16,7 +18,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -25,11 +39,17 @@ import {
 import { handleDownloadWithRef } from "@/lib/handleDownloadWithName";
 import { _crafterStatus, formatCentsToDollars, formatDateTime } from "@/lib/utils";
 import useAllUsers from "@/store/allUsers";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Files, Loader2, TriangleAlert } from "lucide-react";
+import { Files, History, Loader2, TriangleAlert } from "lucide-react";
 import { forwardRef, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
+const formSchema = z.object({
+  message: z.string().min(10, { message: "Message is required" }), // Ensure message field is 10 chars minimum
+});
 const AdminTaskCard = forwardRef(
   (
     {
@@ -49,6 +69,7 @@ const AdminTaskCard = forwardRef(
       songGenre,
       backgroundStory,
       penaltyCount,
+      revisionAttempts,
       crafterComments,
       userStatus = 'pending',
       tab = 'allCrafters'
@@ -56,37 +77,65 @@ const AdminTaskCard = forwardRef(
     ref
   ) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [revisionLoading, setRevisionLoading] = useState(false)
     const [loadingStates, setLoadingStates] = useState({});
     const downloadRefs = useRef([]);
-    const { setIsUpdate } = useAllUsers();
+    const { removeUser } = useAllUsers();
+    const approveForm = useForm({
+      resolver: zodResolver(formSchema), // Zod Resolver
+      defaultValues: {
+        message: "",
+      }
+    });
 
     const onApprove = async (item) => {
       let nextRole = "";
-      if (item.submittedCrafter.role === "lyricist") {
+      const currentRole = item.role;
+      if (currentRole === "lyricist") {
         nextRole = "singer";
-      } else if (item.submittedCrafter.role === "singer") {
+      } else if (currentRole === "singer") {
         nextRole = "engineer";
-      } else if (item.submittedCrafter.role === "engineer") {
-        nextRole = "engineer";
+      } else if (currentRole === "engineer") {
+        nextRole = "done";
       }
 
       try {
         setIsLoading(true);
-        const res = await axios.patch("/api/admin/crafter-approve", {
-          orderId: item._id,
-          role: nextRole,
-          prevRole: item.submittedCrafter.role,
-        });
+        const res = await crafterApproveAction(
+          item._id,
+          nextRole,
+          item.payment,
+          item.role,
+          crafterUsername,
+          crafterEmail
+        )
         if (res.status === 200) {
-          setIsUpdate(true);
-          toast.success(res.data.message);
+          toast.success(res.message || res.error)
+          removeUser(item.assignedCrafterId._id)
         }
       } catch (error) {
-        console.error(error.response?.data?.error);
+        console.error(error);
       } finally {
         setIsLoading(false);
       }
     };
+
+    const onRevision = async (item, data) => {
+      setRevisionLoading(true)
+      try {
+        const res = await crafterRevision(item._id, item.assignedCrafterId._id,
+          item.role, item.crafterUsername, item.crafterEmail, item.musicTemplate, data.message)
+        if (res.message) {
+          toast.success(res.message || res.error)
+          removeUser(item.assignedCrafterId._id)
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error(error.error);
+      } finally {
+        setRevisionLoading(false)
+      }
+    }
 
     const handleDownload = async (fileUrl, fileName, index) => {
       setLoadingStates((prev) => ({ ...prev, [index]: true }));
@@ -100,7 +149,7 @@ const AdminTaskCard = forwardRef(
     };
 
     return (
-      <Card className="w-full" ref={ref}>
+      <Card className="w-full justify-start" ref={ref}>
         <CardHeader className="w-full">
           <CardTitle className="grid grid-cols-2 gap-12 justify-between items-center w-full">
             {/* Order Template */}
@@ -248,6 +297,18 @@ const AdminTaskCard = forwardRef(
                   <p>No of Plenties</p>
                 </TooltipContent>
               </Tooltip>}
+
+              {revisionAttempts > 0 && <Tooltip>
+                <TooltipTrigger>
+                  <div className="flex flex-row gap-2 justify-end items-end">
+                    <History size={18}
+                      className="text-primary" /> 0{revisionAttempts}</div>
+                </TooltipTrigger>
+                <TooltipContent className={'bg-primary'}>
+                  <p>No of Revisions</p>
+                </TooltipContent>
+              </Tooltip>}
+              {/* revisionAttempts */}
               <div className="flex flex-col justify-end items-end">
                 <p>{formatDateTime(time).date}</p>
                 <p>{formatDateTime(time).time}</p>
@@ -257,31 +318,107 @@ const AdminTaskCard = forwardRef(
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="flex flex-row-reverse max-sm:flex-col-reverse justify-between items-center gap-3">
-          {!tab === 'allCrafters' && <Button
-            className="max-sm:w-full cursor-pointer"
-            onClick={() => onApprove(item)}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="animate-spin" /> Loading
-              </>
-            ) : (
-              "Approve"
+        <CardContent className={`
+        ${!crafterComments ? "" : "flex flex-row max-sm:flex-col-reverse justify-between items-center"}
+         gap-3`}>
+          <div className="grid">
+            {crafterComments && <Accordion type="single" collapsible
+            >
+              <AccordionItem value="item-4">
+                <AccordionTrigger>Crafter Comments</AccordionTrigger>
+                <AccordionContent>
+                  {crafterComments}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>}
+          </div>
+          <div>
+            {tab === 'pendingCrafters' && (
+              <div className="flex flex-row justify-end items-end gap-4">
+                {item.revisionAttempts === 0 && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="max-sm:w-full cursor-pointer">
+                        {revisionLoading ? (
+                          <>
+                            <Loader2 className="animate-spin" /> Loading
+                          </>
+                        ) : (
+                          "Revision"
+                        )}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Revision Details</DialogTitle>
+                        <DialogDescription>
+                          Please approve the revision. Form provide an explanation for revising this order. This will help the crafter understand the reason for the change.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <Form {...approveForm}>
+                        <form
+                          onSubmit={approveForm.handleSubmit((data) => onRevision(item, data))}
+                          className="flex flex-col gap-3"
+                        >
+                          <FormField
+                            control={approveForm.control}
+                            name="message"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Textarea placeholder="Revision Details" {...field} />
+                                </FormControl>
+                                <FormMessage>
+                                  {approveForm.formState.errors.message && (
+                                    <p className="text-red-500">
+                                      {approveForm.formState.errors.message.message}
+                                    </p>
+                                  )}
+                                </FormMessage>
+                              </FormItem>
+                            )}
+                          />
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            {revisionLoading ? (
+                              <>
+                                <Loader2 className="animate-spin" /> Loading
+                              </>
+                            ) : (
+                              <Button type="submit"
+                                className={'cursor-pointer'}>Confirm Revision</Button>
+                            )}
+                          </DialogFooter>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
+                )}
+                {item.revisionAttempts >= 0 && (
+                  <Button
+                    className="max-sm:w-full cursor-pointer"
+                    onClick={() => onApprove(item)}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" /> Loading
+                      </>
+                    ) : (
+                      "Approve"
+                    )}
+                  </Button>
+                )}
+              </div>
             )}
-          </Button>}
 
-          {crafterComments && <Accordion type="single" collapsible>
-            <AccordionItem value="item-4">
-              <AccordionTrigger>Crafter Comments</AccordionTrigger>
-              <AccordionContent>
-                {crafterComments}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>}
+          </div>
         </CardContent>
-        <CardFooter />
-      </Card>
+        <CardFooter>
+
+        </CardFooter>
+      </Card >
     );
   }
 );

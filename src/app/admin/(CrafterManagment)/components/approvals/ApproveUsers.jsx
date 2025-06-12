@@ -1,7 +1,7 @@
 "use client";
 import useAllUsers from '@/store/allUsers';
 import React, { useEffect, useState } from 'react';
-import UserCard from './UserCard';
+import UserCard from '../UserCard';
 
 export default function ApproveUsers() {
   const { activeUser } = useAllUsers()

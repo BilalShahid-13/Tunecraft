@@ -7,22 +7,24 @@ import { useEffect, useRef, useState } from 'react';
 import AdminTaskCard from '../AdminTaskCard';
 
 export default function AllCrafters() {
-  const { addAllUser, setIsUpdate } = useAllUsers()
+  const { addAllUser, setIsUpdate, isFetched } = useAllUsers()
   const [allCrafters, setAllCrafter] = useState([]);
   const [isScroll, setIsScroll] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const cardRefs = useRef({});
+  useSmoothScroll(cardRefs, isScroll);
+
   useEffect(() => {
     fetchAllUsers();
-  }, [])
+    console.log("isFetched allCrafters", isFetched)
+  }, [isFetched, setIsUpdate])
 
-  useSmoothScroll(cardRefs, isScroll);
 
   const fetchAllUsers = async () => {
     try {
       setLoading(true)
       const res = await axios.get('/api/admin/get-all-Crafters')
-      // console.log('all-users', res.data.data)
+      console.log(res.data.data)
       setAllCrafter(res.data.data)
       setIsScroll(true);
       addAllUser({ users: res.data.data, mode: "task", task: res.data.data });
@@ -35,37 +37,36 @@ export default function AllCrafters() {
       setLoading(false)
     }
   }
-
-  console.log('allCrafters', allCrafters)
   return (
     <>
       {isLoading ? <Loader /> : <div className='flex flex-col gap-5'>
         {allCrafters.length === 0 ?
-          <p className="text-sm text-gray-500">No Crafters</p> : allCrafters.map((item) => <AdminTaskCard
-            key={item._id}
+          <p className="text-sm text-gray-500">No Crafters</p> : allCrafters.map((item, index) => <AdminTaskCard
+            key={index}
             ref={(el) => {
-              cardRefs.current[item.matchedCrafters[0].assignedCrafterId._id] = el;
+              cardRefs.current[item.assignedCrafterId._id] = el;
             }}
             item={item}
             orderName={item.musicTemplate}
             planName={item.plan.name}
             planPrice={item.plan.price}
             crafterId={item.orderId}
-            ordererName={item.name}
-            ordererEmail={item?.email}
+            ordererName={item.assignedCrafterId.username}
+            ordererEmail={item?.assignedCrafterId.email}
+            tab={'allCrafters'}
             songGenre={item.songGenre}
             backgroundStory={item.backgroundStory}
             jokes={item.jokes}
-            role={item?.matchedCrafters[0]?.role}
-            crafterUsername={item?.matchedCrafters[0]?.assignedCrafterId?.username}
-            crafterEmail={item.matchedCrafters[0].assignedCrafterId.email}
-            penaltyCount={item.matchedCrafters[0].penaltyCount}
-            crafterComments={item.matchedCrafters[0].crafterFeedback}
-            file={item.matchedCrafters[0].submittedFile}
-            time={item.matchedCrafters[0].submittedAtTime}
-            userStatus={item.matchedCrafters[0].submissionStatus}
+            role={item?.role}
+            crafterUsername={item?.crafterUsername}
+            crafterEmail={item?.crafterEmail}
+            penaltyCount={item?.penaltyCount}
+            crafterComments={item?.crafterFeedback}
+            file={item.submittedFile}
+            time={item.submittedAtTime}
+            revisionAttempts={item.revisionAttempts}
+            userStatus={(item.revisionAttempts > 0 && item?.submissionStatus === "submitted") ? "review" : item?.submissionStatus}
             isLoading={isLoading}
-            onClick={() => onApprove(item._id)}
           />)}
       </div>}
     </>

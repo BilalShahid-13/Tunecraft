@@ -1,7 +1,9 @@
 import { dbConnect } from "@/lib/dbConnect";
 import Order from "@/Schema/Order";
 import { NextResponse } from "next/server";
-
+import cron from "node-cron";
+import { checkExpiredExtensions } from "./checkExpiredExtensions";
+import User from "@/Schema/User";
 export async function PATCH(req) {
   const { orderId, role, crafterId } = await req.json();
   if (!orderId || !role || !crafterId) {
@@ -17,6 +19,7 @@ export async function PATCH(req) {
       _id: orderId,
       [`crafters.${role}.assignedCrafterId`]: crafterId,
     });
+    const user = await User.findOne({ _id: crafterId });
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
@@ -36,9 +39,13 @@ export async function PATCH(req) {
     if (!crafter.extension.granted) {
       crafter.extension.granted = true;
       crafter.extension.until = new Date(now.getTime() + twoHoursMs);
-      crafter.penaltyCount = crafter.penaltyCount + 1;
+      user.penaltyCount = user.penaltyCount + 1;
       await order.save();
-
+      await user.save();
+      cron.schedule("* * * * *", () => {
+        console.log("running cron scehduler");
+        checkExpiredExtensions();
+      });
       return NextResponse.json(
         {
           message: "2-hour extension granted",
@@ -58,8 +65,9 @@ export async function PATCH(req) {
       crafter.submissionStatus = "available";
       crafter.extension.granted = false;
       crafter.extension.until = null;
-      crafter.penaltyCount = crafter.penaltyCount + 1;
+      user.penaltyCount = user.penaltyCount + 1;
       await order.save();
+      await user.save();
       return NextResponse.json(
         { message: "Extension window expired. Submission cancelled." },
         { status: 205 }
@@ -67,7 +75,7 @@ export async function PATCH(req) {
     }
 
     // 3) if plenty is 3 so freeze all available tasks
-    if (crafter.penaltyCount === 3) {
+    if (user.penaltyCount === 3) {
       return NextResponse.json(
         { message: "Your available tasks are freeze now for 2 hours" },
         { status: 204 }

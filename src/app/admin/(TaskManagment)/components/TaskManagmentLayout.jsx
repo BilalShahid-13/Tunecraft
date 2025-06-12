@@ -1,5 +1,5 @@
 import { taskManagmentList } from '@/lib/Constant';
-import AdminTabRoot from '../../components/AdminTabRoot';
+import AdminTabRoot from '../../(CrafterManagment)/components/AdminTabRoot';
 import { lazy } from 'react';
 
 const AllCrafters = lazy(() => import('./CraftersTab/AllCrafters'));

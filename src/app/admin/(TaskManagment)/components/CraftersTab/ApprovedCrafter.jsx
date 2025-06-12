@@ -3,11 +3,10 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import useAllUsers from "@/store/allUsers";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import AdminTaskCard from "../AdminTaskCard";
 export default function ApprovedCrafter() {
   const { activeUser } = useAllUsers();
-
   const cardRefs = useRef({});
   useSmoothScroll(cardRefs, true);
 
@@ -21,26 +20,28 @@ export default function ApprovedCrafter() {
             <AdminTaskCard
               key={index}
               ref={(el) => {
-                cardRefs.current[item.matchedCrafters[0].assignedCrafterId._id] = el;
+                cardRefs.current[item.assignedCrafterId._id] = el;
               }}
               item={item}
               orderName={item.musicTemplate}
-              planName={item.plan?.name}
+              planName={item.plan.name}
               planPrice={item.plan.price}
               crafterId={item.orderId}
-              ordererName={item?.name}
-              ordererEmail={item.email}
+              ordererName={item.assignedCrafterId.username}
+              ordererEmail={item?.assignedCrafterId.email}
+              tab={'approvedCrafters'}
               songGenre={item.songGenre}
               backgroundStory={item.backgroundStory}
               jokes={item.jokes}
-              role={item?.matchedCrafters[0]?.role}
-              crafterUsername={item.matchedCrafters[0].assignedCrafterId.username}
-              crafterEmail={item.matchedCrafters[0].assignedCrafterId.email}
-              penaltyCount={item.matchedCrafters[0].penaltyCount}
-              crafterComments={item.matchedCrafters[0].crafterFeedback}
-              file={item.matchedCrafters[0].submittedFile}
-              time={item.matchedCrafters[0].submittedAtTime}
-              userStatus={item.matchedCrafters[0].submissionStatus}
+              role={item?.role}
+              crafterUsername={item?.crafterUsername}
+              crafterEmail={item?.crafterEmail}
+              penaltyCount={item?.penaltyCount}
+              crafterComments={item?.crafterFeedback}
+              file={item.submittedFile}
+              time={item.submittedAtTime}
+              userStatus={item?.submissionStatus}
+            // isLoading={isLoading}
             />
           ))
         )}

@@ -88,12 +88,15 @@ export function _userStatus(status) {
   }
 }
 
-
 export function _crafterStatus(status) {
   if (status === "submitted") {
     return { label: "pending", colorClass: "bg-blue-400" }; // Blue for pending
   }
   if (status === "approved") {
     return { label: "approved", colorClass: "bg-green-400" }; // Green for approved
+  }
+  if (status === "review") {
+    return { label: "pending review", colorClass: "bg-yellow-400" }; // Red for rejected
+    // return { label: "under review", colorClass: "bg-yellow-400" }; // Red for rejected
   }
 }

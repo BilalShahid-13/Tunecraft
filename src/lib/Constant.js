@@ -10,10 +10,12 @@ import Instagram from "../../public/footer/instagram logo.png";
 import X from "../../public/footer/x.png";
 
 // questions
-import Dashboard from "@/app/(Dashboard)/components/Dashboard";
-import craftersManagment from "@/app/admin/components/craftersManagment";
-import Notification from "@/app/admin/components/Notification";
-import projectManagment from "@/app/admin/(TaskManagment)/components/CraftersTab/PendingCrafters";
+import Dashboard from "@/app/(Role)/(Dashboard)/components/Dashboard";
+import Payments from "@/app/(Role)/(Payments)/Payments";
+import Tasks from "@/app/(Role)/(Task)/components/Tasks";
+import craftersManagment from "@/app/admin/(CrafterManagment)/components/craftersManagment";
+import Notification from "@/app/admin/(Notification)/Notification";
+import RootLayout from "@/app/admin/(TaskManagment)/components/TaskManagmentLayout";
 import UpdatePassword from "@/components/UpdatePassword";
 import {
   Bell,
@@ -33,9 +35,6 @@ import Celebration from "../../public/question/celebration.png";
 import loveSong from "../../public/question/love.png";
 import Music from "../../public/question/music.png";
 import Smile from "../../public/question/smile.png";
-import Tasks from "@/app/(Role)/(Task)/components/Tasks";
-import Payments from "@/app/(Role)/(Payments)/Payments";
-import RootLayout from "@/app/admin/(TaskManagment)/components/TaskManagmentLayout";
 
 export const Currency = "MX$";
 
@@ -382,6 +381,7 @@ export const SidebarItems = [
   {
     name: "Payments",
     Icon: Wallet2,
+    // route: payment,
     route: Payments,
   },
   {
@@ -395,12 +395,14 @@ export const adminPanel = [
   {
     name: "Crafters Management",
     Icon: UsersRound,
+    // route: crafterManagmentLayout,
     route: craftersManagment,
   },
   {
     name: "Task Managment",
     Icon: Clipboard,
     route: RootLayout,
+    // route: taskManagment,
   },
   {
     name: "Notifications",

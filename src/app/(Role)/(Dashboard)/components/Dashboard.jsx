@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import TaskLayoutRoot from './TaskLayoutRoot';
 import ActiveTaskCard from './ActiveTaskCard';
 import Plenties from './Plenties';
+import ReviewTaskCard from './ReviewTaskCard';
 
 const useFetchTasks = (
   session,
@@ -28,7 +29,7 @@ const useFetchTasks = (
   const setCrafterTask = useCrafterTask((state) => state.setCrafterTask);
 
   useEffect(() => {
-    if (!session) return;
+    // if (!session) return;
 
     const fetchAvailableTask = async () => {
       try {
@@ -46,8 +47,9 @@ const useFetchTasks = (
     const getActiveTask = async () => {
       setIsLoadingActiveTask(true);
       try {
-        const { crafterTask } = await fetchActiveTask(fetchedTasks);
-        setActiveTask(crafterTask); // activeTask is always an array
+        const { crafterTask, activeTask } = await fetchActiveTask(fetchedTasks);
+        setActiveTask(crafterTask);
+
         setCrafterTask(crafterTask); // crafterTask is object or null
       } catch (error) {
         console.error(error);
@@ -59,7 +61,6 @@ const useFetchTasks = (
     const getPendingTask = async () => {
       try {
         const { pendingTask: tasksArray, crafterTask: taskData } = await fetchPendingTask(fetchedTasks);
-
         if (Array.isArray(tasksArray) && tasksArray.length > 0) {
           setPendingTask(tasksArray);
         } else {
@@ -69,6 +70,7 @@ const useFetchTasks = (
         if (taskData) {
           setCrafterTask(taskData);
         }
+
       } catch (error) {
         console.error('Error fetching pending tasks:', error);
       }
@@ -184,13 +186,28 @@ export default function Dashboard() {
         <Plenties />
       </div>
       <div className="flex flex-col gap-12">
-        <ActiveTaskCard
+        {activeTask && (!activeTask?.adminFeedback) && <ActiveTaskCard
           taskName="active"
-          inReview={pendingTask.length > 0}
-          tasks={pendingTask.length > 0 ? pendingTask : activeTask}
+          inReview={false}
+          tasks={activeTask}
           session={session}
           isLoading={isLoadingActiveTask}
-        />
+        />}
+        {(activeTask?.adminFeedback) && <ReviewTaskCard
+          taskName="active"
+          badge={'review'}
+          inReview={false}
+          tasks={activeTask}
+          session={session}
+          isLoading={isLoadingActiveTask}
+        />}
+        {(pendingTask && pendingTask.length > 0) && <ActiveTaskCard
+          taskName="active"
+          inReview={true}
+          tasks={pendingTask}
+          session={session}
+          isLoading={isLoadingActiveTask}
+        />}
         <TaskLayoutRoot taskName="available" tasks={availableTask} session={session} isLoading={isLoadingAvailableTask} />
         <TaskLayoutRoot taskName="completed" tasks={completedTask} session={session} isLoading={isLoadingCompletedTask} />
       </div>

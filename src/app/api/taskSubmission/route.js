@@ -4,15 +4,18 @@ import { dbConnect } from "@/lib/dbConnect";
 import User from "@/Schema/User";
 import Order from "@/Schema/Order";
 import { NextResponse } from "next/server";
+import Payment from "@/Schema/Payment";
 
 export async function POST(request) {
   try {
     const formData = await request.formData();
     const files = formData.getAll("submissionFile");
-    const comments = formData.get("comments");
+    const comments = formData.get("comment");
     const role = formData.get("role");
     const orderId = formData.get("orderId");
     const crafterId = formData.get("crafterId");
+    const planId = formData.get("planId");
+    const projectName = formData.get("projectName");
 
     // Basic validations
     if (!role || !orderId || !crafterId) {
@@ -63,6 +66,18 @@ export async function POST(request) {
       );
     }
 
+    // update payment model
+    const payment = await Payment.create({
+      crafterRole: role,
+      crafterId: crafterId,
+      orderId: orderId,
+      plan: planId,
+      projectName: projectName,
+      paymentStatus: "pending",
+      paymentDate: now,
+    });
+    await payment.save();
+
     // Upload each file to Cloudinary
     const uploadPromises = files.map(async (file) => {
       const buffer = Buffer.from(await file.arrayBuffer());
@@ -83,7 +98,7 @@ export async function POST(request) {
       fileUrl: secureUrls[index],
     }));
     order.crafters[role].crafterFeedback = comments;
-
+    order.payment = payment._id;
     await order.save();
 
     return NextResponse.json(

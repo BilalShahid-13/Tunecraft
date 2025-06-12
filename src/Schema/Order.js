@@ -110,6 +110,11 @@ const orderSchema = new mongoose.Schema(
       ref: "Plan",
       required: [true, "Plan is required"],
     },
+    payment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+      required: false,
+    },
     musicTemplate: {
       type: String,
       enum: musicGenreEnum,

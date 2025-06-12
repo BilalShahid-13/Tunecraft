@@ -32,7 +32,7 @@ export function AppSidebar({ sidebarCollapsed, toggleSidebar, isMobile, items })
       const notificationItem = items.find((item) => item.name === 'Notifications');
       if (notificationItem && !isFetched) {
         getNotification();
-        getAllCrafterTasks();
+        // getAllCrafterTasks();
         setIsUpdate(true)
       }
     }

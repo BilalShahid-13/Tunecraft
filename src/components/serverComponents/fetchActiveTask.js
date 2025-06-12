@@ -55,16 +55,58 @@ export default async function fetchActiveTask(fetchedTasks = false) {
     // 4) Build crafterTask from the first active task
     const firstTask = tasks[0];
     let newTaskData = {};
-    if (firstTask.crafters[session.user.role].extension.granted === true) {
+
+    if (
+      firstTask.crafters[session.user.role].submissionStatus === "rejected" &&
+      firstTask.crafters[session.user.role].extension.granted === true
+    ) {
       newTaskData = {
         orderId: firstTask._id,
         title: firstTask.musicTemplate,
         songGenre: firstTask.songGenre,
         des: firstTask.jokes,
+        plan: firstTask.plan,
+        adminFeedback: firstTask.crafters[session.user.role].adminFeedback,
+        requirements: firstTask.backgroundStory,
+        currentStage: firstTask.currentStage,
+        clientName: firstTask.name,
+        userStatus: "review",
+        dueDate: firstTask.crafters?.[session.user.role]?.extension.until,
+        submittedFileUrls: firstTask.crafters[session.user.role].submittedFile,
+      };
+    } else if (
+      firstTask.crafters[session.user.role].submissionStatus === "rejected" &&
+      firstTask.crafters[session.user.role].extension.granted === false
+    ) {
+      newTaskData = {
+        orderId: firstTask._id,
+        title: firstTask.musicTemplate,
+        songGenre: firstTask.songGenre,
+        des: firstTask.jokes,
+        plan: firstTask.plan,
+        adminFeedback: firstTask.crafters[session.user.role].adminFeedback,
+        requirements: firstTask.backgroundStory,
+        currentStage: firstTask.currentStage,
+        clientName: firstTask.name,
+        userStatus: "review",
+        dueDate: firstTask.crafters?.[session.user.role]?.taskDeadline,
+        submittedFileUrls: firstTask.crafters[session.user.role].submittedFile,
+      };
+    } else if (
+      firstTask.crafters[session.user.role].submissionStatus === "assigned" &&
+      firstTask.crafters[session.user.role].extension.granted === true
+    ) {
+      newTaskData = {
+        orderId: firstTask._id,
+        title: firstTask.musicTemplate,
+        songGenre: firstTask.songGenre,
+        des: firstTask.jokes,
+        adminFeedback: firstTask?.adminFeedback,
         requirements: firstTask.backgroundStory,
         clientName: firstTask.name,
         plan: firstTask.plan,
         currentStage: firstTask.currentStage,
+        userStatus: "active",
         dueDate: firstTask.crafters?.[session.user.role]?.extension.until,
         submittedFileUrls:
           firstTask.crafters?.[prevRole(session.user.role)]?.submittedFileUrl ||
@@ -77,9 +119,11 @@ export default async function fetchActiveTask(fetchedTasks = false) {
         songGenre: firstTask.songGenre,
         des: firstTask.jokes,
         plan: firstTask.plan,
+        adminFeedback: firstTask?.adminFeedback,
         requirements: firstTask.backgroundStory,
         currentStage: firstTask.currentStage,
         clientName: firstTask.name,
+        userStatus: "active",
         dueDate: firstTask.crafters?.[session.user.role]?.taskDeadline,
         submittedFileUrls:
           firstTask.crafters?.[prevRole(session.user.role)]?.submittedFileUrl ||
@@ -89,7 +133,7 @@ export default async function fetchActiveTask(fetchedTasks = false) {
 
     return {
       activeTask: tasks,
-      crafterTask: [newTaskData],
+      crafterTask: newTaskData,
     };
   } catch (error) {
     console.error(

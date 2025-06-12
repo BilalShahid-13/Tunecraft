@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/card"
 import Rating from './Rating';
 import Image from 'next/image';
-import TaskCard from '@/app/(Dashboard)/components/TaskCard';
+import TaskCard from '@/app/(Role)/(Dashboard)/components/TaskCard';
 
 function ReviewCard({ item }) {
   return (

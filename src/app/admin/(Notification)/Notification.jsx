@@ -31,6 +31,8 @@ export default function Notification() {
     });
   }, [allNotifications, sortOrder]);
 
+  console.log('allNotifications',allNotifications)
+
   return (
     <div className="space-y-3">
       {/* Sorting dropdown */}

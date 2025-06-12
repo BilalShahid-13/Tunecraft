@@ -1,5 +1,3 @@
-// app/api/admin/crafters-submission-review/route.js
-
 import { dbConnect } from "@/lib/dbConnect";
 import Order from "@/Schema/Order";
 import Plan from "@/Schema/Plan";
@@ -10,7 +8,7 @@ export async function GET() {
   try {
     await dbConnect();
 
-    // Find any orders where any crafter has submissionStatus "submitted" or "approved"
+    // Find orders where any crafter has a submissionStatus of "submitted" or "approved"
     const orders = await Order.find({
       $or: [
         {
@@ -33,11 +31,11 @@ export async function GET() {
       "crafters.lyricist.assignedCrafterId",
       "crafters.singer.assignedCrafterId",
       "crafters.engineer.assignedCrafterId",
-      { path: "plan" },
+      { path: "plan", model: Plan },
     ]);
 
     // For each order, gather all crafters whose status is "submitted" or "approved"
-    const formattedOrders = orders.map((orderDoc) => {
+    const formattedOrders = orders.flatMap((orderDoc) => {
       const order = orderDoc.toObject();
       const roles = ["lyricist", "singer", "engineer"];
       const matchedCrafters = [];
@@ -47,37 +45,40 @@ export async function GET() {
         if (
           crafterSub &&
           ["submitted", "approved"].includes(crafterSub.submissionStatus)
-        )
-        {
+        ) {
           matchedCrafters.push({
             role,
-            assignedCrafterId: crafterSub.assignedCrafterId, // populated User document
+            crafterFeedback: crafterSub.crafterFeedback,
+            _id: order._id,
+            orderId: order.orderId,
+            name: order.name,
+            phone: order.phone,
+            email: order.email,
+            songGenre: order.songGenre,
+            jokes: order.jokes,
+            revisionAttempts: crafterSub.revisionAttempts,
+            penaltyCount: crafterSub.penaltyCount,
+            extension: crafterSub.extension,
+            backgroundStory: order.backgroundStory,
+            plan: order.plan, // populated Plan document
+            payment: order.payment, // populated Payment document
+            musicTemplate: order.musicTemplate,
+            currentStage: order.currentStage,
+            orderStatus: order.orderStatus,
+            finalSongUrl: order.finalSongUrl, // populated Final Song URL
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+            assignedCrafterId: crafterSub.assignedCrafterId, // Populated User document
             submissionStatus: crafterSub.submissionStatus,
             submittedFile: crafterSub.submittedFile,
             submittedAtTime: crafterSub.submittedAtTime,
-            // Add any other fields from crafters[role] if needed
+            crafterUsername: crafterSub.assignedCrafterId?.username,
+            crafterEmail: crafterSub.assignedCrafterId?.email,
           });
         }
       });
 
-      return {
-        _id: order._id,
-        orderId: order.orderId,
-        name: order.name,
-        phone: order.phone,
-        email: order.email,
-        songGenre: order.songGenre,
-        jokes: order.jokes,
-        backgroundStory: order.backgroundStory,
-        plan: order.plan, // populated Plan document
-        musicTemplate: order.musicTemplate,
-        currentStage: order.currentStage,
-        orderStatus: order.orderStatus,
-        finalSongUrl: order.finalSongUrl,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt,
-        matchedCrafters, // array of all crafters with status "submitted" or "approved"
-      };
+      return matchedCrafters; // Return array of crafters for flattening
     });
 
     return NextResponse.json(
@@ -90,7 +91,9 @@ export async function GET() {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      {
+        error: error.message || "Internal server error",
+      },
       { status: 500 }
     );
   }

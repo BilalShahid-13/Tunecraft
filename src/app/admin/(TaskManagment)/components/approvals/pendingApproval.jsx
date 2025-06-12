@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useState } from 'react'
-import UserCard from './UserCard'
+import React, { useEffect, useState } from 'react';
 import useAllUsers from '@/store/allUsers'
+import AdminTaskCard from '../AdminTaskCard';
 
-export default function PendingApproval() {
+export default function pendingApproval() {
   const { pendingUser } = useAllUsers()
   const [pendingUsers, setpendingUsers] = useState([])
 
@@ -12,10 +12,9 @@ export default function PendingApproval() {
       setpendingUsers(pendingUser)
     }
   }, [pendingUser])
-
   return (
     <>
-      <UserCard users={pendingUsers} userStatus='pending'/>
+      <AdminTaskCard />
     </>
   )
 }

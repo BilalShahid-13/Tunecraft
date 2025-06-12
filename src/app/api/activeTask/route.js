@@ -20,7 +20,7 @@ export async function POST(req) {
 
     const tasks = await Order.find({
       [assignedCrafterIdField]: userId,
-      [submissionStatusField]: "assigned",
+      [submissionStatusField]: { $in: ["assigned", "rejected"] },
       [rejectedCraftersField]: { $nin: [userId] }, // UserId NOT in rejectedCrafters
       currentStage: role,
     }).populate("plan");
